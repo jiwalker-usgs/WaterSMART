@@ -1,0 +1,5 @@
+
+<script type="text/javascript" src="pages/index/MainMenu/mainMenu.js"></script>
+<script type="text/javascript" src="pages/index/MainMenu/markersButton.js"></script>
+<script type="text/javascript" src="pages/index/MainMenu/constituentButton.js"></script>
+<script type="text/javascript" src="pages/index/MainMenu/loadingToolbarItem.js"></script>
