@@ -3,6 +3,7 @@ if (Ext.isIE) { // http://www.mail-archive.com/users@openlayers.org/msg01838.htm
 }
 
 var CONTROLLER;
+var VIEWPORT;
 
 Ext.onReady(function() {
     initializeLogging();
@@ -58,7 +59,7 @@ Ext.onReady(function() {
         contentEl: 'usgs-footer-panel'
     });
 	
-    new Ext.Viewport({
+    VIEWPORT = new Ext.Viewport({
         renderTo : document.body,
         layout : 'border',
         items : [

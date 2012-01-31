@@ -1,21 +1,36 @@
 Ext.ns("WaterSMART");
 
 WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
-    parsedXslt : undefined,
+    htmlTransform : undefined,
+    xmlTransform : undefined,
     constructor : function(config) {
         if (!config) config = {};
         
         Ext.Ajax.request({
           url: 'xsl/csw-metadata.xsl',
           success: function(response) {
-              var xslt = response.responseText;
-              this.parsedXslt = xmlParse(xslt);
+              var xslt = response.responseXML;
+              this.htmlTransform = new XSLTProcessor();
+              this.htmlTransform.importStylesheet(xslt);
           },
           failure: function() {
               // fail
           },
           scope: this
         });
+        Ext.Ajax.request({
+          url: 'xsl/prettyxml.xsl',
+          success: function(response) {
+              var xslt = response.responseXML;
+              this.xmlTransform = new XSLTProcessor();
+              this.xmlTransform.importStylesheet(xslt);
+          },
+          failure: function() {
+              // fail
+          },
+          scope: this
+        });
+        
         config = Ext.apply({
             title: 'Simple Form',
             id: 'test_form',
@@ -118,16 +133,52 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                             url: form.url,
                             success: function(x, action) {
                                 var form = Ext.getCmp('test_form');
-                                var xml = xmlParse(action.response.responseText);
-                                document.getElementById("tmp-xslt-div").innerHTML =
-                                    xsltProcess(xml, form.parsedXslt);
+                                var xml = action.response.responseXML;
+                                var htmlDom = form.htmlTransform.transformToDocument(xml);
+                                var xmlDom = form.xmlTransform.transformToDocument(xml);
+                                var serializer = new XMLSerializer();
+                                var htmlOutput = serializer.serializeToString(htmlDom.documentElement);
+                                var xmlOutput = serializer.serializeToString(xmlDom.documentElement);
+                                
+                                var outputDiv = document.getElementById("xslt-output-div");
+                                var htmlDiv = document.createElement("div");
+                                htmlDiv.setAttribute("id", "html-tmp-div");
+                                htmlDiv.setAttribute("class", "x-hidden");
+                                var xmlDiv = document.createElement("div");
+                                xmlDiv.setAttribute("id", "xml-tmp-div");
+                                htmlDiv.setAttribute("class", "x-hidden");
+                                outputDiv.appendChild(htmlDiv);
+                                outputDiv.appendChild(xmlDiv);
+                                
+                                htmlDiv.innerHTML = WaterSMART.replaceURLWithHTMLLinks(htmlOutput);
+                                xmlDiv.innerHTML = xmlOutput;
+                                
                                 new Ext.Window({
                                     items: [
-                                        new Ext.Panel({
-                                            contentEl: 'tmp-xslt-div'
+                                        new Ext.TabPanel({
+                                            activeTab: 0,
+                                            overflow: 'auto',
+                                            autoScroll: true,
+                                            items: [
+                                                new Ext.Panel({
+                                                    title: 'Metadata',
+                                                    autoScroll: true,
+                                                    overflow: 'auto',
+                                                    contentEl: 'html-tmp-div'
+                                                }),
+                                                new Ext.Panel({
+                                                    title: 'XML Output',
+                                                    autoScroll: true,
+                                                    overflow: 'auto',
+                                                    contentEl: 'xml-tmp-div'
+                                                })
+                                            ]
                                         })
                                     ],
-                                    modal: true
+                                    modal: true,
+                                    autoScroll: true,
+                                    width: '70%',
+                                    height: VIEWPORT.getHeight() - 150
                                 }).show();
                                 LOG.debug(action);
                             },
@@ -141,3 +192,8 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
     }
 });
 
+// http://stackoverflow.com/questions/37684/how-to-replace-plain-urls-with-links
+WaterSMART.replaceURLWithHTMLLinks = function(text) {
+    var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+    return text.replace(exp,"<a href='$1' target='_blank'>$1</a>"); 
+}

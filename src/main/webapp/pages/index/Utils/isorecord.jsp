@@ -208,7 +208,7 @@
                                     <gco:CharacterString>${param['orgName']}</gco:CharacterString>
                                 </gmd:organisationName>
                             </c:if>
-                            <c:if test="${param['email'] ne null} or ${param['url'] ne null}">
+                            <c:if test="${(param['email'] ne null) or (param['url'] ne null)}">
                                 <gmd:contactInfo>
                                     <gmd:CI_Contact>
 
@@ -280,7 +280,7 @@
                             <gco:CharacterString>${param['orgName']}</gco:CharacterString>
                         </gmd:organisationName>
                     </c:if>
-                    <c:if test="${param['email'] ne null} or ${param['url'] ne null}">
+                    <c:if test="${(param['email'] ne null) or (param['url'] ne null)}">
                         <gmd:contactInfo>
                             <gmd:CI_Contact>
 
@@ -434,7 +434,7 @@
             <gmd:extent>
 
                 <gmd:EX_Extent id="boundingExtent">
-                    <c:if test="${param['bboxw'] ne null} and ${param['bboxs'] ne null} and ${param['bboxe'] ne null} and ${param['bboxn'] ne null}">
+                    <c:if test="${(param['bboxw'] ne null) and (param['bboxs'] ne null) and (param['bboxe'] ne null) and (param['bboxn'] ne null)}">
                         <gmd:geographicElement>
                             <gmd:EX_GeographicBoundingBox id="boundingGeographicBoundingBox">
                                 <gmd:extentTypeCode>
@@ -455,7 +455,7 @@
                             </gmd:EX_GeographicBoundingBox>
                         </gmd:geographicElement>
                     </c:if>
-                    <c:if test="${param['timeStart'] ne null} and ${param['timeEnd'] ne null}">
+                    <c:if test="${(param['timeStart'] ne null) and (param['timeEnd'] ne null)}">
                         <gmd:temporalElement>
                             <gmd:EX_TemporalExtent id="boundingTemporalExtent">
                                 <gmd:extent>
