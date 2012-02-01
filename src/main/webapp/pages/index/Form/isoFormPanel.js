@@ -35,7 +35,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
             title: 'Simple Form',
             id: 'test_form',
             bodyPadding: 5,
-            width: 350,
+//            width: 350,
             //layout : 'border',
             region: 'center',
             // The form will submit an AJAX request to this URL when submitted

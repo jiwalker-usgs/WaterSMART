@@ -46,6 +46,14 @@
         <url-pattern>/export</url-pattern>
     </servlet-mapping>
     <servlet>
+        <servlet-name>Upload</servlet-name>
+        <servlet-class>gov.usgs.cida.watersmart.util.Upload</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Upload</servlet-name>
+        <url-pattern>/upload</url-pattern>
+    </servlet-mapping>
+    <servlet>
         <servlet-name>GeonetworkProxy</servlet-name>
         <servlet-class>gov.usgs.cida.watersmart.proxy.GeonetworkProxy</servlet-class>
     </servlet>

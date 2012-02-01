@@ -59,12 +59,15 @@
         <jsp:include page="js/log4javascript/log4javascript.jsp"/>
         <jsp:include page="js/ext/ux/notify/notify.jsp"/>
         <jsp:include page="js/ext/ux/cida-load/cida-load.jsp"/>
+        <script type="text/javascript" src="js/ext/ux/FileUploadField.js"></script>
+        <link type="text/css" rel="stylesheet" href="css/fileuploadfield.css" />
         <jsp:include page="js/sarissa/sarissa.jsp"/>
 
 <!--        <script type="text/javascript" src="pages/index/Utils/GeoUtils.js"></script>
         <script type="text/javascript" src="pages/index/Map/map.js"></script>
         <script type="text/javascript" src="pages/index/Controller.js"></script>-->
         <script type="text/javascript" src="pages/index/Form/isoFormPanel.js"></script>
+        <script type="text/javascript" src="pages/index/Form/fileUploadPanel.js"></script>
         <script type="text/javascript" src="pages/index/onReady.js"></script>
         
         

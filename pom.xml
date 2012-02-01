@@ -132,6 +132,11 @@
             <artifactId>joda-time-jsptags</artifactId>
             <version>1.1.1</version>
         </dependency>
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2.2</version>
+        </dependency>
 
         
         <!-- javascript dependencies for overlaying-->

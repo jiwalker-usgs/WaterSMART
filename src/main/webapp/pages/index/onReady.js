@@ -27,7 +27,8 @@ Ext.onReady(function() {
 //		mainMenu : mainMenu
 //    });
 //	
-    var form = new WaterSMART.ISOFormPanel();
+    var metaForm = new WaterSMART.ISOFormPanel();
+    var uploadForm = new WaterSMART.FileUploadPanel();
 
     var body = new Ext.Panel({
         region: 'center',
@@ -35,7 +36,8 @@ Ext.onReady(function() {
         layout : 'border',
         autoShow: true,
         items : [
-            form
+            metaForm,
+            uploadForm
         ]
 //        map
 //        ],
