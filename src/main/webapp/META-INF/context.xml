@@ -1,2 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context antiJARLocking="true" path="/watersmart"/>
+<Context antiJARLocking="true" path="/watersmart">
+    <!-- watersmart environment -->
+    <Environment name="watersmart.frontend.log4js.pattern.layout" type="java.lang.String" value="%rms - %-5p - %m%n" />
+    <Environment name="watersmart.frontend.log4js.threshold" type="java.lang.String" value="debug" />
+    <Environment name="watersmart.development" type="java.lang.String" value="true" />
+    <Environment name="watersmart.backend.file.location" type="java.lang.String" value="/tmp/watersmart" />
+</Context>

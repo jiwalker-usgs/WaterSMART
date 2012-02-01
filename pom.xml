@@ -154,8 +154,8 @@
         </dependency>
         <dependency>
             <groupId>gov.usgs.cida.jslibs</groupId>
-            <artifactId>ajaxslt</artifactId>
-            <version>0.8.1-1-SNAPSHOT</version>
+            <artifactId>sarissa</artifactId>
+            <version>0.9.9.5-1-SNAPSHOT</version>
             <type>war</type>
         </dependency>
         
