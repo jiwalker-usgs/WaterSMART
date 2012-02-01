@@ -20,6 +20,25 @@
         </repository>
     </repositories>
     
+    <scm>
+        <connection>scm:git:http://gitub.com/USGS-CIDA/WaterSMART.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/USGS-CIDA/WaterSMART.git</developerConnection>
+        <url>https://github.com/USGS-CIDA/WaterSMART</url>
+    </scm>
+    
+    <distributionManagement>
+        <repository>
+            <id>cida-releases</id>
+            <name>CIDA Releases</name>
+            <url>${cida.maven.url}/content/repositories/cida-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>cida-snapshots</id>
+            <name>CIDA Snapshots</name>
+            <url>${cida.maven.url}/content/repositories/cida-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+    
     <dependencies>
         <dependency>
             <groupId>gov.usgs.cida.gdp</groupId>
@@ -163,47 +182,15 @@
     </dependencies>
     <build>
         <finalName>watersmart</finalName>
-        <!--plugins>
+        <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.1.1</version>
+                <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <overlays>
-                        <overlay>
-                            <groupId>gov.usgs.cida.jslibs</groupId>
-                            <artifactId>openlayers</artifactId>
-                        </overlay>
-                        <overlay>
-                            <groupId>gov.usgs.cida.jslibs</groupId>
-                            <artifactId>extjs</artifactId>
-                        </overlay>
-                        <overlay>
-                            <groupId>gov.usgs.cida.jslibs</groupId>
-                            <artifactId>cida-load-ux</artifactId>
-                        </overlay>
-                        <overlay>
-                            <groupId>gov.usgs.cida.jslibs</groupId>
-                            <artifactId>notify-ux</artifactId>
-                        </overlay>
-                        <overlay>
-                            <groupId>gov.usgs.cida.jslibs</groupId>
-                            <artifactId>geoext</artifactId>
-                        </overlay>
-                        <overlay>
-                            <groupId>gov.usgs.cida.jslibs</groupId>
-                            <artifactId>log4js</artifactId>
-                        </overlay>
-                        <overlay>
-                            <groupId>gov.usgs.cida.jslibs</groupId>
-                            <artifactId>ajaxslt</artifactId>
-                        </overlay>
-                        <overlay></overlay>
-                    </overlays>
-                    <dependentWarExcludes>META-INF/*,WEB-INF/web.xml,index.*</dependentWarExcludes>
-                    
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
-        </plugins-->
+        </plugins>
     </build>
 </project>
