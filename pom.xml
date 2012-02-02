@@ -5,7 +5,7 @@
     <artifactId>watersmart-ui</artifactId>
     <packaging>war</packaging>
     <name>WaterSMART</name>
-    <version>001-SNAPSHOT</version>
+    <version>002-SNAPSHOT</version>
     
     <properties>
         <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
@@ -14,9 +14,9 @@
     
     <repositories>
         <repository>
-            <id>cida-gdp-development</id>
-            <name>CIDA GDP Development</name>
-            <url>${cida.maven.url}/content/groups/cida-gdp-development</url>
+            <id>nexus</id>
+            <name>CIDA Nexus</name>
+            <url>${cida.maven.url}/content/groups/public/</url>
         </repository>
     </repositories>
     
@@ -125,6 +125,11 @@
             <artifactId>commons-fileupload</artifactId>
             <version>1.2.2</version>
         </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
 
         
         <!-- javascript dependencies for overlaying-->
@@ -176,8 +181,6 @@
             <version>0.9.9.5-1</version>
             <type>war</type>
         </dependency>
-        
-            
     </dependencies>
     <build>
         <finalName>watersmart</finalName>
