@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -71,9 +73,6 @@ public class SYEParserTest {
         try {
             ncFile = new File("/tmp/test.nc");
             RecordType rt = syeParser.parseMetadata();
-            rt.addType(new Variable("obs", NCUtil.XType.NC_FLOAT, new TreeMap()));
-            // can change to INT?
-            rt.addType(new Variable("est", NCUtil.XType.NC_FLOAT, new TreeMap()));
             Station sampleStation = new Station(42.4f, -89.22f, "sample_station");
             nc = new StationTimeSeriesNetCDFFile(ncFile, rt, true, sampleStation);
             while (syeParser.hasNext()) {
@@ -88,7 +87,7 @@ public class SYEParserTest {
         }
         finally {
             IOUtils.closeQuietly(nc);
-            assertThat(FileUtils.sizeOf(ncFile), is(equalTo(307571L)));
+            assertThat(FileUtils.sizeOf(ncFile), is(equalTo(307575L)));
             FileUtils.deleteQuietly(ncFile);
         }
     }

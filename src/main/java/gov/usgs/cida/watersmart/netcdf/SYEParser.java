@@ -2,19 +2,23 @@ package gov.usgs.cida.watersmart.netcdf;
 
 import gov.usgs.cida.netcdf.dsg.Observation;
 import gov.usgs.cida.netcdf.dsg.RecordType;
+import gov.usgs.cida.netcdf.dsg.Variable;
+import gov.usgs.cida.netcdf.jna.NCUtil;
 import java.io.*;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.joda.time.Days;
 import org.joda.time.Instant;
-import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormatterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Parses an individual file of the SYE R type (stations) need to be the filenames
+ * 
  * @author Jordan Walker <jiwalker@usgs.gov>
  */
 public class SYEParser extends DSGParser {
@@ -26,7 +30,9 @@ public class SYEParser extends DSGParser {
      * may want other patterns for pieces of metadata (ex. stationId)
      * and for some formats, there could be a data separator (when not broken up into separate files)
      */
-    public static final Pattern headerPattern = Pattern.compile("^\"date\" \"estq\" \"obsq\"$");
+    public static final Pattern headerLinePattern = Pattern.compile("^\"date\"(?: \"\\w+\")+$");
+    public static final Pattern stationIdPattern = Pattern.compile("(\\w+)\\.txt");
+    
     public static final Pattern dataPattern = Pattern.compile("^\"\\d+\" \"(\\d+/\\d+/\\d{4})\" ([^ ]+) ([^ ]+)$");
     public static final DateTimeFormatter inputDateFormatter = new DateTimeFormatterBuilder()
             .appendMonthOfYear(1)
@@ -36,42 +42,55 @@ public class SYEParser extends DSGParser {
             .appendYear(4, 4)
             .toFormatter()
             .withZoneUTC();
-    private static final int readAheadLimit = 4096;
     
     // base date is also used as a metadataComplete flag
     private Instant baseDate;
-    private File inputFile;
-    private BufferedReader reader;
+    private String filename;
     private int stationIndex;
     private RecordType recordType;
     
-    public SYEParser(File infile) {
-        this.inputFile = infile;
+    public SYEParser(File infile) throws FileNotFoundException {
+        super(infile);
+        this.filename = infile.getName();
         this.stationIndex = -1;
-        try {
-            reader = new BufferedReader(new FileReader(this.inputFile));
+        // Defining variable pattern here, watch out for this
+        this.headerVariablePattern = Pattern.compile("(?:\\s?\"date|(\\w+)\")");
+    }
+    
+    /**
+     * StationId's will be included in the filename
+     * change the pattern or this function to reflect the actual format
+     * Used by parseMetadata to perform a lookup
+     * @param filename Name of the file being parsed
+     * @return station name for this data
+     */
+    private String getStationId(String filename) {
+        Matcher matcher = stationIdPattern.matcher(filename);
+        if (matcher.matches()) {
+            return matcher.group(1);
         }
-        catch (FileNotFoundException fnfe) {
-            LOG.error("Input file not found", fnfe);
-        }
+        return null;
     }
     
     @Override
     public RecordType parseMetadata() {
         this.baseDate = null; // get baseDate somehow (may be static)
         // define what we need for metadata
+        
+        // this.stationIndex = somewhere.stationLookup(getStationId(this.filename));
         this.stationIndex = 0; // TODO do some sort of lookup here
 
         try {
-            reader.mark(readAheadLimit);
+            reader.mark(READ_AHEAD_LIMIT);
             String line = null;
             boolean headerRead = false;
+            String[] columns = null;
             while (null != (line = reader.readLine())) {
-                Matcher matcher = headerPattern.matcher(line);
+                Matcher matcher = headerLinePattern.matcher(line);
                 if (matcher.matches()) {
-                    // could pull column names here?
+                    columns = headerVariables(line);
                     // recordType add var ...
-                    reader.mark(readAheadLimit);
+                    reader.mark(READ_AHEAD_LIMIT);
                     headerRead = true;
                 }
                 else if (headerRead) {
@@ -80,7 +99,16 @@ public class SYEParser extends DSGParser {
                         String date = matcher.group(1);
                         Instant timestep = Instant.parse(date, inputDateFormatter);
                         this.baseDate = timestep;
+                        
                         recordType = new RecordType("days since " + baseDate.toString());
+                        for (String varname : columns) {
+                            // populate map with necessary attrs
+                            Map<String,Object> attrs = new TreeMap<String,Object>();
+                            // assuming float for all var for now
+                            Variable var = new Variable(varname, NCUtil.XType.NC_FLOAT, attrs);
+                            recordType.addType(var);
+                        }
+                            
                         reader.reset();
                         return recordType;
                     }
@@ -132,20 +160,6 @@ public class SYEParser extends DSGParser {
         }
         finally {
             return observation;
-        }
-    }
-
-    @Override
-    public boolean hasNext() {
-        try {
-            reader.mark(readAheadLimit);
-            String line = reader.readLine();
-            reader.reset();
-            return (line != null);
-        }
-        catch (IOException ex) {
-            LOG.debug("Failure reading file", ex);
-            return false;
         }
     }
 }
