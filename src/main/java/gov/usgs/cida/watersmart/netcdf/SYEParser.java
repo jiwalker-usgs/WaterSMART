@@ -5,6 +5,8 @@ import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Variable;
 import gov.usgs.cida.netcdf.jna.NCUtil;
 import java.io.*;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -33,7 +35,10 @@ public class SYEParser extends DSGParser {
     public static final Pattern headerLinePattern = Pattern.compile("^\"date\"(?: \"\\w+\")+$");
     public static final Pattern stationIdPattern = Pattern.compile("(\\w+)\\.txt");
     
-    public static final Pattern dataPattern = Pattern.compile("^\"\\d+\" \"(\\d+/\\d+/\\d{4})\" ([^ ]+) ([^ ]+)$");
+    // Line looks like '"x" "mm/dd/yyyy" val1 val2 ...'
+    public static final Pattern dataLinePattern = Pattern.compile("^\"\\d+\" \"(\\d+/\\d+/\\d{4})\"((?: [^ ]+)+)$");
+    // Could have split on spaces but using this regex instead
+    public static final Pattern dataValuePattern = Pattern.compile("( [^ ]+)");
     public static final DateTimeFormatter inputDateFormatter = new DateTimeFormatterBuilder()
             .appendMonthOfYear(1)
             .appendLiteral('/')
@@ -94,7 +99,7 @@ public class SYEParser extends DSGParser {
                     headerRead = true;
                 }
                 else if (headerRead) {
-                    matcher = dataPattern.matcher(line);
+                    matcher = dataLinePattern.matcher(line);
                     if (matcher.matches()) {
                         String date = matcher.group(1);
                         Instant timestep = Instant.parse(date, inputDateFormatter);
@@ -138,19 +143,24 @@ public class SYEParser extends DSGParser {
             if (baseDate != null && stationIndex >= 0) {
                 String line = reader.readLine();
                 if (null != line) {
-                    Matcher matcher = dataPattern.matcher(line);
-                    if (matcher.matches()) {
-                        String date = matcher.group(1);
+                    Matcher lineMatcher = dataLinePattern.matcher(line);
+                    if (lineMatcher.matches()) {
+                        String date = lineMatcher.group(1);
                         Instant timestep = Instant.parse(date, inputDateFormatter);
                         if (baseDate == null) {
                             baseDate = timestep;
                         }
                         // may want to support other units (hours, months, years, etc)
                         int days = Days.daysBetween(baseDate, timestep).getDays();
-                        float estValue = Float.parseFloat(matcher.group(2));
-                        // can change to int?
-                        float obsValue = Float.parseFloat(matcher.group(3));
-                        observation = new Observation(days, stationIndex, estValue, obsValue);
+                        
+                        String values = lineMatcher.group(2);
+                        Matcher valueMatcher = dataValuePattern.matcher(values);
+                        List<Float> floatVals = new LinkedList<Float>();
+                        while (valueMatcher.find()) {
+                            float value = Float.parseFloat(valueMatcher.group(1));
+                            floatVals.add(value);
+                        }
+                        observation = new Observation(days, stationIndex, floatVals.toArray());
                     }
                 }
             }

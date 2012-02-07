@@ -87,7 +87,7 @@ public class SYEParserTest {
         }
         finally {
             IOUtils.closeQuietly(nc);
-            assertThat(FileUtils.sizeOf(ncFile), is(equalTo(307575L)));
+            assertThat(FileUtils.sizeOf(ncFile), is(equalTo(13079L)));
             FileUtils.deleteQuietly(ncFile);
         }
     }
