@@ -5,8 +5,13 @@ import gov.usgs.cida.netcdf.dsg.RecordType;
 import java.io.*;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.joda.time.Days;
+import org.joda.time.Instant;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeFormatterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,11 +24,29 @@ public abstract class DSGParser implements Iterator<Observation> {
     private static Logger LOG = LoggerFactory.getLogger(DSGParser.class);
     public static final int READ_AHEAD_LIMIT = 4096;
     
-    protected Pattern headerVariablePattern;
+
+    protected abstract Pattern getDataLinePattern();
+    protected abstract Pattern getDataValuePattern();
+    
+    /**
+     * this should match the last line before the data starts
+     * may want other patterns for pieces of metadata (ex. stationId)
+     * and for some formats, there could be a data separator (when not broken up into separate files)
+     * @return Pattern describing the header line that precedes the data
+     */
+    protected abstract Pattern getHeaderLinePattern();
+    protected abstract Pattern getHeaderVariablePattern();
+    
+    protected abstract DateTimeFormatter getInputDateFormatter();
+    
     protected BufferedReader reader;
+    protected Instant baseDate;
+    protected int stationIndex;
     
     public DSGParser(File infile) throws FileNotFoundException {
-        reader = new BufferedReader(new FileReader(infile));
+        this.reader = new BufferedReader(new FileReader(infile));
+        this.baseDate = new Instant(0L);
+        this.stationIndex = -1;
     }
     
     @Override
@@ -40,8 +63,48 @@ public abstract class DSGParser implements Iterator<Observation> {
         }
     }
 
+    /**
+     * Reading of metadata needs to happen before this will work
+     * This should always be preceded by a hasNext()
+     * 
+     * @return next Observation from the file, will be null if hasNext() was not
+     *  called and end of file was reached or metadata hasn't been parsed yet
+     */
     @Override
-    public abstract Observation next();
+    public Observation next() {
+        // go through the file and make a list of Observation elements
+        // Observation requires station index, so be wary of that
+        Observation observation = null;
+        try {
+            if (stationIndex >= 0) {
+                String line = reader.readLine();
+                if (null != line) {
+                    Matcher lineMatcher = getDataLinePattern().matcher(line);
+                    if (lineMatcher.matches()) {
+                        String date = lineMatcher.group(1);
+                        Instant timestep = Instant.parse(date, getInputDateFormatter());
+                        // may want to support other units (hours, months, years, etc)
+                        int days = Days.daysBetween(this.baseDate, timestep).getDays();
+                        
+                        String values = lineMatcher.group(2);
+                        Matcher valueMatcher = getDataValuePattern().matcher(values);
+                        List<Float> floatVals = new LinkedList<Float>();
+                        while (valueMatcher.find()) {
+                            float value = Float.parseFloat(valueMatcher.group(1));
+                            floatVals.add(value);
+                        }
+                        observation = new Observation(days, stationIndex, floatVals.toArray());
+                    }
+                }
+            }
+        }
+        catch (IOException ioe) {
+            LOG.debug("Error reading file", ioe);
+        }
+        finally {
+            return observation;
+        }
+    }
 
     @Override
     public void remove() {
@@ -49,28 +112,14 @@ public abstract class DSGParser implements Iterator<Observation> {
     }
     
     public abstract RecordType parseMetadata();
-    
+
     /**
-     * Pass in a pattern that captures the variable names and gives null for
-     * non-variable column headers
-     * @param pattern Pattern which matches the headerLine and captures variables
-     * @param headerLine Line to parse which has been identified as a header
-     * @return String array of variable names
+     * StationId's are extracted on a per file basis
+     * change the pattern or this function to reflect the actual format
+     * Used by parseMetadata to perform a lookup
+     * @param parseText Text to parse for stationId
+     * @return station name for this data
      */
-    protected String[] headerVariables(String headerLine) {
-        if (headerVariablePattern == null) {
-            LOG.debug("Implementing class must define headerVariablePattern to use this function");
-            throw new IllegalStateException();
-        }
-        LinkedList<String> list = new LinkedList<String>();
-        Matcher matcher = headerVariablePattern.matcher(headerLine);
-        while (matcher.find()) {
-            String match = matcher.group(1);
-            if (null != match) {
-                list.add(match);
-            }
-        }
-        String[] returnArr = new String[list.size()];
-        return list.toArray(returnArr);
-    }
+    protected abstract String getStationId(String parseText);
+    
 }
