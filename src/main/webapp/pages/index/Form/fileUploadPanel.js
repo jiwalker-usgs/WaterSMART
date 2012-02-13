@@ -27,7 +27,7 @@ WaterSMART.FileUploadPanel = Ext.extend(Ext.form.FormPanel, {
             buttons: [{
                 text: 'Upload',
                 handler: function() {
-                    var fp = Ext.getCmp('uploadPanel');
+                    var fp = this.ownerCt.ownerCt; //Ext.getCmp('uploadPanel');
                     if(fp.getForm().isValid()) {
                         fp.getForm().submit({
                             url: 'upload',
