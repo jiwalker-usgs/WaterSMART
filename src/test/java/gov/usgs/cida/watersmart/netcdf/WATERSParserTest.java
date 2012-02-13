@@ -80,7 +80,7 @@ public class WATERSParserTest {
         finally {
             IOUtils.closeQuietly(nc);
             assertThat(FileUtils.sizeOf(ncFile), is(equalTo(16769L)));
-            //FileUtils.deleteQuietly(ncFile);
+            FileUtils.deleteQuietly(ncFile);
         }
     }
 
