@@ -11,6 +11,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.NotImplementedException;
 
 /**
@@ -56,8 +57,9 @@ public class CreateDSGFromZip {
                 // first file sets the rhythm
                 if (nc == null) {
                     Station[] stupidArray = new Station[stations.size()];
+                    stations.toArray(stupidArray);
                     nc = new StationTimeSeriesNetCDFFile(ncFile, meta, true, 
-                            stations.toArray(stupidArray));
+                            stupidArray);
                 }
                 while (dsgParse.hasNext()) {
                     Observation ob = dsgParse.next();
@@ -70,5 +72,6 @@ public class CreateDSGFromZip {
                 }
             }
         }
+        IOUtils.closeQuietly(nc);
     }
 }

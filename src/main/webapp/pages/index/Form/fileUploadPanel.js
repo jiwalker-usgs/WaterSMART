@@ -12,10 +12,21 @@ WaterSMART.FileUploadPanel = Ext.extend(Ext.form.FormPanel, {
             width: '50%',
             region: 'east',
             items: [{
-                xtype: 'textfield',
-                fieldLabel: 'Filename',
-                name: 'filename',
-                allowBlank: 'false'
+                xtype: 'combo',
+                fieldLabel: 'Model',
+                name: 'modeltype',
+                mode: 'local',
+                editable: false,
+                store: new Ext.data.ArrayStore({
+                    fields: [
+                        'displayText',
+                        'value'
+                    ],
+                    data: [['SYE R', 'SYE'], ['WATERS', 'WATERS']]
+                }),
+                displayField: 'displayText',
+                valueField: 'value',
+                hiddenName: 'modeltype'
             },{
                 xtype: 'fileuploadfield',
                 id: 'form-file',

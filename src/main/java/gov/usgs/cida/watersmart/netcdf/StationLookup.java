@@ -40,10 +40,9 @@ public class StationLookup {
 
         try {
             String wfsUrl = props.getProperty("watersmart.stations.url", "http://igsarm-cida-javadev1.er.usgs.gov:8081/geoserver/watersmart/ows");
-            String typeName = props.getProperty("watersmart.stations.url", "watersmart:se_sites");
+            String typeName = props.getProperty("watersmart.stations.typeName", "watersmart:se_sites");
             String url = wfsUrl + "?service=WFS&version=1.1.0&request=GetFeature&typeName=" + typeName + "&outputFormat=text/xml; subtype=gml/3.2";
             String primaryAtt = props.getProperty("watersmart.stations.primaryAttribute", "site_no");
-            String geom = props.getProperty("watersmart.stations.geom", "the_geom");
             
 //            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 //            dbf.setNamespaceAware(true);
@@ -115,7 +114,7 @@ public class StationLookup {
     public static int lookup(String station) {
         try {
             String wfsUrl = props.getProperty("watersmart.stations.url", "http://igsarm-cida-javadev1.er.usgs.gov:8081/geoserver/watersmart/ows");
-            String typeName = props.getProperty("watersmart.stations.url", "watersmart:se_sites");
+            String typeName = props.getProperty("watersmart.stations.typeName", "watersmart:se_sites");
             String primaryAtt = props.getProperty("watersmart.stations.primaryAttribute", "site_no");
             String url = wfsUrl + "?service=WFS&version=1.1.0&request=GetFeature&typeName=" + 
                          typeName + "&outputFormat=text/xml; subtype=gml/3.2&CQL_FILTER=" +

@@ -102,7 +102,6 @@ public class SYEParser extends DSGParser {
         // define what we need for metadata
         
         this.stationIndex = StationLookup.lookup(getStationId(this.filename));
-        this.stationIndex = 0; // TODO do some sort of lookup here
 
         try {
             reader.mark(READ_AHEAD_LIMIT);
