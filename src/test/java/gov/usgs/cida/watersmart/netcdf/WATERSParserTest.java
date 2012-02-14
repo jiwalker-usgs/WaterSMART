@@ -64,7 +64,7 @@ public class WATERSParserTest {
         try {
             ncFile = new File("/tmp/test.nc");
             RecordType rt = watersParser.parseMetadata();
-            Station sampleStation = new Station(42.4f, -89.22f, "sample_station");
+            Station sampleStation = new Station(34.8139814f, -83.305993f, "02177000");
             nc = new StationTimeSeriesNetCDFFile(ncFile, rt, true, sampleStation);
             while (watersParser.hasNext()) {
                 Observation ob = watersParser.next();

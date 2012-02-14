@@ -9,4 +9,5 @@
     <Environment name="watersmart.stations.url" type="java.lang.String" value="http://igsarm-cida-javadev1.er.usgs.gov:8081/geoserver/watersmart/ows" />
     <Environment name="watersmart.stations.typeName" type="java.lang.String" value="watersmart:se_sites" />
     <Environment name="watersmart.stations.primaryAttribute" type="java.lang.String" value="site_no" />
+    <Environment name="watersmart.sos.location" type="java.lang.String" value="/mnt/gdp/data/thredds/watersmart/sos" />
 </Context>

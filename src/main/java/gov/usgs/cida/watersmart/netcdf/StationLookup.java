@@ -116,6 +116,7 @@ public class StationLookup {
             String wfsUrl = props.getProperty("watersmart.stations.url", "http://igsarm-cida-javadev1.er.usgs.gov:8081/geoserver/watersmart/ows");
             String typeName = props.getProperty("watersmart.stations.typeName", "watersmart:se_sites");
             String primaryAtt = props.getProperty("watersmart.stations.primaryAttribute", "site_no");
+            // ugly!
             String url = wfsUrl + "?service=WFS&version=1.1.0&request=GetFeature&typeName=" + 
                          typeName + "&outputFormat=text/xml; subtype=gml/3.2&CQL_FILTER=" +
                          primaryAtt + "%20like%20'%25" + station + "'";

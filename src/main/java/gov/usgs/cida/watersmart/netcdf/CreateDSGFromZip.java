@@ -4,6 +4,7 @@ import gov.usgs.cida.netcdf.dsg.Observation;
 import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Station;
 import gov.usgs.cida.netcdf.dsg.StationTimeSeriesNetCDFFile;
+import gov.usgs.cida.watersmart.config.DynamicReadOnlyProperties;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +21,7 @@ import org.apache.commons.lang.NotImplementedException;
  */
 public class CreateDSGFromZip {
     
-    public static final File ncFile = new File("/tmp/watersmart/output/test.nc");
+    private static final DynamicReadOnlyProperties props = DynamicReadOnlyProperties.initProps();
     
     public enum ModelType {
         SYE,
@@ -30,6 +31,10 @@ public class CreateDSGFromZip {
     }
     
     public static void create(File srcZip, ModelType type) throws IOException {
+        String sosPath = props.getProperty("watersmart.sos.location", System.getProperty("java.io.tmpdir"));
+        String filename = srcZip.getName().replace(".zip", ".nc");
+        
+        File ncFile = new File(sosPath + File.separator + filename);
         ZipFile zip = new ZipFile(srcZip);
         Enumeration<? extends ZipEntry> entries = zip.entries();
         StationTimeSeriesNetCDFFile nc = null;

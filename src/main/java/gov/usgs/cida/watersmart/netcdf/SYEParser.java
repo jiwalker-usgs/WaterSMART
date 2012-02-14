@@ -102,6 +102,11 @@ public class SYEParser extends DSGParser {
         // define what we need for metadata
         
         this.stationIndex = StationLookup.lookup(getStationId(this.filename));
+        if (this.stationIndex == -1) {
+            throw new RuntimeException("Station not found during lookup. "
+                    + "If this is a valid station ID, the geoserver"
+                    + " instance could be down.");
+        }
 
         try {
             reader.mark(READ_AHEAD_LIMIT);
