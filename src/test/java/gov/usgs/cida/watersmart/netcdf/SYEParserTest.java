@@ -4,14 +4,10 @@ import gov.usgs.cida.netcdf.dsg.Observation;
 import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Station;
 import gov.usgs.cida.netcdf.dsg.StationTimeSeriesNetCDFFile;
-import gov.usgs.cida.netcdf.dsg.Variable;
-import gov.usgs.cida.netcdf.jna.NCUtil;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -32,7 +28,7 @@ public class SYEParserTest {
     public static final File sampleFile;
     
     static {
-        String sample = "gov/usgs/cida/watersmart/netcdf/Archfield_sampleoutput_20Jan2012.txt";
+        String sample = "gov/usgs/cida/watersmart/netcdf/02177000.txt";
         URL tmp = SYEParserTest.class.getClassLoader().getResource(sample);
         sampleFile = new File(tmp.getFile());
     }
@@ -56,18 +52,17 @@ public class SYEParserTest {
     
     @Test
     public void testParseObservations() throws IOException {
-        SYEParser syeParser = new SYEParser(sampleFile);
+        SYEParser syeParser = new SYEParser(new FileInputStream(sampleFile), sampleFile.getName());
         syeParser.parseMetadata();
         if (syeParser.hasNext()) {
             Observation ob = syeParser.next();
             assertThat(((Float)ob.values[0]).floatValue(), is(equalTo(70.66f)));
         }
-
     }
     
     @Test
     public void testNetCDFOutput() throws IOException {
-        SYEParser syeParser = new SYEParser(sampleFile);
+        SYEParser syeParser = new SYEParser(new FileInputStream(sampleFile), sampleFile.getName());
         StationTimeSeriesNetCDFFile nc = null;
         File ncFile = null;
         try {

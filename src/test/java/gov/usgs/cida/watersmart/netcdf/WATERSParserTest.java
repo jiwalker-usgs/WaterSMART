@@ -6,15 +6,14 @@ import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Station;
 import gov.usgs.cida.netcdf.dsg.StationTimeSeriesNetCDFFile;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
-import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import org.joda.time.format.DateTimeFormatter;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
@@ -39,7 +38,7 @@ public class WATERSParserTest {
     @Test
     public void testGetStationId() throws FileNotFoundException {
         String possibleStationLine = "StationID:\t12345";
-        WATERSParser instance = new WATERSParser(sampleFile);
+        WATERSParser instance = new WATERSParser(new FileInputStream(sampleFile));
         String expResult = "12345";
         String result = instance.getStationId(possibleStationLine);
         assertThat(result, is(equalTo(expResult)));
@@ -51,7 +50,7 @@ public class WATERSParserTest {
     @Test
     public void testParseMetadata() throws FileNotFoundException {
         System.out.println("parseMetadata");
-        WATERSParser instance = new WATERSParser(sampleFile);
+        WATERSParser instance = new WATERSParser(new FileInputStream(sampleFile));
         RecordType result = instance.parseMetadata();
         // Should have written RecordType to be more testable
         assertThat(result, notNullValue());
@@ -59,7 +58,7 @@ public class WATERSParserTest {
 
     @Test
     public void testNetcdfOutput() throws FileNotFoundException {
-        WATERSParser watersParser = new WATERSParser(sampleFile);
+        WATERSParser watersParser = new WATERSParser(new FileInputStream(sampleFile));
         StationTimeSeriesNetCDFFile nc = null;
         File ncFile = null;
         try {

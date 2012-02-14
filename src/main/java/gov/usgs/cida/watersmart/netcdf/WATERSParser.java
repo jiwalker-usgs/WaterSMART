@@ -1,12 +1,11 @@
 package gov.usgs.cida.watersmart.netcdf;
 
-import gov.usgs.cida.netcdf.dsg.Observation;
 import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Variable;
 import gov.usgs.cida.netcdf.jna.NCUtil;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -49,8 +48,8 @@ public class WATERSParser extends DSGParser {
             .toFormatter()
             .withZoneUTC();
     
-    public WATERSParser(File infile) throws FileNotFoundException {
-        super(infile);
+    public WATERSParser(InputStream input) throws FileNotFoundException {
+        super(input);
     }
     
     /**

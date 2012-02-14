@@ -43,8 +43,8 @@ public abstract class DSGParser implements Iterator<Observation> {
     protected Instant baseDate;
     protected int stationIndex;
     
-    public DSGParser(File infile) throws FileNotFoundException {
-        this.reader = new BufferedReader(new FileReader(infile));
+    public DSGParser(InputStream input) throws FileNotFoundException {
+        this.reader = new BufferedReader(new InputStreamReader(input));
         this.baseDate = new Instant(0L);
         this.stationIndex = -1;
     }
@@ -96,6 +96,9 @@ public abstract class DSGParser implements Iterator<Observation> {
                         observation = new Observation(days, stationIndex, floatVals.toArray());
                     }
                 }
+            }
+            else {
+                throw new IllegalStateException("Must obtain stationId before getting observations");
             }
         }
         catch (IOException ioe) {

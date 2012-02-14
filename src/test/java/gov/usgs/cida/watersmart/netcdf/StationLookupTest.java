@@ -1,6 +1,7 @@
 
 package gov.usgs.cida.watersmart.netcdf;
 
+import gov.usgs.cida.netcdf.dsg.Station;
 import java.util.List;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -19,7 +20,7 @@ public class StationLookupTest {
     @Test
     public void testGetStationList() {
         System.out.println("getStationList:");
-        List<String> stations = StationLookup.getStationList();
+        List<Station> stations = StationLookup.getStationList();
         assertThat(stations.size(), is(equalTo(509)));
     }
     

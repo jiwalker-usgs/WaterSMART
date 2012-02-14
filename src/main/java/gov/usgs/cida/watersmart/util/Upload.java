@@ -2,6 +2,8 @@ package gov.usgs.cida.watersmart.util;
 
 
 import gov.usgs.cida.watersmart.config.DynamicReadOnlyProperties;
+import gov.usgs.cida.watersmart.netcdf.CreateDSGFromZip;
+import gov.usgs.cida.watersmart.netcdf.CreateDSGFromZip.ModelType;
 import java.io.*;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -60,16 +62,17 @@ public class Upload extends HttpServlet {
             FileItemIterator iter;
             try {
                 List<FileItem> itemList = upload.parseRequest(request);
-                String filename = null;
+                ModelType modelType = null;
                 for (FileItem item : itemList) {
                     String name = item.getFieldName();
                     // filename must come first
-                    if (item.isFormField() && "filename".equals(item.getFieldName())) {
-                        filename = item.getString();
+                    if (item.isFormField() && "modeltype".equals(item.getFieldName())) {
+                        modelType = ModelType.valueOf(item.getString());
                     }
-                    else if (null != filename) {
-                        destinationFile = new File(tempDir + File.separator + filename);
+                    else if (null != modelType) {
+                        destinationFile = new File(tempDir + File.separator + item.getName());
                         saveFileFromRequest(item.getInputStream(), destinationFile);
+                        CreateDSGFromZip.create(destinationFile, modelType);
                     }
                     else {
                         throw new Exception();
@@ -81,13 +84,14 @@ public class Upload extends HttpServlet {
             }
         } else {
             // Handle octet streams (from standards browsers)
-            String filename = request.getParameter("filename");
-            destinationFile = new File(tempDir + File.separator + filename);
-            try {
-                saveFileFromRequest(request.getInputStream(), destinationFile);
-            } catch (IOException ex) {
-                // LOG
-            }
+            //String filename = request.getParameter("filename");
+//            destinationFile = new File(tempDir + File.separator + filename);
+//            try {
+//                saveFileFromRequest(request.getInputStream(), destinationFile);
+//                CreateDSGFromZip.create(destinationFile);
+//            } catch (IOException ex) {
+//                // LOG
+//            }
         }
         
         String responseText = null;

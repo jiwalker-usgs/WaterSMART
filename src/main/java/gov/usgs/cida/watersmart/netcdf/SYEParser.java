@@ -3,9 +3,9 @@ package gov.usgs.cida.watersmart.netcdf;
 import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Variable;
 import gov.usgs.cida.netcdf.jna.NCUtil;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -51,12 +51,13 @@ public class SYEParser extends DSGParser {
     /**
      * Define all the regular expressions needed for parsing here
      * Should check that all necessary patterns are defined at some point
-     * @param infile
+     * @param input 
+     * @param name 
      * @throws FileNotFoundException 
      */
-    public SYEParser(File infile) throws FileNotFoundException {
-        super(infile);
-        this.filename = infile.getName();
+    public SYEParser(InputStream input, String name) throws FileNotFoundException {
+        super(input);
+        this.filename = name;
     }
     
     /**
@@ -100,7 +101,7 @@ public class SYEParser extends DSGParser {
     public RecordType parseMetadata() {
         // define what we need for metadata
         
-        // this.stationIndex = somewhere.stationLookup(getStationId(this.filename));
+        this.stationIndex = StationLookup.lookup(getStationId(this.filename));
         this.stationIndex = 0; // TODO do some sort of lookup here
 
         try {
