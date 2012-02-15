@@ -22,6 +22,8 @@
             
             CONFIG.LOG4JS_PATTERN_LAYOUT = '<%= props.getProperty("watersmart.frontend.log4js.pattern.layout","%rms - %-5p - %m%n") %>';
             CONFIG.LOG4JS_LOG_THRESHOLD = '<%= props.getProperty("watersmart.frontend.log4js.threshold", "info") %>';
+            CONFIG.GEOSERVER_URL = '<%= props.getProperty("watersmart.stations.url", "http://localhost:8080/geoserver/ows") %>';
+            CONFIG.SITES_LAYER = '<%= props.getProperty("watersmart.stations.typeName", "watersmart:se_sites") %>';
             CONFIG.DEVELOPMENT = <%= development %>;
 
             /**
@@ -37,6 +39,22 @@
                 }
                 return -1;
             }
+            
+            // http://jibbering.com/faq/#parseDate
+            Date.parseISO8601 = function(dateStringInRange){
+                var isoExp = /^\s*(\d{4})-(\d\d)-(\d\d)\s*$/,
+                date = new Date(NaN), month,
+                parts = isoExp.exec(dateStringInRange);
+
+                if(parts) {
+                    month = +parts[2];
+                    date.setFullYear(parts[1], month - 1, parts[3]);
+                    if(month != date.getMonth() + 1) {
+                        date.setTime(NaN);
+                    }
+                }
+                return date;
+            };
         </script>
         
         <jsp:include page="js/ext/ext.jsp">
@@ -55,6 +73,7 @@
         <jsp:include page="js/geoext/geoext.jsp" >
             <jsp:param name="debug-qualifier" value="<%= development %>" />
         </jsp:include>
+        <jsp:include page="js/geoext/ux/SOS/SOS.jsp"/>
 
         <jsp:include page="js/log4javascript/log4javascript.jsp"/>
         <jsp:include page="js/ext/ux/notify/notify.jsp"/>
@@ -64,6 +83,8 @@
 
         <script type="text/javascript" src="pages/index/Form/isoFormPanel.js"></script>
         <script type="text/javascript" src="pages/index/Form/fileUploadPanel.js"></script>
+        <script type="text/javascript" src="pages/index/Plotter/PlotterPanel.js"></script>
+        <script type="text/javascript" src="pages/index/Map/map.js"></script>
         <script type="text/javascript" src="pages/index/onReady.js"></script>
         
         

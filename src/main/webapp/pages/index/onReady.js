@@ -13,7 +13,7 @@ Ext.onReady(function() {
     initializeNotification();
     LOADMASK.show();
 	
-//    var map = new NAWQA.Map();
+    var map = new WaterSMART.Map();
 //    var options = new NAWQA.OptionsPanel({
 //        binStore : new GeoExt.data.LayerStore()
 //    });
@@ -30,14 +30,25 @@ Ext.onReady(function() {
     var metaForm = new WaterSMART.ISOFormPanel();
     var uploadForm = new WaterSMART.FileUploadPanel();
 
+    var forms = new Ext.Panel({
+        region: 'east',
+        border: false,
+        layout: 'border',
+        collapsed: true,
+        collapsible: true,
+        width: '60%',
+        autoShow: true,
+        items: [metaForm, uploadForm]
+    });
+
     var body = new Ext.Panel({
         region: 'center',
         border: false,
         layout : 'border',
         autoShow: true,
         items : [
-            metaForm,
-            uploadForm
+            forms,
+            map
         ]
 //        map
 //        ],

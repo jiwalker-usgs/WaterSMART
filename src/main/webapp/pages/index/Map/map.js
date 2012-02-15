@@ -1,7 +1,7 @@
-Ext.ns("NAWQA");
+Ext.ns("WaterSMART");
 
 
-NAWQA.Map = Ext.extend(GeoExt.MapPanel, {
+WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
     layersLoading : 0,
     controller : undefined,
     WGS84 : new OpenLayers.Projection("EPSG:4326"),
@@ -33,34 +33,17 @@ NAWQA.Map = Ext.extend(GeoExt.MapPanel, {
             transitionEffect : 'resize'
         };
         
-        var statesLayer = new OpenLayers.Layer.WMS(
-            "CONUS United States", 
-            CONFIG.CIDA_GEOSERVER_ENDPOINT + "sample/wms",
-            {
-                LAYERS: 'sample:CONUS',
-                transparent : true,
-                format: 'image/png'
-            },
-            {
-                opacity : '0.3',
-                displayOutsideMaxExtent: true,
-                isBaseLayer: false,
-                transitionEffect : 'resize',
-                displayInLayerSwitcher : true
-            } 
-            );
-			
-        var sitesLayerName = 'nawqa_map:NAWQA_MAP_SITES';
+        var sitesLayerName = CONFIG.SITES_LAYER;
 					
         var sitesLayer = new OpenLayers.Layer.WMS(
 //            CONFIG.MAP_QUERIED_LAYER_NAME,
-            'NAWQA: All Sites',
-            CONFIG.CIDA_GEOSERVER_ENDPOINT + "nawqa_map/wms",
+            'WaterSMART: Stations',
+            CONFIG.GEOSERVER_URL,
             {
                 LAYERS: sitesLayerName,
                 transparent : true,
                 // TODO: This needs to be moved into GeoServer
-                SLD : window.location + "custom-sld.xml?layer=" + sitesLayerName + "&opacity=0.7&hexColor=FF0000&size=7",
+                //SLD : window.location + "custom-sld.xml?layer=" + sitesLayerName + "&opacity=0.7&hexColor=FF0000&size=7",
                 format: 'image/png'
             },
             {
@@ -78,7 +61,7 @@ NAWQA.Map = Ext.extend(GeoExt.MapPanel, {
                 isBaseLayer: false,
                 transitionEffect : 'resize'
             });
-        this.defaultMapConfig.layers.layers =  [statesLayer, sitesLayer];
+        this.defaultMapConfig.layers.layers =  [sitesLayer];
       
         this.defaultMapConfig.layers.baseLayers = [
             new OpenLayers.Layer.XYZ(
@@ -180,7 +163,7 @@ NAWQA.Map = Ext.extend(GeoExt.MapPanel, {
             border: false
         }, config);
       
-        NAWQA.Map.superclass.constructor.call(this, config);
+        WaterSMART.Map.superclass.constructor.call(this, config);
         LOG.info('map.js::constructor(): Construction complete.');
        
         this.addEvents(
@@ -315,100 +298,19 @@ NAWQA.Map = Ext.extend(GeoExt.MapPanel, {
         LOG.info('map.js::constructor(): Adding new control to map.');
         this.map.addControls([editingToolbarControl]);
     },
-    addIdentifyToolingToMap : function() {
-        var getFeatureInfoControl = new OpenLayers.Control.ExtendedWMSGetFeatureInfo({
-            AVAILABLE_EXPORT_TYPES : ['CSV','GML2','GML3','GML3.2','JSON','SHAPEFILE'],
-            drillDown : true,
-            queryVisible: true, // If true, filter out hidden layers when searching the map for layers to query
-            maxFeatures: 100,
-            // infoFormat: 'application/vnd.ogc.gml', // This works if we want the GML back
-            // If the filter count matches the layer count, each order of filters will be used for each 
-            // order of layers. Otherwise, the first filter will be used for each layer
-            cql_filter: [
-            //                new OpenLayers.Filter.Logical({
-            //                    type : OpenLayers.Filter.Logical.OR,
-            //                    filters : [
-            //                        new OpenLayers.Filter.Comparison({
-            //                            type : OpenLayers.Filter.Comparison.EQUAL_TO,
-            //                            property : 'SPECIFIC_LAND_USE',
-            //                            value : 'Cropland'
-            //                        }),
-            //                        new OpenLayers.Filter.Comparison({
-            //                            type : OpenLayers.Filter.Comparison.EQUAL_TO,
-            //                            property : 'SPECIFIC_LAND_USE',
-            //                            value : 'Not Applicable'
-            //                        }) 
-            //                    ]
-            //                })                
-            ],
-            filter : [
-            //                new OpenLayers.Filter.Logical({
-            //                    type : OpenLayers.Filter.Logical.OR,
-            //                    filters : [
-            //                        new OpenLayers.Filter.Comparison({
-            //                            type : OpenLayers.Filter.Comparison.EQUAL_TO,
-            //                            property : 'SPECIFIC_LAND_USE',
-            //                            value : 'Cropland'
-            //                        }),
-            //                        new OpenLayers.Filter.Comparison({
-            //                            type : OpenLayers.Filter.Comparison.EQUAL_TO,
-            //                            property : 'SPECIFIC_LAND_USE',
-            //                            value : 'Not Applicable'
-            //                        }) 
-            //                    ]
-            //                })                
-            ],
-            layers: [
-            new OpenLayers.Layer.WMS("SITES", CONFIG.CIDA_GEOSERVER_ENDPOINT + "nawqa_map/wms",
-            {
-                LAYERS: 'nawqa_map:NAWQA_MAP_SITES'
-            }),
-            new OpenLayers.Layer.WMS("MAP", CONFIG.CIDA_GEOSERVER_ENDPOINT + "nawqa_map/wms",
-            {
-                LAYERS: 'nawqa_map:NAWQA_MAP'
-            })
-            ], // This is done automatically but cannot be null to start
-            eventListeners: {
-                /**
-                 * No queryable layers were found
-                 */
-                nogetfeatureinfo : function(event) {
-                    LOG.debug('map.js:: User attempted to identify a feature but no feature was found for identification');
-                },
-                /**
-                 * Triggered before the request is sent. 
-                 * The event object has an *xy* property with the position of the 
-                 * mouse click or hover event that triggers the request
-                 */
-                beforegetfeatureinfo : function(event) {
-                    LOG.debug('map.js:: About to send a WMSGetFeatureInfo on XY point: ' + event.xy.x + ', ' + event.xy.y);
-                },
-                /**
-                 * Triggered when a GetFeatureInfo response is received.
-                 * The event object has a *text* property with the body of the
-                 * response (String), a *features* property with an array of the
-                 * parsed features, an *xy* property with the position of the mouse
-                 * click or hover event that triggered the request, and a *request*
-                 * property with the request itself. If drillDown is set to true and
-                 * multiple requests were issued to collect feature info from all
-                 * layers, *text* and *request* will only contain the response body
-                 * and request object of the last request.
-                 */
-                getfeatureinfo: function(event) {
-                    LOG.debug('map.js:: Received feature info');
+    addIdentifyToolingToMap: function() {
+        var getFeatureInfoControl = new OpenLayers.Control.WMSGetFeatureInfo({
+            infoFormat : 'application/vnd.ogc.gml',
+            maxFeatures : 1,
+            layers : this.defaultMapConfig.layers.layers,
+            eventListeners : {
+                getfeatureinfo : function(event) {
                     
-                    // Here we check if any text came back, and if it did, does it have anything in the body node?
-                    if (!event.text || !event.text.contains('table>')){
-                        LOG.info('map.js:: Feature info response did not contain any information');
-                        return;
-                    }
-                    
-                    // We did get something back. Create the popup
                     this.map.addPopup(new OpenLayers.Popup.FramedCloud(
                         "framedcloud", 
                         this.map.getLonLatFromPixel(event.xy),
                         null,
-                        function(text) {
+                        function(features) {
                             // TODO: Possibly, instead of using the direct HTML returned by GeoServer, 
                             // get the XML returned by GeoServer and create an ExtJS grid from it.
                             
@@ -420,93 +322,216 @@ NAWQA.Map = Ext.extend(GeoExt.MapPanel, {
                                 (new Ext.Element(popup)).remove();
                             })
                             
-                            return text;
-                        }(event.text),
+                            var panel = new WaterSMART.Plotter();
+                            panel.loadSOSStore({
+                                url : "http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/SYE.nc",
+                                vars : 'estq'
+                            }, features[0].attributes.site_no);
+                            return '<div id="popup-content">' + 
+                                '<div id="dygraph-content"></div>' +
+                                '<div id="dygraph-legend"></div></div>';
+                        }(event.features),
                         null,
                         true
                         ));
-                    
-                    // Decorate the popup with a set of export controls
-                    var popup = Ext.DomQuery.selectNode("[id=framedcloud]");
-                    var tables = Ext.DomQuery.jsSelect("table", popup)
-                    Ext.iterate(tables, function(table, index){
-                        // Append a control set after each table
-                        var controlDiv = Ext.DomHelper.insertHtml('afterEnd', table, '<div class="framedcloud-table-controlset" id="framedcloud-table-controlset-'+index+'"></div>');
-                        var selectControl = Ext.DomHelper.insertHtml('beforeEnd', controlDiv, 'Export to: <select class="framedcloud-table-controlset-select" id="framedcloud-table-controlset-select-'+index+'"><option></option></select>');
-
-                        Ext.each(this.AVAILABLE_EXPORT_TYPES, function(type){
-                            Ext.DomHelper.insertHtml('beforeEnd', selectControl, '<option value='+type+'>'+type+'</option>');
-                        }, this)
-                    }, this)
-                    
-                    var getLonLatRadiusFromXY = function(pixel, radius) {
-                        var result = 100000;
-						
-                        var upperLeftPx = new OpenLayers.Pixel(pixel.x - radius, pixel.y - radius);
-                        var lowerRightPx = new OpenLayers.Pixel(pixel.x + radius, pixel.y + radius);
-						
-                        var upperLeftLL = CONTROLLER.mapPanel.map.getLonLatFromPixel(upperLeftPx);
-                        var lowerRightLL = CONTROLLER.mapPanel.map.getLonLatFromPixel(lowerRightPx);
-						
-                        result = Math.sqrt(Math.pow((lowerRightLL.lon - upperLeftLL.lon), 2) + Math.pow((upperLeftLL.lat - lowerRightLL.lat), 2));
-						
-                        result = result / 2.0;
-						
-                        return result;
-                    }
-                    var lonlat = CONTROLLER.mapPanel.map.getLonLatFromPixel(event.xy);
-                    
-                    var radiusPxSize = 3;
-                    var radius = getLonLatRadiusFromXY(event.xy, radiusPxSize);
-                    
-                    // Add functionality to the dropdown list we created
-                    $('.framedcloud-table-controlset-select').each(function(csi, cse){
-                        $(cse).change(function(eventObject){
-                            if (eventObject.currentTarget.value) {
-                                var exportTableNumber = eventObject.currentTarget.parentElement.id.charAt(eventObject.currentTarget.parentElement.id.length - 1);
-                                var exportTableName = exportTableNumber == 0 ? 'NAWQA_MAP_SITES' : 'NAWQA_MAP';
-                                LOG.debug('map.js:: User wishes to export ' + eventObject.currentTarget.value + ' from table ' + exportTableName);
-								
-                                var bboxFilter = new OpenLayers.Filter.Spatial({
-                                    type: OpenLayers.Filter.Spatial.DWITHIN,
-                                    value: new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat),
-                                    property: 'GEOM',
-                                    distance: radius,
-                                    distanceUnits: 'm',
-                                    projection: "EPSG:900913"
-                                })
-                                                    
-                                var filter_1_1_0 = new OpenLayers.Format.Filter({
-                                    version: "1.1.0"
-                                });
-                                
-                                var filterOutput = filter_1_1_0.write(
-                                    new OpenLayers.Filter.Logical({
-                                        type : OpenLayers.Filter.Logical.AND,
-                                        filters : event.object.filter.concat([bboxFilter])
-                                    })
-                                    )
-                                
-                                // Do the actual export
-                                var postData = {
-                                    'geoserver-endpoint' : CONFIG.CIDA_GEOSERVER_ENDPOINT + 'wfs',
-                                    'layer-name' : 'nawqa_map:' + exportTableName,
-                                    'output-type' : eventObject.currentTarget.value.toLowerCase(),
-                                    'filter' : XMLtoString(filterOutput),
-                                    'output-filename' : 'export'
-                                }
-                                $.download('export', postData);
-                            }
-                        })
-                    })
                 }
             }
         });
-        
         this.map.addControl(getFeatureInfoControl);
         getFeatureInfoControl.activate();
-         
     },
+//    addIdentifyToolingToMap : function() {
+//        var getFeatureInfoControl = new OpenLayers.Control.ExtendedWMSGetFeatureInfo({
+//            AVAILABLE_EXPORT_TYPES : ['CSV','GML2','GML3','GML3.2','JSON','SHAPEFILE'],
+//            drillDown : true,
+//            queryVisible: true, // If true, filter out hidden layers when searching the map for layers to query
+//            maxFeatures: 100,
+//            // infoFormat: 'application/vnd.ogc.gml', // This works if we want the GML back
+//            // If the filter count matches the layer count, each order of filters will be used for each 
+//            // order of layers. Otherwise, the first filter will be used for each layer
+//            cql_filter: [
+//            //                new OpenLayers.Filter.Logical({
+//            //                    type : OpenLayers.Filter.Logical.OR,
+//            //                    filters : [
+//            //                        new OpenLayers.Filter.Comparison({
+//            //                            type : OpenLayers.Filter.Comparison.EQUAL_TO,
+//            //                            property : 'SPECIFIC_LAND_USE',
+//            //                            value : 'Cropland'
+//            //                        }),
+//            //                        new OpenLayers.Filter.Comparison({
+//            //                            type : OpenLayers.Filter.Comparison.EQUAL_TO,
+//            //                            property : 'SPECIFIC_LAND_USE',
+//            //                            value : 'Not Applicable'
+//            //                        }) 
+//            //                    ]
+//            //                })                
+//            ],
+//            filter : [
+//            //                new OpenLayers.Filter.Logical({
+//            //                    type : OpenLayers.Filter.Logical.OR,
+//            //                    filters : [
+//            //                        new OpenLayers.Filter.Comparison({
+//            //                            type : OpenLayers.Filter.Comparison.EQUAL_TO,
+//            //                            property : 'SPECIFIC_LAND_USE',
+//            //                            value : 'Cropland'
+//            //                        }),
+//            //                        new OpenLayers.Filter.Comparison({
+//            //                            type : OpenLayers.Filter.Comparison.EQUAL_TO,
+//            //                            property : 'SPECIFIC_LAND_USE',
+//            //                            value : 'Not Applicable'
+//            //                        }) 
+//            //                    ]
+//            //                })                
+//            ],
+//            layers: [
+//            new OpenLayers.Layer.WMS("SITES", CONFIG.CIDA_GEOSERVER_ENDPOINT + "nawqa_map/wms",
+//            {
+//                LAYERS: 'nawqa_map:NAWQA_MAP_SITES'
+//            }),
+//            new OpenLayers.Layer.WMS("MAP", CONFIG.CIDA_GEOSERVER_ENDPOINT + "nawqa_map/wms",
+//            {
+//                LAYERS: 'nawqa_map:NAWQA_MAP'
+//            })
+//            ], // This is done automatically but cannot be null to start
+//            eventListeners: {
+//                /**
+//                 * No queryable layers were found
+//                 */
+//                nogetfeatureinfo : function(event) {
+//                    LOG.debug('map.js:: User attempted to identify a feature but no feature was found for identification');
+//                },
+//                /**
+//                 * Triggered before the request is sent. 
+//                 * The event object has an *xy* property with the position of the 
+//                 * mouse click or hover event that triggers the request
+//                 */
+//                beforegetfeatureinfo : function(event) {
+//                    LOG.debug('map.js:: About to send a WMSGetFeatureInfo on XY point: ' + event.xy.x + ', ' + event.xy.y);
+//                },
+//                /**
+//                 * Triggered when a GetFeatureInfo response is received.
+//                 * The event object has a *text* property with the body of the
+//                 * response (String), a *features* property with an array of the
+//                 * parsed features, an *xy* property with the position of the mouse
+//                 * click or hover event that triggered the request, and a *request*
+//                 * property with the request itself. If drillDown is set to true and
+//                 * multiple requests were issued to collect feature info from all
+//                 * layers, *text* and *request* will only contain the response body
+//                 * and request object of the last request.
+//                 */
+//                getfeatureinfo: function(event) {
+//                    LOG.debug('map.js:: Received feature info');
+//                    
+//                    // Here we check if any text came back, and if it did, does it have anything in the body node?
+//                    if (!event.text || !event.text.contains('table>')){
+//                        LOG.info('map.js:: Feature info response did not contain any information');
+//                        return;
+//                    }
+//                    
+//                    // We did get something back. Create the popup
+//                    this.map.addPopup(new OpenLayers.Popup.FramedCloud(
+//                        "framedcloud", 
+//                        this.map.getLonLatFromPixel(event.xy),
+//                        null,
+//                        function(text) {
+//                            // TODO: Possibly, instead of using the direct HTML returned by GeoServer, 
+//                            // get the XML returned by GeoServer and create an ExtJS grid from it.
+//                            
+//                            // Close any other popups and remove them from the dom
+//                            var popups = Ext.DomQuery.jsSelect("[id=framedcloud]");// olPopupCloseBox
+//                            Ext.iterate(popups, function(popup){
+//                                var closeButton = Ext.DomQuery.selectNode("[class=olPopupCloseBox]", popup);
+//                                closeButton.click();
+//                                (new Ext.Element(popup)).remove();
+//                            })
+//                            
+//                            return text;
+//                        }(event.text),
+//                        null,
+//                        true
+//                        ));
+//                    
+//                    // Decorate the popup with a set of export controls
+//                    var popup = Ext.DomQuery.selectNode("[id=framedcloud]");
+//                    var tables = Ext.DomQuery.jsSelect("table", popup)
+//                    Ext.iterate(tables, function(table, index){
+//                        // Append a control set after each table
+//                        var controlDiv = Ext.DomHelper.insertHtml('afterEnd', table, '<div class="framedcloud-table-controlset" id="framedcloud-table-controlset-'+index+'"></div>');
+//                        var selectControl = Ext.DomHelper.insertHtml('beforeEnd', controlDiv, 'Export to: <select class="framedcloud-table-controlset-select" id="framedcloud-table-controlset-select-'+index+'"><option></option></select>');
+//
+//                        Ext.each(this.AVAILABLE_EXPORT_TYPES, function(type){
+//                            Ext.DomHelper.insertHtml('beforeEnd', selectControl, '<option value='+type+'>'+type+'</option>');
+//                        }, this)
+//                    }, this)
+//                    
+//                    var getLonLatRadiusFromXY = function(pixel, radius) {
+//                        var result = 100000;
+//						
+//                        var upperLeftPx = new OpenLayers.Pixel(pixel.x - radius, pixel.y - radius);
+//                        var lowerRightPx = new OpenLayers.Pixel(pixel.x + radius, pixel.y + radius);
+//						
+//                        var upperLeftLL = CONTROLLER.mapPanel.map.getLonLatFromPixel(upperLeftPx);
+//                        var lowerRightLL = CONTROLLER.mapPanel.map.getLonLatFromPixel(lowerRightPx);
+//						
+//                        result = Math.sqrt(Math.pow((lowerRightLL.lon - upperLeftLL.lon), 2) + Math.pow((upperLeftLL.lat - lowerRightLL.lat), 2));
+//						
+//                        result = result / 2.0;
+//						
+//                        return result;
+//                    }
+//                    var lonlat = CONTROLLER.mapPanel.map.getLonLatFromPixel(event.xy);
+//                    
+//                    var radiusPxSize = 3;
+//                    var radius = getLonLatRadiusFromXY(event.xy, radiusPxSize);
+//                    
+//                    // Add functionality to the dropdown list we created
+//                    $('.framedcloud-table-controlset-select').each(function(csi, cse){
+//                        $(cse).change(function(eventObject){
+//                            if (eventObject.currentTarget.value) {
+//                                var exportTableNumber = eventObject.currentTarget.parentElement.id.charAt(eventObject.currentTarget.parentElement.id.length - 1);
+//                                var exportTableName = exportTableNumber == 0 ? 'NAWQA_MAP_SITES' : 'NAWQA_MAP';
+//                                LOG.debug('map.js:: User wishes to export ' + eventObject.currentTarget.value + ' from table ' + exportTableName);
+//								
+//                                var bboxFilter = new OpenLayers.Filter.Spatial({
+//                                    type: OpenLayers.Filter.Spatial.DWITHIN,
+//                                    value: new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat),
+//                                    property: 'GEOM',
+//                                    distance: radius,
+//                                    distanceUnits: 'm',
+//                                    projection: "EPSG:900913"
+//                                })
+//                                                    
+//                                var filter_1_1_0 = new OpenLayers.Format.Filter({
+//                                    version: "1.1.0"
+//                                });
+//                                
+//                                var filterOutput = filter_1_1_0.write(
+//                                    new OpenLayers.Filter.Logical({
+//                                        type : OpenLayers.Filter.Logical.AND,
+//                                        filters : event.object.filter.concat([bboxFilter])
+//                                    })
+//                                    )
+//                                
+//                                // Do the actual export
+//                                var postData = {
+//                                    'geoserver-endpoint' : CONFIG.CIDA_GEOSERVER_ENDPOINT + 'wfs',
+//                                    'layer-name' : 'nawqa_map:' + exportTableName,
+//                                    'output-type' : eventObject.currentTarget.value.toLowerCase(),
+//                                    'filter' : XMLtoString(filterOutput),
+//                                    'output-filename' : 'export'
+//                                }
+//                                $.download('export', postData);
+//                            }
+//                        })
+//                    })
+//                }
+//            }
+//        });
+//        
+//        this.map.addControl(getFeatureInfoControl);
+//        getFeatureInfoControl.activate();
+//         
+//    },
     addLayers : function(layers) {
         if (Ext.isArray(layers)) {
             this.map.addLayers(layers);

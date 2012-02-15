@@ -32,7 +32,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
         });
         
         config = Ext.apply({
-            title: 'Simple Form',
+            title: 'Metadata',
             id: 'test_form',
             bodyPadding: 5,
 //            width: 350,
@@ -45,39 +45,56 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
 
             // The fields
             items: [{
-                fieldLabel: 'Full Name',
+                fieldLabel: 'Modeler Name',
                 name: 'name',
                 allowBlank: false
             },{
-                fieldLabel: 'Organization',
-                name: 'orgName',
+//                fieldLabel: 'Organization',
+//                name: 'orgName',
+//                allowBlank: false
+//            },{
+                fieldLabel: 'Model Name',
+                name: 'model',
                 allowBlank: false
             },{
-                fieldLabel: 'Email',
-                name: 'email',
-                allowBlank: true
+                fieldLabel: 'Model Version',
+                name: 'version',
+                allowBlank: false
             },{
-                fieldLabel: 'Web Address',
-                name: 'url',
-                allowBlank: true
-            },{
-                fieldLabel: 'Title',
+
+//                fieldLabel: 'Email',
+//                name: 'email',
+//                allowBlank: true
+//            },{
+//                fieldLabel: 'Web Address',
+//                name: 'url',
+//                allowBlank: true
+//            },{
+                fieldLabel: 'Run Identifier',
                 name: 'title',
-                allowBlank: true
+                allowBlank: false
             },{
                 xtype : 'datefield',
-                fieldLabel: 'Creation Date',
+                fieldLabel: 'Run Date',
                 name: 'creationDate',
+                allowBlank: false
+            },{
+                fieldLabel: 'Calibration/ Validation Scenario',
+                name: 'scenario',
+                allowBlank: false
+            },{
+                fieldLabel: 'Comments',
+                name: 'comments',
                 allowBlank: true
             },{
-                fieldLabel: 'Abstract',
-                name: 'abstract',
-                allowBlank: true
-            },{
-                fieldLabel: 'Credit',
-                name: 'credit',
-                allowBlank: true
-            },{
+//                fieldLabel: 'Abstract',
+//                name: 'abstract',
+//                allowBlank: true
+//            },{
+//                fieldLabel: 'Credit',
+//                name: 'credit',
+//                allowBlank: true
+//            },{
                 fieldLabel: 'Keywords (comma separated)',
                 name: 'keywords',
                 allowBlank: true
@@ -124,7 +141,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                 }]
             }],
             buttons: [{
-                    text: 'Submit',
+                    text: 'View Metadata',
                     type: 'submit',
                     formBind: true,
                     handler: function(a, b, c) {
