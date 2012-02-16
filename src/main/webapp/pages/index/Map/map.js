@@ -18,6 +18,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
         initialExtent : new OpenLayers.Bounds(-13887774.391472, 2816656.9073115, -7453285.1855353, 6340613.1336976),
         center : new OpenLayers.LonLat(-8750000, 4671831)
     },
+    popup : undefined,
    
     constructor : function(config) {
         LOG.debug('map.js::constructor()');
@@ -305,37 +306,49 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
             layers : this.defaultMapConfig.layers.layers,
             eventListeners : {
                 getfeatureinfo : function(event) {
-                    
-                    this.map.addPopup(new OpenLayers.Popup.FramedCloud(
-                        "framedcloud", 
-                        this.map.getLonLatFromPixel(event.xy),
-                        null,
-                        function(features) {
-                            // TODO: Possibly, instead of using the direct HTML returned by GeoServer, 
-                            // get the XML returned by GeoServer and create an ExtJS grid from it.
-                            
-                            // Close any other popups and remove them from the dom
-                            var popups = Ext.DomQuery.jsSelect("[id=framedcloud]");// olPopupCloseBox
-                            Ext.iterate(popups, function(popup){
-                                var closeButton = Ext.DomQuery.selectNode("[class=olPopupCloseBox]", popup);
-                                closeButton.click();
-                                (new Ext.Element(popup)).remove();
-                            })
-                            
-                            var panel = new WaterSMART.Plotter();
-                            panel.loadSOSStore({
-                                url : "http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/SYE.nc",
-                                vars : 'estq'
-                            }, features[0].attributes.site_no);
-                            return '<div id="popup-content">' + 
-                                '<div id="dygraph-content"></div>' +
-                                '<div id="dygraph-legend"></div></div>';
-                        }(event.features),
-                        null,
-                        true
-                        ));
-                }
+                    if (event.features && event.features[0]){
+                        var panel = new WaterSMART.Plotter();
+                        panel.loadSOSStore({
+                            url : "http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/SYE.nc",
+                            vars : 'estq'
+                        }, event.features[0].attributes.site_no);
+
+                        if(!this.popup) {
+                            this.popup = new GeoExt.Popup({
+                                title: event.features[0].attributes.station_nm,
+                                anchored: false,
+//                                location: OpenLayers.Projection.transform(
+//                                    event.features[0].geometry,
+//                                    "EPSG:4269",
+//                                    "EPSG:900913"
+//                                ),
+                                width: 600,
+                                height: 300,
+                                map: this.map,
+                                items : [
+                                    panel
+                                ],
+                                collapsible: true,
+                                closeAction: 'hide'
+                            });
+                            this.popup.on('resize', function() {
+                                panel.resizePlotter();
+                            });
+                        } else {
+//                            this.popup.location = OpenLayers.Projection.transform(
+//                                    event.features[0].geometry,
+//                                    new OpenLayers.Projection("EPSG:4269"),
+//                                    new OpenLayers.Projection("EPSG:900913")
+//                                );
+                            this.popup.setTitle(event.features[0].attributes.station_nm);
+                        }
+                        this.popup.show();
+                        
+                    }
+                },
+                scope: this
             }
+            
         });
         this.map.addControl(getFeatureInfoControl);
         getFeatureInfoControl.activate();

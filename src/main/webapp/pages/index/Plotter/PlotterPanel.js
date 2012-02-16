@@ -2,15 +2,42 @@ Ext.ns("WaterSMART");
 
 WaterSMART.Plotter = Ext.extend(Ext.Panel, {
     plotterData : [],
+    plotterTitle : undefined,
     plotterDiv : undefined,
     legendDiv : undefined,
+    height : undefined,
+    legendWidth : undefined,
     sosStore : undefined,
+    graph : undefined,
+    yLabels : [],
     constructor : function(config) {
         config = config || {};
         this.plotterDiv = config.plotterDiv || 'dygraph-content';
         this.legendDiv = config.legendDiv || 'dygraph-legend';
+        this.legendWidth = config.legendWidth || 100;
+        this.height = config.height || 200;
+        this.plotterTitle = config.title || 'Demo';
+        
+        var contentPanel = new Ext.Panel({
+            contentEl : this.plotterDiv,
+            itemId : 'contentPanel',
+            ref : '../contentPanel',
+            layout : 'fit',
+            region : 'center',
+            autoShow : true
+        });
+        var legendPanel = new Ext.Panel({
+            itemId : 'legendPanel',
+            ref : '../legendPanel',
+            contentEl : this.legendDiv,
+            layout : 'fit', 
+            region : 'east',
+            width : this.legendWidth,
+            autoShow : true
+        });
+        
         config = Ext.apply({
-            //items : [contentPanel, legendPanel],
+            items : [contentPanel, legendPanel],
             layout : 'border',
             autoShow : true,
             //tbar : this.toolbar,
@@ -22,7 +49,7 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
     },
     loadSOSStore : function(meta, offering) {
         var url = "proxy/" + meta.url + "?service=SOS&request=GetObservation&version=1.0.0&offering=" + encodeURI(offering) + "&observedProperty=" + meta.vars;
-        
+        this.yLabels = [meta.vars];
         this.sosStore = new GDP.SOSGetObservationStore({
             url : url, // gmlid is url for now, eventually, use SOS endpoint + gmlid or whatever param
             autoLoad : true,
@@ -77,6 +104,18 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
 
         this.dygraphUpdateOptions(store);
     },
+    resizePlotter : function() {
+        LOG.debug('Plotter:resizePlotter()');
+        var divPlotter = Ext.get(this.plotterDiv);
+        var divLegend = Ext.get(this.legendDiv);
+        
+        divLegend.setWidth(this.legendWidth);
+        divPlotter.setWidth(this.getWidth() - (this.legendWidth + 2));
+        divPlotter.setHeight(this.getHeight()); 
+        if (this.graph) {
+            this.graph.resize(divPlotter.getWidth(), divPlotter.getHeight());
+        }
+    },
     dygraphUpdateOptions : function(store) {
         var record = store.getAt(0);
         
@@ -85,14 +124,14 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
 
         // TODO figure out what to do if dataRecord has more than time and mean
         this.graph = new Dygraph(
-            Ext.get(this.PlotterDiv).dom,
+            Ext.get(this.plotterDiv).dom,
             this.plotterData,
             { // http://dygraphs.com/options.html
                 hideOverlayOnMouseOut : false,
                 legend: 'always',
-                customBars: true,
-                errorBars: true,
-                fillAlpha: this.errorBarsOn ? 0.15 : 0.0,
+                //customBars: true,
+                //errorBars: true,
+                //fillAlpha: this.errorBarsOn ? 0.15 : 0.0,
                 labels: ["Date"].concat(this.yLabels),
                 labelsDiv: Ext.get(this.legendDiv).dom,
                 labelsDivWidth: this.legendWidth,

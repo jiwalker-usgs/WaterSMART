@@ -80,6 +80,7 @@
         <jsp:include page="js/ext/ux/cida-load/cida-load.jsp"/>
         <jsp:include page="js/ext/ux/fileuploadfield/upload.jsp"/>
         <jsp:include page="js/sarissa/sarissa.jsp"/>
+        <jsp:include page="js/dygraphs/dygraphs.jsp"/>
 
         <script type="text/javascript" src="pages/index/Form/isoFormPanel.js"></script>
         <script type="text/javascript" src="pages/index/Form/fileUploadPanel.js"></script>
@@ -97,6 +98,10 @@
         </jsp:include>
 
         <div id="xslt-output-div"></div>
+        <div id="dygraph-div" class="x-hidden">
+            <div id="dygraph-content" class="x-hidden"></div>
+            <div id="dygraph-legend" class="x-hidden"></div>
+        </div>
 
         <jsp:include page="template/USGSFooter.jspf">
             <jsp:param name="footer-class" value="x-hidden"/>

@@ -215,6 +215,12 @@
             <version>0.9.9.5-1</version>
             <type>war</type>
         </dependency>
+        <dependency>
+            <groupId>gov.usgs.cida.jslibs</groupId>
+            <artifactId>dygraphs-core</artifactId>
+            <version>20120215-2-SNAPSHOT</version>
+            <type>war</type>
+        </dependency>
     </dependencies>
     <build>
         <finalName>watersmart</finalName>
