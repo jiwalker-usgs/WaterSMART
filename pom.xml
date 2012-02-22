@@ -168,6 +168,12 @@
         <!-- javascript dependencies for overlaying-->
         <dependency>
             <groupId>gov.usgs.cida.jslibs</groupId>
+            <artifactId>usgs-template</artifactId>
+            <version>1.0</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>gov.usgs.cida.jslibs</groupId>
             <artifactId>openlayers</artifactId>
             <version>2.11-3</version>
             <type>war</type>

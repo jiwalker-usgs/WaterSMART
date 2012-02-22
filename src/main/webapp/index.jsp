@@ -8,8 +8,17 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <jsp:include page="pages/head.jspf"/>
-        <jsp:include page="template/USGSHead.jspf"/>
+        <jsp:include page="template/USGSHead.jsp">
+            <jsp:param name="shortName" value="WaterSMART" />
+            <jsp:param name="title" value="WaterSMART Model Intercomparison Portal" />
+            <jsp:param name="description" value="WaterSMART Modle Intercomparison Portal" />
+            <jsp:param name="author" value="Jordan Walker"/>
+            <jsp:param name="publisher" value="USGS - U.S. Geological Survey, Water Resources; CIDA - Center for Integrated Data Analytics" />
+            <jsp:param name="keywords" value="USGS, U.S. Geological Survey, water, earth science, hydrology, hydrologic, data, streamflow, stream, river, lake, flood, drought, quality, basin, watershed, environment, ground water, groundwater" />
+            <jsp:param name="revisedDate" value="20120221" />
+            <jsp:param name="nextReview" value="20130221" />
+            <jsp:param name="expires" value="never" />
+        </jsp:include>
         
         <script type="text/javascript">
             var WATERSMART = {};
@@ -92,7 +101,7 @@
         
     </head>
     <body>
-        <jsp:include page="template/USGSHeader.jspf">
+        <jsp:include page="template/USGSHeader.jsp">
             <jsp:param name="header-class" value="x-hidden"/>
             <jsp:param name="site-title" value="WaterSMART"/>
         </jsp:include>
@@ -103,10 +112,10 @@
             <div id="dygraph-legend" class="x-hidden"></div>
         </div>
 
-        <jsp:include page="template/USGSFooter.jspf">
+        <jsp:include page="template/USGSFooter.jsp">
             <jsp:param name="footer-class" value="x-hidden"/>
-            <jsp:param name="site-url" value=""/>
-            <jsp:param name="contact-info" value=""/>
+            <jsp:param name="site-url" value="http://cida.usgs.gov/watersmart"/>
+            <jsp:param name="contact-info" value="dblodgett@usgs.gov"/>
         </jsp:include>
     </body>
 </html>
