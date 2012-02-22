@@ -310,7 +310,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
                         var panel = new WaterSMART.Plotter();
                         panel.loadSOSStore({
                             url : "http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/SYE.nc",
-                            vars : 'estq'
+                            vars : 'estq,obsq'
                         }, event.features[0].attributes.site_no);
 
                         if(!this.popup) {
