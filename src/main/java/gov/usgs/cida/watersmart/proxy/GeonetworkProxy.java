@@ -1,5 +1,6 @@
 package gov.usgs.cida.watersmart.proxy;
 
+import gov.usgs.cida.watersmart.config.DynamicReadOnlyProperties;
 import gov.usgs.service.OWSProxyServletX;
 import java.io.IOException;
 import java.net.URI;
@@ -36,15 +37,26 @@ import org.slf4j.LoggerFactory;
 public class GeonetworkProxy extends OWSProxyServletX {
 
     private static Logger LOGGER = LoggerFactory.getLogger(GeonetworkProxy.class);
+    
     private static CookieStore cookieJar;
     private static Date selfExpireCookieDate;
-    private static final String GEONETWORK_CSW = "http://130.11.165.241:8081/geonetwork/srv/en/csw";
-    private static final String GEONETWORK_LOGIN = "http://130.11.165.241:8081/geonetwork/srv/en/xml.user.login";
-    private static final String GEONETWORK_LOGOUT = "http://130.11.165.241:8081/geonetwork/srv/en/xml.user.logout";
+    private static final DynamicReadOnlyProperties props = DynamicReadOnlyProperties.initProps();
+    // currently defaults to gdp2 geonetwork
+    private static final String geonetworkAddr = props.getProperty("watersmart.geonetwork.addr");
+    private static final String GEONETWORK_CSW = geonetworkAddr + "/srv/en/csw";
+    private static final String GEONETWORK_LOGIN = geonetworkAddr + "/srv/en/xml.user.login";
+    private static final String GEONETWORK_LOGOUT = geonetworkAddr + "/srv/en/xml.user.logout";
+    private static final String GEONETWORK_USER = props.getProperty("watersmart.geonetwork.user");
+    private static final String GEONETWORK_PASS = props.getProperty("watersmart.geonetwork.pass");
+    
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
+        if (null == geonetworkAddr || null == GEONETWORK_USER || null == GEONETWORK_PASS) {
+            throw new RuntimeException("Geonetwork dependency not declared in JNDI context,"
+                    + " please set GEONETWORK_ADDR, GEONETWORK_USER, and GEONETWORK_PASS");
+        }
         cookieJar = new BasicCookieStore();
         selfExpireCookieDate = new Date();
         LOGGER.debug("Geonetwork proxy initialized");
@@ -87,7 +99,7 @@ public class GeonetworkProxy extends OWSProxyServletX {
         // username and password should be configured somewhere
         LOGGER.warn("username and password are still not parameterized");
         HttpEntity entity = new StringEntity(
-                "username=derivative&password=gdp.tmp",
+                "username=" + GEONETWORK_USER + "&password=" + GEONETWORK_PASS,
                 "application/x-www-form-urlencoded",
                 "UTF-8");
         ((HttpEntityEnclosingRequest) request).setEntity(entity);

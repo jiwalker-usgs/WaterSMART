@@ -73,6 +73,7 @@
         <jsp:include page="js/openlayers/openlayers.jsp">
             <jsp:param name="isDevelopment" value="<%= development %>" />
         </jsp:include>
+        <script type="text/javascript" src="js/watersmart/XMLHttpRequest.js"></script>
 
         <script type="text/javascript">
             // change this?
@@ -103,7 +104,7 @@
     <body>
         <jsp:include page="template/USGSHeader.jsp">
             <jsp:param name="header-class" value="x-hidden"/>
-            <jsp:param name="site-title" value="WaterSMART"/>
+            <jsp:param name="site-title" value="WaterSMART Model Intercomparison Portal"/>
         </jsp:include>
 
         <div id="xslt-output-div"></div>

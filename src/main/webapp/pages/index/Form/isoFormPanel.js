@@ -200,9 +200,40 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                                 LOG.debug(action);
                             },
                             params:{},
-                            waitMsg:'Saving...'
+                            waitMsg:'Loading...'
                         });
                     }
+            }, {
+                text: 'Save to Geonetwork',
+                type: 'submit',
+                formBind: true,
+                handler: function(a, b, c) {
+                    var form = Ext.getCmp('test_form');
+                    form.getForm().submit({
+                        url: form.url,
+                        success: function(x, action) {
+                            var xml = action.response.responseXML;
+                            
+                            Ext.Ajax.request({
+                                url: 'geonetwork/csw',
+                                method: 'POST',
+                                xmlData: xml,
+                                success: function(response) {
+                                    var result = response.responseText;
+                                    LOG.debug(result);
+                                },
+                                failure: function(panel, fail) {
+                                    LOG.debug(fail);
+                                }
+                            });
+                        },
+                        failure: function(panel, fail) {
+                            LOG.debug(fail);
+                        },
+                        params: {transaction: true},
+                        waitMsg: 'Saving...'
+                    });
+                }
             }]
         }, config);
     WaterSMART.ISOFormPanel.superclass.constructor.call(this, config);

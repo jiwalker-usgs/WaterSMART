@@ -12,6 +12,25 @@
 <% pageContext.setAttribute("now", new org.joda.time.DateTime()); %>
 
 
+<c:if test="${param['transaction'] ne null}">
+<csw:Transaction xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+                 xmlns:gmd="http://www.isotc211.org/2005/gmd"
+                 xmlns:srv="http://www.isotc211.org/2005/srv"
+                 xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                 xmlns:gsr="http://www.isotc211.org/2005/gsr"
+                 xmlns:gss="http://www.isotc211.org/2005/gss"
+                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                 xmlns:gts="http://www.isotc211.org/2005/gts"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xmlns:gml="http://www.opengis.net/gml/3.2"
+                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                 xmlns:gco="http://www.isotc211.org/2005/gco"
+                 xmlns:gmi="http://www.isotc211.org/2005/gmi"
+                 xmlns:geonet="http://www.fao.org/geonetwork"
+                 xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://www.isotc211.org/2005/gmd/gmd.xsd http://www.isotc211.org/2005/srv http://schemas.opengis.net/iso/19139/20060504/srv/srv.xsd">
+    <csw:Insert>
+</c:if>
+        
 <gmd:MD_Metadata xmlns:gmd="http://www.isotc211.org/2005/gmd"
                  xmlns:srv="http://www.isotc211.org/2005/srv"
                  xmlns:gmx="http://www.isotc211.org/2005/gmx"
@@ -1096,3 +1115,7 @@
     </gmd:metadataMaintenance>
             --%>
 </gmd:MD_Metadata>
+<c:if test="${param['transaction'] ne null}">
+    </csw:Insert>
+</csw:Transaction>
+</c:if>

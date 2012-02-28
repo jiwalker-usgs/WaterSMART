@@ -155,6 +155,11 @@
             <artifactId>woodstox-core-lgpl</artifactId>
             <version>4.1.2</version>
         </dependency>
+        <dependency>
+            <groupId>acegisecurity</groupId>
+            <artifactId>acegi-security</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         
         <!-- Testing! -->
         <dependency>
@@ -163,7 +168,6 @@
             <version>4.10</version>
             <scope>test</scope>
         </dependency>
-
         
         <!-- javascript dependencies for overlaying-->
         <dependency>

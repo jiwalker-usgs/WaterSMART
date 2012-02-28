@@ -20,6 +20,7 @@
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>FORWARD</dispatcher>
     </filter-mapping>
+    
     <servlet>
         <servlet-name>OWSProxy</servlet-name>
         <servlet-class>gov.usgs.service.OWSProxyServletX</servlet-class>
