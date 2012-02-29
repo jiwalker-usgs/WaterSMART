@@ -1,11 +1,12 @@
 package gov.usgs.cida.watersmart.netcdf;
 
 import com.ctc.wstx.stax.WstxInputFactory;
+import gov.usgs.cida.config.DynamicReadOnlyProperties;
 import gov.usgs.cida.netcdf.dsg.Station;
-import gov.usgs.cida.watersmart.config.DynamicReadOnlyProperties;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import javax.naming.NamingException;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -33,7 +34,16 @@ public class StationLookup {
     
     private static Logger LOG = LoggerFactory.getLogger(StationLookup.class);
     // Read wfs endpoint from JNDI
-    private static DynamicReadOnlyProperties props = DynamicReadOnlyProperties.initProps();
+    private static DynamicReadOnlyProperties props = new DynamicReadOnlyProperties();
+    
+    static {
+        try {
+            props.addJNDIContexts(new String[0]);
+        }
+        catch (NamingException ex) {
+            LOG.debug("unable to add JNDI context", ex);
+        }
+    }
     
     // Call to get the list of all stations, create 
     public static List<Station> getStationList() {

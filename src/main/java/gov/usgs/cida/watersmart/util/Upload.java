@@ -1,11 +1,12 @@
 package gov.usgs.cida.watersmart.util;
 
 
-import gov.usgs.cida.watersmart.config.DynamicReadOnlyProperties;
+import gov.usgs.cida.config.DynamicReadOnlyProperties;
 import gov.usgs.cida.watersmart.netcdf.CreateDSGFromZip;
 import gov.usgs.cida.watersmart.netcdf.CreateDSGFromZip.ModelType;
 import java.io.*;
 import java.util.List;
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +26,12 @@ public class Upload extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        props = DynamicReadOnlyProperties.initProps();
+        try {
+            props = new DynamicReadOnlyProperties().addJNDIContexts(new String[0]);
+        }
+        catch (NamingException ex) {
+                // LOG
+        }
     }
 
     @Override

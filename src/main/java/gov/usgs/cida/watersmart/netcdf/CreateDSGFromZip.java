@@ -1,10 +1,10 @@
 package gov.usgs.cida.watersmart.netcdf;
 
+import gov.usgs.cida.config.DynamicReadOnlyProperties;
 import gov.usgs.cida.netcdf.dsg.Observation;
 import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Station;
 import gov.usgs.cida.netcdf.dsg.StationTimeSeriesNetCDFFile;
-import gov.usgs.cida.watersmart.config.DynamicReadOnlyProperties;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +12,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import javax.naming.NamingException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.NotImplementedException;
 
@@ -21,7 +22,16 @@ import org.apache.commons.lang.NotImplementedException;
  */
 public class CreateDSGFromZip {
     
-    private static final DynamicReadOnlyProperties props = DynamicReadOnlyProperties.initProps();
+    private static final DynamicReadOnlyProperties props = new DynamicReadOnlyProperties();
+    
+    static {
+        try {
+            props.addJNDIContexts(new String[0]);
+        }
+        catch (NamingException ex) {
+            // LOG
+        }
+    }
     
     public enum ModelType {
         SYE,

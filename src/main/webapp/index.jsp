@@ -1,7 +1,7 @@
 
 <%@page import="javax.naming.NamingException"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
-<%@page import="gov.usgs.cida.watersmart.config.DynamicReadOnlyProperties"%>
+<%@page import="gov.usgs.cida.config.DynamicReadOnlyProperties"%>
 <%@page language="java" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
@@ -25,7 +25,8 @@
             var CONFIG = {};
             
             <% 
-                DynamicReadOnlyProperties props = DynamicReadOnlyProperties.initProps(); 
+                DynamicReadOnlyProperties props = new DynamicReadOnlyProperties();
+                props.addJNDIContexts(new String[0]);
                 boolean development = Boolean.parseBoolean(props.getProperty("watersmart.development"));
             %>
             
