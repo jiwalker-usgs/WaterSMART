@@ -71,7 +71,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
 //                allowBlank: true
 //            },{
                 fieldLabel: 'Run Identifier',
-                name: 'title',
+                name: 'runIdent',
                 allowBlank: false
             },{
                 xtype : 'datefield',

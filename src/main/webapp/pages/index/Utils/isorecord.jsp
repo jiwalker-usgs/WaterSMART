@@ -180,9 +180,9 @@
 
             <gmd:citation>
                 <gmd:CI_Citation>
-                    <c:if test="${param['title'] ne null}">
+                    <c:if test="${param['model'] ne null}">
                         <gmd:title>
-                            <gco:CharacterString>${param['title']}</gco:CharacterString>
+                            <gco:CharacterString>${param['model']} ${param['version']} - ${param['runIdent']}</gco:CharacterString>
                         </gmd:title>
                     </c:if>
                     <c:if test="${param['creationDate'] ne null}">

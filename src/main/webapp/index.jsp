@@ -19,6 +19,7 @@
             <jsp:param name="nextReview" value="20130221" />
             <jsp:param name="expires" value="never" />
         </jsp:include>
+        <link type="text/css" rel="stylesheet" href="css/cswclient.css" />
         
         <script type="text/javascript">
             var WATERSMART = {};
