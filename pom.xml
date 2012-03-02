@@ -5,7 +5,7 @@
     <artifactId>watersmart-ui</artifactId>
     <packaging>war</packaging>
     <name>WaterSMART</name>
-    <version>002-SNAPSHOT</version>
+    <version>004-SNAPSHOT</version>
     
     <properties>
         <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
