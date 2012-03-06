@@ -14,10 +14,21 @@
     </head>
     <body>
         <h3>Identify yourself!</h3>
-        <%= (request.getParameter("code") != null) ? 
-            "<p style='color:red'>" + LoginMessage.getMessage(request.getParameter("code")) + "</p>":
-            ""  
+        <% 
+            String code = request.getParameter("code");
+            String msg = "";
+            if (code != null) {
+                int codeVal = -1;
+                try {
+                    codeVal = Integer.parseInt(code);
+                }
+                catch (NumberFormatException nfe) {
+                    codeVal = -1;
+                }
+                msg = "<p style='color:red'>" + LoginMessage.getMessage(codeVal) + "</p>";
+            }
         %>
+        <%= msg %>
         <form method="POST" action='<%= response.encodeURL("index.jsp")%>' >
             <table cellpadding="2" border="0" cellspacing="0">
                 <tr>

@@ -8,7 +8,7 @@ public enum LoginMessage {
     BAD_PASS(0, "Incorrect username or password"),
     BAD_GROUP(1, "User is authorized to view this page"),
     NOT_HTTPS(2, "You have been redirected to the secure login page"),
-    LOGOUT(3, "You have succesfully logged out"),
+    LOGOUT(3, "You have successfully logged out"),
     ERROR(-1, "How did you get here?");
     
     int code;
