@@ -8,6 +8,17 @@
     </welcome-file-list>
     
     <!-- Security ;) -->
+    <security-constraint>
+        <display-name>Security Constraint</display-name>
+        <web-resource-collection>
+            <web-resource-name>Protected Area</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+ 
     <filter>
         <filter-name>SessionFilter</filter-name>
         <filter-class>gov.usgs.cida.filter.SessionFilter</filter-class>

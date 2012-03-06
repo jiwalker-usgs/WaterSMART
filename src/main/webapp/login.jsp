@@ -4,6 +4,7 @@
     Author     : Jordan Walker <jiwalker@usgs.gov>
 --%>
 
+<%@page import="gov.usgs.cida.watersmart.ldap.LoginMessage"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -12,6 +13,11 @@
         <title>WaterSMART Login</title>
     </head>
     <body>
+        <h3>Identify yourself!</h3>
+        <%= (request.getParameter("code") != null) ? 
+            "<p style='color:red'>" + LoginMessage.getMessage(request.getParameter("code")) + "</p>":
+            ""  
+        %>
         <form method="POST" action='<%= response.encodeURL("index.jsp")%>' >
             <table cellpadding="2" border="0" cellspacing="0">
                 <tr>

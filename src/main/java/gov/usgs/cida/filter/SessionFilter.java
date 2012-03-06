@@ -1,6 +1,7 @@
 package gov.usgs.cida.filter;
 
 import gov.usgs.cida.watersmart.ldap.LDAPConnect;
+import gov.usgs.cida.watersmart.ldap.LoginMessage;
 import gov.usgs.cida.watersmart.ldap.User;
 import gov.usgs.cida.watersmart.util.JNDISingleton;
 import java.io.IOException;
@@ -53,7 +54,7 @@ public class SessionFilter extends HttpServlet implements Filter {
         if (null != httpreq.getParameter(LOGOUT)) {
             log.trace("logout: " + sessionUser.uid);
             session.invalidate();
-            httpresp.sendRedirect(redirectPage);
+            httpresp.sendRedirect(redirectPage + "?code=" + LoginMessage.LOGOUT);
             return;
         }
 
@@ -87,7 +88,7 @@ public class SessionFilter extends HttpServlet implements Filter {
                         log.debug(
                                 "Failed Authentication. Redirecting to login page.");
                         //redirect to nonauthhome.jsp in HTTPS
-                        httpresp.sendRedirect(redirectPage);
+                        httpresp.sendRedirect(redirectPage + "?code=" + LoginMessage.BAD_PASS);
                     }
                     else {
                         log.debug(
@@ -95,10 +96,15 @@ public class SessionFilter extends HttpServlet implements Filter {
                     }
                     return;
                 }
-                else {
+                else if (userObj.isAuthenticated()){
                     log.trace("Authentication Passed. Storing user in session.");
                     //Confirm we know this person
                     session.setAttribute(APP_AUTH, userObj);
+                }
+                else {
+                    log.trace("Correct password, user not in allowed group.");
+                    httpresp.sendRedirect(redirectPage + "?code=" + LoginMessage.BAD_GROUP);
+                    return;
                 }
             }
         }
@@ -107,7 +113,7 @@ public class SessionFilter extends HttpServlet implements Filter {
                 //HTTP
                 log.debug("Non-HTTPS protocol. Redirecting to secure page.");
                 //redirect to nonauthhome.jsp in HTTPS
-                httpresp.sendRedirect(redirectPage);
+                httpresp.sendRedirect(redirectPage + "?code=" + LoginMessage.NOT_HTTPS);
             }
             else {
                 log.debug("Non-HTTPS protocol. Returning empty response.");
