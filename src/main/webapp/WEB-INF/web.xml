@@ -53,7 +53,7 @@
     </filter>
     <filter-mapping>
         <filter-name>UrlRewriteFilter</filter-name>
-        <url-pattern>/tuckey*</url-pattern>
+        <url-pattern>/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>FORWARD</dispatcher>
     </filter-mapping>

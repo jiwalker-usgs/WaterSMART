@@ -45,6 +45,9 @@ public class SessionFilter extends HttpServlet implements Filter {
 //		String serverAuth = req.getHeader(SERVER_AUTH);
         User sessionUser = (developmentMode && null != developmentUser) ? developmentUser : (User)session.getAttribute(
                 APP_AUTH);
+        if (developmentMode && session.getAttribute(APP_AUTH) == null) {
+            session.setAttribute(APP_AUTH, developmentUser);
+        }
 //		Integer appAuthId = (Integer) session.getAttribute(APP_AUTH_ID);
 
         if (null != httpreq.getParameter(LOGOUT)) {
