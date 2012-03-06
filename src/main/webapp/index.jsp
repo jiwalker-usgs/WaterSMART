@@ -2,6 +2,7 @@
 <%@page import="javax.naming.NamingException"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
 <%@page import="gov.usgs.cida.config.DynamicReadOnlyProperties"%>
+<%@page import="gov.usgs.cida.watersmart.ldap.User"%>
 <%@page language="java" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
@@ -36,6 +37,8 @@
             CONFIG.GEOSERVER_URL = '<%= props.getProperty("watersmart.stations.url", "http://localhost:8080/geoserver/ows") %>';
             CONFIG.SITES_LAYER = '<%= props.getProperty("watersmart.stations.typeName", "watersmart:se_sites") %>';
             CONFIG.DEVELOPMENT = <%= development %>;
+
+            SESSION.USER = '<%= ((User)request.getSession().getAttribute("X_AUTH_REAL_USER")).uid %>';
 
             /**
              * Takes an element, checks the array for that element

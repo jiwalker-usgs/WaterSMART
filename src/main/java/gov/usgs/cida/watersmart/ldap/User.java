@@ -30,4 +30,10 @@ public class User {
     public boolean isAuthenticated() {
         return isAuthenticated;
     }
+    
+    public static User devUser() {
+        User user = new User("CN=Dev,OU=USGS,O=DOI", "devuser@usgs.gov", "Developer", "Dude", "dev");
+        user.setAuthentication(true);
+        return user;
+    }
 }

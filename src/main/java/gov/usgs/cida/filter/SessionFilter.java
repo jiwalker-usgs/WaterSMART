@@ -28,7 +28,7 @@ public class SessionFilter extends HttpServlet implements Filter {
      * DEVELOPMENT FLAG, TURNS OFF SSL requirement
      */
     public static boolean developmentMode;
-    public static String developmentUser;
+    public static User developmentUser;
     public boolean redirectOnFail;
     public static String redirectPage;
     public static String dataSource;
@@ -43,19 +43,19 @@ public class SessionFilter extends HttpServlet implements Filter {
         HttpSession session = httpreq.getSession();
 
 //		String serverAuth = req.getHeader(SERVER_AUTH);
-        String sessionUser = (developmentMode && null != developmentUser) ? developmentUser : (String) session.getAttribute(
+        User sessionUser = (developmentMode && null != developmentUser) ? developmentUser : (User)session.getAttribute(
                 APP_AUTH);
 //		Integer appAuthId = (Integer) session.getAttribute(APP_AUTH_ID);
 
         if (null != httpreq.getParameter(LOGOUT)) {
-            log.trace("logout: " + sessionUser);
+            log.trace("logout: " + sessionUser.uid);
             session.invalidate();
             httpresp.sendRedirect(redirectPage);
             return;
         }
 
         if (null != req.getParameter(REFRESH)) {
-            log.trace("refresh: " + sessionUser);
+            log.trace("refresh: " + sessionUser.uid);
             return;
         }
 
@@ -63,8 +63,8 @@ public class SessionFilter extends HttpServlet implements Filter {
         if (req.isSecure() || developmentMode) {
             //HTTPS or dev mode
 
-            if (null != sessionUser) {
-                log.trace(sessionUser + " already logged in");
+            if (null != sessionUser && sessionUser.isAuthenticated()) {
+                log.trace(sessionUser.uid + " already logged in");
             }
             else {
                 // special case for the redirect page
@@ -95,7 +95,7 @@ public class SessionFilter extends HttpServlet implements Filter {
                 else {
                     log.trace("Authentication Passed. Storing user in session.");
                     //Confirm we know this person
-                    session.setAttribute(APP_AUTH, userObj.uid);
+                    session.setAttribute(APP_AUTH, userObj);
                 }
             }
         }
@@ -139,7 +139,7 @@ public class SessionFilter extends HttpServlet implements Filter {
         if ("true".equals(dev)) {
             //Set Development true
             developmentMode = true;
-            developmentUser = "dev";
+            developmentUser = User.devUser();
         }
         else {
             //Production Mode
