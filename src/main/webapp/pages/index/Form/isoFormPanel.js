@@ -215,7 +215,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                             var xml = action.response.responseXML;
                             
                             Ext.Ajax.request({
-                                url: 'geonetwork/csw',
+                                url: 'service/geonetwork/csw',
                                 method: 'POST',
                                 xmlData: xml,
                                 success: function(response) {

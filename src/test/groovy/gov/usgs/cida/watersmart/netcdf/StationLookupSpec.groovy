@@ -17,11 +17,11 @@ class StationLookupSpec extends Specification {
         StationLookup.lookup(stationId) == index
         
         where:
-        stationId   | index
-        "02177000"  | 0
-        "02186000"  | 7
-        "02204130"  | 15
-        "blah"      | -1
+        stationId  | index
+        "02177000" | 0
+        "02186000" | 7
+        "02204130" | 15
+        "blah"     | -1
     }
 }
 

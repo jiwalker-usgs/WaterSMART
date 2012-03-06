@@ -23,23 +23,7 @@
             <name>CIDA Nexus Snapshots</name>
             <url>${cida.maven.url}/content/groups/public-snapshots/</url>
         </repository>
-        <repository>
-            <id>spock-snapshots</id>
-            <url>http://m2repo.spockframework.org/snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
     </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>spock-snapshots</id>
-            <url>http://m2repo.spockframework.org/snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 
     <scm>
         <connection>scm:git:http://gitub.com/USGS-CIDA/WaterSMART.git</connection>
@@ -208,7 +192,7 @@
         <dependency>
             <groupId>org.spockframework</groupId>
             <artifactId>spock-core</artifactId>
-            <version>0.6-groovy-1.8-SNAPSHOT</version>
+            <version>0.6-groovy-1.8</version>
             <scope>test</scope>
         </dependency>
 <!--        <dependency>
@@ -329,11 +313,6 @@
                         <artifactId>groovy-all</artifactId>
                         <version>1.8.6</version>
                     </dependency>
-<!--                    <dependency>
-                        <groupId>junit</groupId>
-                        <artifactId>junit</artifactId>
-                        <version>4.10</version>
-                    </dependency>-->
                 </dependencies>
             </plugin>
             <plugin>

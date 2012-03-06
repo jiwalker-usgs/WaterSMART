@@ -6,6 +6,7 @@ import gov.usgs.cida.netcdf.dsg.Station;
 import gov.usgs.cida.netcdf.dsg.StationTimeSeriesNetCDFFile;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import org.apache.commons.io.FileUtils;
@@ -58,6 +59,12 @@ public class SYEParserTest {
             Observation ob = syeParser.next();
             assertThat(((Float)ob.values[0]).floatValue(), is(equalTo(70.66f)));
         }
+    }
+    
+    @Test(expected=IllegalStateException.class)
+    public void testParseObservationsTooEarly() throws FileNotFoundException {
+        SYEParser syeParser = new SYEParser(new FileInputStream(sampleFile), sampleFile.getName());
+        Observation ob = syeParser.next();
     }
     
     @Test

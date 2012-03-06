@@ -41,7 +41,7 @@ WaterSMART.FileUploadPanel = Ext.extend(Ext.form.FormPanel, {
                     var fp = this.ownerCt.ownerCt; //Ext.getCmp('uploadPanel');
                     if(fp.getForm().isValid()) {
                         fp.getForm().submit({
-                            url: 'upload',
+                            url: 'service/upload',
                             waitMsg: 'Please be patient while your file uploads',
                             success: function(fp, o) {
                                 Ext.Msg.show({
