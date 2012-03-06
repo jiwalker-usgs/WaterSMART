@@ -30,6 +30,7 @@
                 DynamicReadOnlyProperties props = new DynamicReadOnlyProperties();
                 props.addJNDIContexts(new String[0]);
                 boolean development = Boolean.parseBoolean(props.getProperty("watersmart.development"));
+                User user = (User)request.getSession().getAttribute("X_AUTH_REAL_USER");
             %>
             
             CONFIG.LOG4JS_PATTERN_LAYOUT = '<%= props.getProperty("watersmart.frontend.log4js.pattern.layout","%rms - %-5p - %m%n") %>';
@@ -38,7 +39,7 @@
             CONFIG.SITES_LAYER = '<%= props.getProperty("watersmart.stations.typeName", "watersmart:se_sites") %>';
             CONFIG.DEVELOPMENT = <%= development %>;
 
-            SESSION.USER = '<%= ((User)request.getSession().getAttribute("X_AUTH_REAL_USER")).uid %>';
+            WATERSMART.USER = '<%= (user == null) ? "" : user.uid %>';
 
             /**
              * Takes an element, checks the array for that element
