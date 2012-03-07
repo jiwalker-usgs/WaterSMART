@@ -85,8 +85,7 @@ public class SessionFilter extends HttpServlet implements Filter {
                 User userObj = authenticateUser(user, pass);
                 if (null == userObj) {
                     if (redirectOnFail) {
-                        log.debug(
-                                "Failed Authentication. Redirecting to login page.");
+                        log.debug("Failed Authentication. Redirecting to login page.");
                         //redirect to nonauthhome.jsp in HTTPS
                         httpresp.sendRedirect(redirectPage + "?code=" + LoginMessage.BAD_PASS);
                     }

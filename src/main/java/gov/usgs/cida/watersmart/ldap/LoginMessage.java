@@ -6,10 +6,10 @@ package gov.usgs.cida.watersmart.ldap;
  */
 public enum LoginMessage {
     BAD_PASS(0, "Incorrect username or password"),
-    BAD_GROUP(1, "User is authorized to view this page"),
+    BAD_GROUP(1, "User is not authorized to view this page"),
     NOT_HTTPS(2, "You have been redirected to the secure login page"),
     LOGOUT(3, "You have successfully logged out"),
-    ERROR(-1, "How did you get here?");
+    ERROR(-1, "How did I get here?");
     
     int code;
     String msg;

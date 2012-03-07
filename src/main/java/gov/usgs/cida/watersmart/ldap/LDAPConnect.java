@@ -6,7 +6,10 @@ import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.directory.*;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.InitialDirContext;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,8 +24,7 @@ public class LDAPConnect {
 
     static {
         try {
-            jndiProps = new DynamicReadOnlyProperties().addJNDIContexts(
-                    new String[0]);
+            jndiProps = new DynamicReadOnlyProperties().addJNDIContexts(new String[0]);
         }
         catch (NamingException ex) {
             // LOG
@@ -64,10 +66,10 @@ public class LDAPConnect {
                 String dn = result.getNameInNamespace();
                 
                 user = new User(dn, mail, givenname, sn, uid);
-                
+                String group = jndiProps.getProperty("watersmart.ldap.group");
                 answers = context.search(
                         "", 
-                        "(&(objectClass=groupOfNames)(cn=GS-W-WImdn CIDA Javadev)(member=" + dn + "))",
+                        "(&(objectClass=groupOfNames)(cn=" + group + ")(member=" + dn + "))",
                         null);
                 if (answers.hasMore()) {
                     user.setAuthentication(true);

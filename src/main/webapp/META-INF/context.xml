@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context antiJARLocking="true" path="/watersmart">
-    <!-- watersmart environment -->
+    <!-- watersmart environment using this like documentation for what settings are available -->
     <Environment name="watersmart.frontend.log4js.pattern.layout" type="java.lang.String" value="%rms - %-5p - %m%n" />
     <Environment name="watersmart.frontend.log4js.threshold" type="java.lang.String" value="debug" />
     <Environment name="watersmart.development" type="java.lang.String" value="true" />
@@ -10,4 +10,9 @@
     <Environment name="watersmart.stations.typeName" type="java.lang.String" value="watersmart:se_sites" />
     <Environment name="watersmart.stations.primaryAttribute" type="java.lang.String" value="site_no" />
     <Environment name="watersmart.sos.location" type="java.lang.String" value="/mnt/gdp/data/thredds/watersmart/sos" />
+    <Environment name="watersmart.ldap.url" type="java.lang.String" value="ldaps://gsvaresh02.er.usgs.gov:636" />
+    <Environment name="watersmart.ldap.group" type="java.lang.String" value="GS-W-WImdn CIDA Javadev" override="false" />
+    <Environment name="watersmart.geonetwork.addr" type="java.lang.String" value="http://130.11.165.241:8081/geonetwork" override="false" />
+    <Environment name="watersmart.geonetwork.user" type="java.lang.String" value="watersmart" override="false" />
+    <Environment name="watersmart.geonetwork.pass" type="java.lang.String" value="not_the_password" override="false" />
 </Context>
