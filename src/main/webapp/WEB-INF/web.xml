@@ -7,12 +7,12 @@
         <welcome-file>login.jsp</welcome-file>
     </welcome-file-list>
     
-    <!-- Security ;) -->
+    <!-- Security -->
     <security-constraint>
         <display-name>Security Constraint</display-name>
         <web-resource-collection>
             <web-resource-name>Protected Area</web-resource-name>
-            <url-pattern>/*</url-pattern>
+            <url-pattern>/login.jsp</url-pattern>
         </web-resource-collection>
         <user-data-constraint>
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
@@ -72,7 +72,6 @@
     <servlet>
         <servlet-name>OWSProxy</servlet-name>
         <servlet-class>gov.usgs.service.OWSProxyServletX</servlet-class>
-        <!--        <servlet-class>gov.usgs.service.OWSProxyServlet</servlet-class>-->
         <init-param>
             <param-name>getRequestURIKey</param-name>
             <param-value>/proxy/*</param-value>
