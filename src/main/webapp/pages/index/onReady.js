@@ -2,7 +2,6 @@ if (Ext.isIE) { // http://www.mail-archive.com/users@openlayers.org/msg01838.htm
     document.namespaces;
 }
 
-var CONTROLLER;
 var VIEWPORT;
 
 Ext.onReady(function() {
@@ -14,19 +13,6 @@ Ext.onReady(function() {
     LOADMASK.show();
 	
     var map = new WaterSMART.Map();
-//    var options = new NAWQA.OptionsPanel({
-//        binStore : new GeoExt.data.LayerStore()
-//    });
-//	
-//	var mainMenu = new NAWQA.MainMenu({
-//        optionsPanel : options
-//    });
-//	
-//    CONTROLLER = new NAWQA.Controller({
-//        mapPanel : map,
-//		mainMenu : mainMenu
-//    });
-//	
     var metaForm = new WaterSMART.ISOFormPanel();
     var uploadForm = new WaterSMART.FileUploadPanel();
 
@@ -50,9 +36,6 @@ Ext.onReady(function() {
             forms,
             map
         ]
-//        map
-//        ],
-//        tbar : mainMenu
     });
 	
     var headerPanel = new Ext.Panel({
@@ -90,7 +73,7 @@ function initializeAjax() {
         "ajax-request-firing",
         "ajax-requests-complete",
         "ajax-request-exception"
-    );
+        );
         
     Ext.Ajax.on('beforerequest', function(connection, options) {
         if (!Ext.Ajax.isLoading()) {
