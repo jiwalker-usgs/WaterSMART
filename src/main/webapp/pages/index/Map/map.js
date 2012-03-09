@@ -65,6 +65,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
         this.map = new OpenLayers.Map({
             maxExtent: this.COUNTRY_BBOX,
             controls: [
+            new OpenLayers.Control.Navigation(),
             new OpenLayers.Control.OverviewMap(),
             new OpenLayers.Control.MousePosition({
                 prefix : 'POS: '
