@@ -65,6 +65,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
         this.map = new OpenLayers.Map({
             maxExtent: this.COUNTRY_BBOX,
             controls: [
+            new OpenLayers.Control.Navigation(),
             new OpenLayers.Control.OverviewMap(),
             new OpenLayers.Control.MousePosition({
                 prefix : 'POS: '
@@ -106,131 +107,36 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
             );
        
         this.processMapConfigObject(this.defaultMapConfig);
-       
-//        this.addEditingToolbarToMap();
         this.addIdentifyToolingToMap();
         this.map.events.on({
-            /**
-             * Triggered before a layer has been removed. The event
-             * object will include a *layer* property that references the layer  
-             * to be removed. When a listener returns "false" the removal will be 
-             * aborted.
-             */
             'preremovelayer' :  function (event) {
-            //                try {
-            //                    var map = event.object;
-            //                    var layer = event.layer;
-            //                    var wmsGetFeatureInfoControl = map.getControlsBy('displayClass', 'olControlWMSGetFeatureInfo')[0];
-            //                    var layerIndex = -1;
-            //                    if (wmsGetFeatureInfoControl) {
-            //                        layerIndex = wmsGetFeatureInfoControl.layers.contains(layer);
-            //                    }
-            //                
-            //                    // While removing identifiable layers from our map, 
-            //                    // we also want to remove these layers from our identifier control
-            //                    if (layerIndex > -1) {
-            //                //                    wmsGetFeatureInfoControl.layers.splice(layerIndex, 1);
-            //                    }
-            //                } catch (e) {
-            //                    // This is an issue with IE. We may have ended up here because 
-            //                    // of an exception thrown in the command chain in line 207.
-            //                    // This occurs when we are trying to reload the application.
-            //                    // I don't know yet whether or not to handle this
-            //                    LOG.warn(e)
-            //                }
             },
-            /**
-             * Triggered before a layer has been added.  The event
-             * object will include a *layer* property that references the layer  
-             * to be added. When a listener returns "false" the adding will be 
-             * aborted.
-             */     
             'preaddlayer' : function (event) {
-                var map = event.object;
                 var layer = event.layer;
-                var wmsGetFeatureInfoControl = map.getControlsBy('displayClass', 'olControlWMSGetFeatureInfo')[0];
-               
-                // We want to let our application know that this layer is loading and 
-                // also when it has finished loading
-                // "loadstart", "loadend", "loadcancel"
                 layer.events.on({
-                    'loadstart' : function (args) {
-                        var element = args.element;
-                        var layer = args.object;
+                    'loadstart' : function () {
                         this.layersLoading++;
                         LOG.debug('map.js::Layer loading started. Layers loading: ' + this.layersLoading);
                         if (this.layersLoading == 1) {
                             this.fireEvent("layer-load-start");
                         }
                     },
-                    'loadend' : function(args) {
-                        var element = args.element;
-                        var layer = args.object;
+                    'loadend' : function() {
                         this.layersLoading--;
                         LOG.debug('map.js::Layer loading ended. Layers loading: ' + this.layersLoading);
                         if (this.layersLoading === 0) {
                             this.fireEvent("layer-load-end");
                         }
                     },
-                    'loadcancel' : function (args) {
+                    'loadcancel' : function () {
                         this.layersLoading = 0;
                         LOG.debug('map.js::Layer loading cancelled. Layers loading: ' + this.layersLoading);
                     },
                     scope : this
                 })              
-                // If the layer we have is identifiable, 
-                // add that layer to our identifier control
-                if (layer.metadata.identifiable) {
-                //                    wmsGetFeatureInfoControl.layers.push(layer);
-                }
             },
             scope : this
         })
-    },
-    /**
-     * Adds an OpenLayers.Control.EditingToolbar to the map
-     */
-    addEditingToolbarToMap : function() {
-        LOG.trace('map.js::constructor(): Creating editing toolbar control, adding it to the map.');
-        var editingVectorLayer = new OpenLayers.Layer.Vector(
-            "selection-vector-layer",{
-                'renderers' : ["SVG", "VML", "Canvas"]
-            }
-            );
-        var editingToolbarControl = new OpenLayers.Control.EditingToolbar(editingVectorLayer);
-        LOG.trace('map.js::constructor(): Removing path control from editing toolbar control.');
-        
-        // Remove line and point controls. We only need polygon currently
-        editingToolbarControl.controls.remove(editingToolbarControl.getControlsBy('displayClass', 'olControlDrawFeaturePath')[0])
-        editingToolbarControl.controls.remove(editingToolbarControl.getControlsBy('displayClass', 'olControlDrawFeaturePoint')[0])
-//      
-//        // Instead of adding a navigation control to the map, we will use the editingToolbarControl's navigation control
-//        var navigationControl = editingToolbarControl.getControlsBy('displayClass', 'olControlNavigation')[0];
-//        navigationControl.dragPanOptions = {
-//            enableKinetic : true
-//        };
-//        navigationControl.pinchZoomOptions = {
-//            autoActivate : true
-//        };
-//        navigationControl.documentDrag = true;
-//        navigationControl.handleRightClicks = true;
-//        navigationControl.zoomBoxEnabled = true;
-//        navigationControl.zoomWheelEnabled = true
-//       
-//        var polyFeatureControl = editingToolbarControl.getControlsBy('displayClass', 'olControlDrawFeaturePolygon')[0];
-//        polyFeatureControl.handler.persist = true;
-//        polyFeatureControl.events.on({
-//            'featureadded' : function(a) {
-//                var polygonBounds = a.feature.geometry.components[0].getBounds();
-//                LOG.debug('map.js:: User drew a polygon on the map -> ' + polygonBounds)
-//                LOG.debug('map.js:: Zooming map to ' + polygonBounds);
-//                this.map.zoomToExtent(polygonBounds);
-//                this.controller.polygonCreated(a.feature);
-//            },
-//            scope: this
-//        })
-        LOG.info('map.js::constructor(): Adding new control to map.');
-        this.map.addControls([editingToolbarControl]);
     },
     addIdentifyToolingToMap: function() {
         var getFeatureInfoControl = new OpenLayers.Control.WMSGetFeatureInfo({
@@ -240,43 +146,35 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
             eventListeners : {
                 getfeatureinfo : function(event) {
                     if (event.features && event.features[0]){
-                        var panel = new WaterSMART.Plotter();
-                        panel.loadSOSStore({
-                            url : "http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/SYE.nc",
-                            vars : 'estq,obsq'
-                        }, event.features[0].attributes.site_no);
 
                         if(!this.popup) {
                             this.popup = new GeoExt.Popup({
                                 title: event.features[0].attributes.station_nm,
                                 anchored: false,
-                                //                                location: OpenLayers.Projection.transform(
-                                //                                    event.features[0].geometry,
-                                //                                    "EPSG:4269",
-                                //                                    "EPSG:900913"
-                                //                                ),
                                 width: 600,
                                 height: 300,
                                 map: this.map,
-                                items : [
-                                panel
-                                ],
                                 collapsible: true,
-                                closeAction: 'hide'
-                            });
-                            this.popup.on('resize', function() {
-                                panel.resizePlotter();
+                                closeAction: 'hide',
+                                listeners : {
+                                    'resize' : function(popup, width, height) {
+                                        popup.plotterPanel.resizePlotter(width, height);
+                                    },
+                                    'hide' : function(popup) {
+                                        popup.removeAll(false);
+                                    }
+                                }
                             });
                         } else {
-                            //                            this.popup.location = OpenLayers.Projection.transform(
-                            //                                    event.features[0].geometry,
-                            //                                    new OpenLayers.Projection("EPSG:4269"),
-                            //                                    new OpenLayers.Projection("EPSG:900913")
-                            //                                );
                             this.popup.setTitle(event.features[0].attributes.station_nm);
                         }
-                        this.popup.show();
                         
+                        new WaterSMART.Plotter({
+                            url : "http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/SYE.nc",
+                            vars : 'estq,obsq',
+                            offering : event.features[0].attributes.site_no,
+                            ownerWindow : this.popup
+                        })
                     }
                 },
                 scope: this

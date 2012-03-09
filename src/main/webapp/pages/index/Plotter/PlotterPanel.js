@@ -1,32 +1,43 @@
 Ext.ns("WaterSMART");
 
 WaterSMART.Plotter = Ext.extend(Ext.Panel, {
+    contentPanel : undefined,
+    legendDiv : undefined,
+    legendPanel : undefined,
     plotterData : [],
     plotterTitle : undefined,
     plotterDiv : undefined,
-    legendDiv : undefined,
     height : undefined,
     legendWidth : undefined,
+    offering : undefined,
     sosStore : undefined,
     graph : undefined,
+    ownerWindow : undefined,
+    url : undefined,
+    vars : undefined,
     yLabels : [],
     constructor : function(config) {
         config = config || {};
         this.plotterDiv = config.plotterDiv || 'dygraph-content';
         this.legendDiv = config.legendDiv || 'dygraph-legend';
         this.legendWidth = config.legendWidth || 100;
-        this.height = config.height || 200;
+        this.height = config.height || 250;
         this.plotterTitle = config.title || 'Demo';
+        this.offering = config.offering;
+        this.ownerWindow = config.ownerWindow;
+        this.url = config.url || "http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/SYE.nc";
+        this.vars = config.vars;
         
-        var contentPanel = new Ext.Panel({
+        this.contentPanel = new Ext.Panel({
             contentEl : this.plotterDiv,
+            id : 'contentPanel',
             itemId : 'contentPanel',
             ref : '../contentPanel',
             layout : 'fit',
             region : 'center',
             autoShow : true
         });
-        var legendPanel = new Ext.Panel({
+        this.legendPanel = new Ext.Panel({
             itemId : 'legendPanel',
             ref : '../legendPanel',
             contentEl : this.legendDiv,
@@ -37,19 +48,25 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
         });
         
         config = Ext.apply({
-            items : [contentPanel, legendPanel],
+            items : [this.contentPanel, this.legendPanel],
+            ref : 'plotterPanel',
             layout : 'border',
             autoShow : true,
-            //tbar : this.toolbar,
             bufferResize : true,
             split: true
         }, config);
         
         WaterSMART.Plotter.superclass.constructor.call(this, config);
+        
+        this.loadSOSStore({
+            url : this.url,
+            vars : this.vars,
+            offering : this.offering
+        })
     },
-    loadSOSStore : function(meta, offering) {
-        var url = "proxy/" + meta.url + "?service=SOS&request=GetObservation&version=1.0.0&offering=" + encodeURI(offering) + "&observedProperty=" + meta.vars;
-        this.yLabels = meta.vars.split(',');
+    loadSOSStore : function(options) {
+        var url = "proxy/" + options.url + "?service=SOS&request=GetObservation&version=1.0.0&offering=" + encodeURI(options.offering) + "&observedProperty=" + options.vars;
+        this.yLabels = options.vars.split(',');
         this.sosStore = new GDP.SOSGetObservationStore({
             url : url, // gmlid is url for now, eventually, use SOS endpoint + gmlid or whatever param
             autoLoad : true,
@@ -61,7 +78,13 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
             baseParams : {},
             listeners : {
                 load : function(store) {
-                    this.globalArrayUpdate(store, meta);
+                    this.globalArrayUpdate(store);
+                    if (this.sosStore.data.items.length) {
+                        this.ownerWindow.add(this);
+                        this.ownerWindow.show();
+                    } else {
+                        this.ownerWindow.hide();
+                    }
                 },
                 exception : function() {
                     LOG.debug('Plotter: SOS store has encountered an exception.');
@@ -76,7 +99,7 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
             
         });
     },
-    globalArrayUpdate : function(store, meta) {
+    globalArrayUpdate : function(store) {
         LOG.debug('Plotter:globalArrayUpdate()');
         var record = store.getAt(0);
         if (!record) {
@@ -104,15 +127,26 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
 
         this.dygraphUpdateOptions(store);
     },
-    resizePlotter : function() {
-        LOG.debug('Plotter:resizePlotter()');
-        var divPlotter = Ext.get(this.plotterDiv);
-        var divLegend = Ext.get(this.legendDiv);
+    resizePlotter : function(width, height) {
+        LOG.debug('Plotter:resizePlotter(): Incoming width: '+width+', incoming height: ' + height);
+        var divPlotter = Ext.fly(this.plotterDiv);
+        var divLegend = Ext.fly(this.legendDiv);
         
+        LOG.debug('Plotter:resizePlotter(): Setting legend div width to ' + this.legendWidth);
         divLegend.setWidth(this.legendWidth);
-        divPlotter.setWidth(this.getWidth() - (this.legendWidth + 2));
-        divPlotter.setHeight(this.getHeight()); 
+        
+        LOG.debug('Plotter:resizePlotter(): Setting plotter div width to ' + ((width + 2) - divLegend.getWidth()));
+        divPlotter.setWidth((width + 2) - this.legendWidth -20);
+
+        var panelHeight = height;
+        var plotterDivHeight = height - 40
+        LOG.debug('Plotter:resizePlotter(): Setting plotter PlotterPanel height to ' + panelHeight);
+        LOG.debug('Plotter:resizePlotter(): Setting plotter Plotter div height to ' + plotterDivHeight);
+        this.setHeight(height);
+        divPlotter.setHeight(height - 40); 
+        
         if (this.graph) {
+            LOG.debug('Plotter:resizePlotter(): Setting graph width ' + divPlotter.getWidth() + ', height: ' + divPlotter.getHeight());
             this.graph.resize(divPlotter.getWidth(), divPlotter.getHeight());
         }
     },
