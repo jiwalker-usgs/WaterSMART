@@ -25,7 +25,7 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
         this.plotterTitle = config.title || 'Demo';
         this.offering = config.offering;
         this.ownerWindow = config.ownerWindow;
-        this.url = config.url || "http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/SYE.nc";
+        this.url = config.url;
         this.vars = config.vars;
         
         this.contentPanel = new Ext.Panel({
