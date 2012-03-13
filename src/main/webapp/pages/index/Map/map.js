@@ -4,6 +4,7 @@ Ext.ns("WaterSMART");
 WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
     layersLoading : 0,
     controller : undefined,
+    cswRecordStore : undefined,
     WGS84 : new OpenLayers.Projection("EPSG:4326"),
     WGS84_GOOGLE_MERCATOR : new OpenLayers.Projection("EPSG:900913"),
     defaultMapConfig : {
@@ -22,7 +23,18 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
         LOG.debug('map.js::constructor()');
         var options = config || {};
         
-        this.SOSEndpoint = options.SOSEndpoint;
+        this.cswRecordStore = options.cswRecordStore;
+        var idInfo = this.cswRecordStore.data.items[0].get("identificationInfo");
+        this.SOSEndpoint = function(idInfo) {
+            var url = '';
+            Ext.each(idInfo, function(idInfoItem) {
+                if (idInfoItem.serviceIdentification && idInfoItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
+                    url = idInfoItem.serviceIdentification.operationMetadata.linkage.URL;
+                    return false;
+                }
+            }, this)
+            return url;
+        }(idInfo)
         
         var EPSG900913Options = {
             sphericalMercator : true,
@@ -174,7 +186,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
                         
                         new WaterSMART.Plotter({
                             url : this.SOSEndpoint,
-                            vars : 'estq,obsq',
+                            vars : 'Discharge',
                             offering : event.features[0].attributes.site_no,
                             ownerWindow : this.popup
                         })
