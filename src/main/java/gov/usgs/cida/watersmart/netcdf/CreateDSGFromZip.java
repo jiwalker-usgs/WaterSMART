@@ -37,7 +37,7 @@ public class CreateDSGFromZip {
         SYE,
         WATERS,
         PRMS,
-        FINCH;
+        AFINCH;
     }
     
     public static void create(File srcZip, ModelType type) throws IOException {

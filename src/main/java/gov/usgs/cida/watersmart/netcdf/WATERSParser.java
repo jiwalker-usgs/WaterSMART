@@ -101,9 +101,6 @@ public class WATERSParser extends DSGParser {
 
     @Override
     public RecordType parseMetadata() {
-        
-        // this.stationIndex = somewhere.stationLookup(getStationId(this.filename));
-        this.stationIndex = 0; // TODO do some sort of lookup here
 
         try {
             reader.mark(READ_AHEAD_LIMIT);
@@ -138,7 +135,7 @@ public class WATERSParser extends DSGParser {
                 else {
                     String station = getStationId(line);
                     if (station != null) {
-                        //this.stationIndex = lookup(station);
+                        this.stationIndex = StationLookup.lookup(station);
                     }
                     else {
                         String user = getUser(line);
