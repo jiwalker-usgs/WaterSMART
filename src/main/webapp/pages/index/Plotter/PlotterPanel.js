@@ -67,7 +67,7 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
     loadSOSStore : function(options) {
         var url = "proxy/" + options.url + "?service=SOS&request=GetObservation&version=1.0.0&offering=" + encodeURI(options.offering) + "&observedProperty=" + options.vars;
         this.yLabels = options.vars.split(',');
-        this.sosStore = new GDP.SOSGetObservationStore({
+        this.sosStore = new CIDA.SOSGetObservationStore({
             url : url, // gmlid is url for now, eventually, use SOS endpoint + gmlid or whatever param
             autoLoad : true,
             proxy : new Ext.data.HttpProxy({
