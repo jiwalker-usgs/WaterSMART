@@ -16,7 +16,9 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
         center : new OpenLayers.LonLat(-9506240,395340)
     },
     owsEndpoint : undefined,
+    plotterVars : undefined,
     popup : undefined,
+    sitesLayerName : undefined,
     sosEndpoint : undefined,
     WGS84 : new OpenLayers.Projection("EPSG:4326"),
     WGS84_GOOGLE_MERCATOR : new OpenLayers.Projection("EPSG:900913"),
@@ -25,28 +27,17 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
         var options = config || {};
         
         this.cswRecordStore = options.cswRecordStore;
-        var idInfo = this.cswRecordStore.data.items[0].get("identificationInfo");
-        this.sosEndpoint = function(idInfo) {
-            var url = '';
-            Ext.each(idInfo, function(idInfoItem) {
-                if (idInfoItem.serviceIdentification && idInfoItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
-                    url = idInfoItem.serviceIdentification.operationMetadata.linkage.URL;
-                    return false;
-                }
-            }, this)
-            return url;
-        }(idInfo)
+        Ext.each(this.cswRecordStore.data.items[0].get("identificationInfo"), function(idInfoItem) {
+            if (idInfoItem.serviceIdentification && idInfoItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
+                this.sosEndpoint = idInfoItem.serviceIdentification.operationMetadata.linkage.URL;
+                this.plotterVars = idInfoItem.serviceIdentification.operationMetadata.name.CharacterString.value;
+            }
+            if (idInfoItem.serviceIdentification && idInfoItem.serviceIdentification.id.toLowerCase() === 'geoserver') {
+                this.owsEndpoint = idInfoItem.serviceIdentification.operationMetadata.linkage.URL;
+                this.sitesLayerName = idInfoItem.serviceIdentification.operationMetadata.name.CharacterString.value;
+            }
+        }, this)
         
-        this.owsEndpoint = function(idInfo) {
-            var url = '';
-            Ext.each(idInfo, function(idInfoItem) {
-                if (idInfoItem.serviceIdentification && idInfoItem.serviceIdentification.id.toLowerCase() === 'geoserver') {
-                    url = idInfoItem.serviceIdentification.operationMetadata.linkage.URL;
-                    return false;
-                }
-            }, this)
-            return url;
-        }(idInfo);
         
         var EPSG900913Options = {
             sphericalMercator : true,
@@ -58,14 +49,12 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
             buffer : 3,
             transitionEffect : 'resize'
         };
-        
-        var sitesLayerName = CONFIG.SITES_LAYER;
 					
         var sitesLayer = new OpenLayers.Layer.WMS(
             'WaterSMART: Stations',
             this.owsEndpoint,
             {
-                LAYERS: sitesLayerName,
+                LAYERS: this.sitesLayerName,
                 transparent : true,
                 format: 'image/png'
             },
@@ -198,7 +187,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
                         
                         new WaterSMART.Plotter({
                             url : this.sosEndpoint,
-                            vars : 'Discharge',
+                            vars : this.plotterVars,
                             offering : event.features[0].attributes.site_no,
                             ownerWindow : this.popup
                         })
