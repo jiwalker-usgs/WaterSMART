@@ -5,8 +5,6 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
     layersLoading : 0,
     controller : undefined,
     cswRecordStore : undefined,
-    WGS84 : new OpenLayers.Projection("EPSG:4326"),
-    WGS84_GOOGLE_MERCATOR : new OpenLayers.Projection("EPSG:900913"),
     defaultMapConfig : {
         layers : {
             baseLayers : [],
@@ -17,15 +15,18 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
         initialExtent : new OpenLayers.Bounds(-9847210.8347114,3508563.9150696,-9055506.6162999,4451100.8664317),
         center : new OpenLayers.LonLat(-9506240,395340)
     },
+    owsEndpoint : undefined,
     popup : undefined,
-    SOSEndpoint : undefined,
+    sosEndpoint : undefined,
+    WGS84 : new OpenLayers.Projection("EPSG:4326"),
+    WGS84_GOOGLE_MERCATOR : new OpenLayers.Projection("EPSG:900913"),
     constructor : function(config) {
         LOG.debug('map.js::constructor()');
         var options = config || {};
         
         this.cswRecordStore = options.cswRecordStore;
         var idInfo = this.cswRecordStore.data.items[0].get("identificationInfo");
-        this.SOSEndpoint = function(idInfo) {
+        this.sosEndpoint = function(idInfo) {
             var url = '';
             Ext.each(idInfo, function(idInfoItem) {
                 if (idInfoItem.serviceIdentification && idInfoItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
@@ -35,6 +36,17 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
             }, this)
             return url;
         }(idInfo)
+        
+        this.owsEndpoint = function(idInfo) {
+            var url = '';
+            Ext.each(idInfo, function(idInfoItem) {
+                if (idInfoItem.serviceIdentification && idInfoItem.serviceIdentification.id.toLowerCase() === 'geoserver') {
+                    url = idInfoItem.serviceIdentification.operationMetadata.linkage.URL;
+                    return false;
+                }
+            }, this)
+            return url;
+        }(idInfo);
         
         var EPSG900913Options = {
             sphericalMercator : true,
@@ -51,7 +63,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
 					
         var sitesLayer = new OpenLayers.Layer.WMS(
             'WaterSMART: Stations',
-            CONFIG.GEOSERVER_URL,
+            this.owsEndpoint,
             {
                 LAYERS: sitesLayerName,
                 transparent : true,
@@ -185,7 +197,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
                         }
                         
                         new WaterSMART.Plotter({
-                            url : this.SOSEndpoint,
+                            url : this.sosEndpoint,
                             vars : 'Discharge',
                             offering : event.features[0].attributes.site_no,
                             ownerWindow : this.popup
