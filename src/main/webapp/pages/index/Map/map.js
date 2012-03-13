@@ -17,9 +17,12 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
         center : new OpenLayers.LonLat(-9506240,395340)
     },
     popup : undefined,
-   
+    SOSEndpoint : undefined,
     constructor : function(config) {
         LOG.debug('map.js::constructor()');
+        var options = config || {};
+        
+        this.SOSEndpoint = options.SOSEndpoint;
         
         var EPSG900913Options = {
             sphericalMercator : true,
@@ -170,7 +173,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
                         }
                         
                         new WaterSMART.Plotter({
-                            url : "http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/SYE.nc",
+                            url : this.SOSEndpoint,
                             vars : 'estq,obsq',
                             offering : event.features[0].attributes.site_no,
                             ownerWindow : this.popup

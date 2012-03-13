@@ -90,6 +90,7 @@
             <jsp:param name="debug-qualifier" value="<%= development %>" />
         </jsp:include>
         <jsp:include page="js/geoext/ux/SOS/SOS.jsp"/>
+        <jsp:include page="js/geoext/ux/CSW/CSW.jsp"/>
 
         <jsp:include page="js/log4javascript/log4javascript.jsp"/>
         <jsp:include page="js/ext/ux/notify/notify.jsp"/>
@@ -103,8 +104,6 @@
         <script type="text/javascript" src="pages/index/Plotter/PlotterPanel.js"></script>
         <script type="text/javascript" src="pages/index/Map/map.js"></script>
         <script type="text/javascript" src="pages/index/onReady.js"></script>
-        
-        
         
     </head>
     <body>
