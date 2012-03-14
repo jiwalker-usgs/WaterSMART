@@ -10,7 +10,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>WaterSMART Login</title>
+        <title>WaterSMART</title>
         <jsp:include page="template/USGSHead.jsp">
             <jsp:param name="shortName" value="WaterSMART" />
             <jsp:param name="title" value="WaterSMART Model Intercomparison Portal" />
@@ -39,50 +39,98 @@
                 int codeVal = -1;
                 try {
                     codeVal = Integer.parseInt(code);
-                }
-                catch (NumberFormatException nfe) {
+                } catch (NumberFormatException nfe) {
                     codeVal = -1;
                 }
                 msg = "<p style=\"color:red\">" + LoginMessage.getMessage(codeVal) + "</p>";
             }
         %>
-        
+
         <script type="text/javascript">
             Ext.onReady(function() {
                 initializeLoadMask();
                 LOADMASK.show();
                 
-                var body = new Ext.FormPanel({
+                var bodyPanel = new Ext.Panel({
+                    id : 'body-panel',
+                    layout : 'column',
                     region: 'center',
-                    border: false,
-                    autoShow: true,
-                    standardSubmit: true,
-                    url: 'index.jsp',
-                    title: 'Identify Yourself!',
-                    items: [{
-                            xtype: 'displayfield',
-                            html: '<%= msg %>'
-                        },{
-                            fieldLabel: 'Username',
-                            xtype: 'textfield',
-                            name: 'username'
-                        }, {
-                            fieldLabel: 'Password',
-                            xtype: 'textfield',
-                            inputType: 'password',
-                            name: 'password'
-                        }],
-                    buttons: [{
-                            text: 'Save',
-                            handler: function(){
-                                var fp = this.ownerCt.ownerCt,
-                                form = fp.getForm();
-                                if (form.isValid()) {
-                                    form.submit();
-                                }
+                    items: [
+                        new Ext.Panel({
+                            border : false,
+                            html : '<img src="images/key.jpg" id="watersmart-key-image" />',
+                            style : {
+                                'margin-top':'10%'
                             }
-                        }]
-                });
+                        }),
+                        new Ext.FormPanel({
+                            id : 'form-panel',
+                            style : {
+                                'margin-top':'10%'
+                            },
+                            columnWidth: .3,
+                            border: false,
+                            autoShow: true,
+                            standardSubmit: true,
+                            url: 'index.jsp',
+                            buttonAlign : 'center',
+                            labelSeparator : '',
+                            bodyStyle : {
+                                'color' : '#616161'
+                            },
+                            style : {
+                                'margin-top' : '9%'
+                            },
+                            items: [
+                                new Ext.Panel({
+                                    border : false,
+                                    html : '<img src="images/stop-hand.gif" id="watersmart-stophand-image" />&nbsp;Please identify yourself:'
+                                }),
+                                {
+                                    xtype: 'displayfield',
+                                    html: '<%= msg%>',
+                                    id : 'errorMessage'
+                                },{
+                                    id : 'username-input-field',
+                                    fieldLabel: 'User Name',
+                                    xtype: 'textfield',
+                                    name: 'username'
+                                }, {
+                                    id : 'password-input-field',
+                                    fieldLabel: 'Password',
+                                    xtype: 'textfield',
+                                    inputType: 'password',
+                                    name: 'password'
+                                }],
+                            buttons: [{
+                                    text: 'Sign In',
+                                    handler: function(){
+                                        var fp = this.ownerCt.ownerCt,
+                                        form = fp.getForm();
+                                        if (form.isValid()) {
+                                            form.submit();
+                                        }
+                                    }
+                                }]
+                        }),
+                        new Ext.Panel({
+                            id : 'description-panel',
+                            columnWidth: .38,
+                            html : '<img src="images/watersmart-graphic-small.jpg" id="watersmart-title-image" />'+
+                                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vehicula interdum orci, ac pellentesque purus fermentum eu. Nulla facilisi. Morbi id dui diam. Nulla facilisi. Etiam vitae nunc dui, et suscipit justo. Vivamus mauris lorem, facilisis et dignissim et, ornare iaculis nunc. Suspendisse potenti. Curabitur orci ante, posuere in accumsan at, vestibulum in nibh. In hendrerit mollis lacinia. Sed quam ligula, dapibus nec facilisis quis, sollicitudin a ligula. Nullam pulvinar auctor turpis, ut semper urna facilisis vitae. Duis neque urna, adipiscing sed accumsan id, vestibulum at lorem. Pellentesque sit amet purus imperdiet risus suscipit pharetra at id massa.<br /><br />',
+                            style : {
+                                'margin-top':'7%',
+                                'color' : '#616161'
+                            },
+                            border : false
+                        }),
+                        new Ext.Panel({
+                            columnWidth: .03,
+                            border : false,
+                            html : '&nbsp;'
+                        })
+                    ]
+                })
                 
                 var headerPanel = new Ext.Panel({
                     id: 'header-panel',
@@ -105,7 +153,7 @@
                     layout : 'border',
                     items : [
                         headerPanel,
-                        body,
+                        bodyPanel,
                         footerPanel
                     ]
                 });
@@ -114,23 +162,7 @@
             
 
         </script>
-    <!--
-        <form method="POST" action='<%= response.encodeURL("index.jsp")%>' >
-            <table cellpadding="2" border="0" cellspacing="0">
-                <tr>
-                    <td align="right">Username:</td>
-                    <td align="left"><input type="text" name="username" size="9"></td>
-                </tr>
-                <tr>
-                    <td align="right">Password:</td>
-                    <td align="left"><input type="password" name="password" size="9"></td>
-                </tr>
-                <tr>
-                    <td align="right"><input type="submit" value="Log In"></td>
-                    <td align="left"><input type="reset"></td>
-                </tr>
-            </table>
-        </form>-->
+        <%= response.encodeURL("index.jsp")%>' >
 
         <jsp:include page="template/USGSFooter.jsp">
             <jsp:param name="footer-class" value="x-hidden"/>
