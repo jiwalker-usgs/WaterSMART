@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.xml.stream.XMLStreamException;
 import org.joda.time.Days;
 import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormatter;
@@ -41,12 +42,14 @@ public abstract class DSGParser implements Iterator<Observation> {
     protected abstract DateTimeFormatter getInputDateFormatter();
     protected BufferedReader reader;
     protected Instant baseDate;
-    protected int stationIndex;
+    protected String stationNum;
+    protected StationLookup stationLookup;
 
-    public DSGParser(InputStream input) throws FileNotFoundException {
+    public DSGParser(InputStream input, String wfsUrl, String typeName, String commonAttr) throws IOException, XMLStreamException {
         this.reader = new BufferedReader(new InputStreamReader(input));
         this.baseDate = new Instant(0L);
-        this.stationIndex = -1;
+        this.stationLookup = new StationLookup(wfsUrl, typeName, commonAttr);
+        this.stationNum = null;
     }
 
     @Override
@@ -75,8 +78,8 @@ public abstract class DSGParser implements Iterator<Observation> {
         // go through the file and make a list of Observation elements
         // Observation requires station index, so be wary of that
         Observation observation = null;
-
-        if (stationIndex >= 0) {
+        
+        if (stationNum != null) {
             try {
                 String line = reader.readLine();
                 if (null != line) {
@@ -85,8 +88,8 @@ public abstract class DSGParser implements Iterator<Observation> {
                         String date = lineMatcher.group(1);
                         Instant timestep = Instant.parse(date,
                                                          getInputDateFormatter());
-                        // may want to support other units (hours, months, years, etc)
-                        int days = Days.daysBetween(this.baseDate, timestep).getDays();
+                        
+                        int days = calculateTimeOffset(timestep);
 
                         String values = lineMatcher.group(2);
                         Matcher valueMatcher = getDataValuePattern().matcher(
@@ -96,6 +99,7 @@ public abstract class DSGParser implements Iterator<Observation> {
                             float value = Float.parseFloat(valueMatcher.group(1));
                             floatVals.add(value);
                         }
+                        int stationIndex = stationLookup.lookup(stationNum);
                         observation = new Observation(days, stationIndex,
                                                       floatVals.toArray());
                     }
@@ -114,10 +118,16 @@ public abstract class DSGParser implements Iterator<Observation> {
         }
 
     }
+    
+    protected int calculateTimeOffset(Instant time) {
+        // may want to support other units (hours, months, years, etc)
+        int days = Days.daysBetween(this.baseDate, time).getDays();
+        return days;
+    }
 
     @Override
     public void remove() {
-        // since this is a parser, remove doesn't make sense
+        throw new UnsupportedOperationException("remove doesn't make sense");
     }
 
     public abstract RecordType parseMetadata();
