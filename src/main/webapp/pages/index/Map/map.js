@@ -26,17 +26,17 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
         LOG.debug('map.js::constructor()');
         var options = config || {};
         
-        this.cswRecordStore = options.cswRecordStore;
-        Ext.each(this.cswRecordStore.data.items[0].get("identificationInfo"), function(idInfoItem) {
-            if (idInfoItem.serviceIdentification && idInfoItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
-                this.sosEndpoint = idInfoItem.serviceIdentification.operationMetadata.linkage.URL;
-                this.plotterVars = idInfoItem.serviceIdentification.operationMetadata.name.CharacterString.value;
-            }
-            if (idInfoItem.serviceIdentification && idInfoItem.serviceIdentification.id.toLowerCase() === 'geoserver') {
-                this.owsEndpoint = idInfoItem.serviceIdentification.operationMetadata.linkage.URL;
-                this.sitesLayerName = idInfoItem.serviceIdentification.operationMetadata.name.CharacterString.value;
-            }
-        }, this)
+//        this.cswRecordStore = options.cswRecordStore;
+//        Ext.each(this.cswRecordStore.data.items[0].get("identificationInfo"), function(idInfoItem) {
+//            if (idInfoItem.serviceIdentification && idInfoItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
+//                this.sosEndpoint = idInfoItem.serviceIdentification.operationMetadata.linkage.URL;
+//                this.plotterVars = idInfoItem.serviceIdentification.operationMetadata.name.CharacterString.value;
+//            }
+//            if (idInfoItem.serviceIdentification && idInfoItem.serviceIdentification.id.toLowerCase() === 'geoserver') {
+//                this.owsEndpoint = idInfoItem.serviceIdentification.operationMetadata.linkage.URL;
+//                this.sitesLayerName = idInfoItem.serviceIdentification.operationMetadata.name.CharacterString.value;
+//            }
+//        }, this)
         
         
         var EPSG900913Options = {
@@ -50,22 +50,22 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
             transitionEffect : 'resize'
         };
 					
-        var sitesLayer = new OpenLayers.Layer.WMS(
-            'WaterSMART: Stations',
-            this.owsEndpoint,
-            {
-                LAYERS: this.sitesLayerName,
-                transparent : true,
-                format: 'image/png'
-            },
-            {
-                extractAttributes : true,
-                opacity : '0.5',
-                displayOutsideMaxExtent: true,
-                isBaseLayer: false,
-                transitionEffect : 'resize'
-            });
-        this.defaultMapConfig.layers.layers =  [sitesLayer];
+//        var sitesLayer = new OpenLayers.Layer.WMS(
+//            'WaterSMART: Stations',
+//            this.owsEndpoint,
+//            {
+//                LAYERS: this.sitesLayerName,
+//                transparent : true,
+//                format: 'image/png'
+//            },
+//            {
+//                extractAttributes : true,
+//                opacity : '0.5',
+//                displayOutsideMaxExtent: true,
+//                isBaseLayer: false,
+//                transitionEffect : 'resize'
+//            });
+//        this.defaultMapConfig.layers.layers =  [sitesLayer];
       
         this.defaultMapConfig.layers.baseLayers = [
         new OpenLayers.Layer.XYZ(
@@ -123,7 +123,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
             );
        
         this.processMapConfigObject(this.defaultMapConfig);
-        this.addIdentifyToolingToMap();
+//        this.addIdentifyToolingToMap();
         this.map.events.on({
             'preremovelayer' :  function (event) {
             },

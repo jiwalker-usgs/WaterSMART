@@ -19,6 +19,101 @@ Ext.onReady(function() {
 	
     LOG.debug('onReady.js::Getting ready to load CSW Record Store');
     
+    var parentCswStore = new CIDA.CSWGetRecordsStore({
+        url : "service/geonetwork/csw",
+        storeId : 'parentCswStore',
+        opts : {
+            resultType : 'results',
+            outputSchema : 'http://www.isotc211.org/2005/gmd',
+            Query : {
+                ElementSetName : {
+                    value: 'full'
+                },
+                Constraint : {
+                    Filter : {
+                        type : '==',
+                        property : 'ParentIdentifier',
+                        value : CONFIG.CSW_PARENT_IDENTIFIER
+                    },
+                    version : '1.1.0'
+                }
+            }
+        },
+            listeners : {
+                load : function(store) {
+                    LOG.debug('onReady.js::CSW Record Store loaded ' + store.totalLength + ' record(s)');
+        
+                    var map = new WaterSMART.Map();
+        
+                    var modelRunSelPanel = new WaterSMART.ModelRunSelectionPanel({
+                        cswStore : store
+                    });
+        
+                    var metaForm = new WaterSMART.ISOFormPanel();
+        
+                    var uploadForm = new WaterSMART.FileUploadPanel();
+
+                    var forms = new Ext.Panel({
+                        region: 'east',
+                        border: false,
+                        layout: 'border',
+                        collapsed: true,
+                        collapsible: true,
+                        width: '60%',
+                        autoShow: true,
+                        items: [
+                            modelRunSelPanel
+//                        metaForm, 
+//                        uploadForm
+                        ]
+                    });
+
+                    var bodyPanel = new Ext.Panel({
+                        region: 'center',
+                        border: false,
+                        layout : 'border',
+                        autoShow: true,
+                        items : [
+                        forms,
+                        map
+                        ]
+                    });
+	
+                    var headerPanel = new Ext.Panel({
+                        id: 'header-panel',
+                        region: 'north',
+                        height: 'auto',
+                        border : false,
+                        autoShow: true,
+                        contentEl: 'usgs-header-panel'
+                    });
+                    var footerPanel = new Ext.Panel({
+                        id: 'footer-panel',
+                        region: 'south',
+                        height: 'auto',
+                        border : false,
+                        autoShow: true,
+                        contentEl: 'usgs-footer-panel'
+                    });
+	
+                    VIEWPORT = new Ext.Viewport({
+                        renderTo : document.body,
+                        layout : 'border',
+                        items : [
+                        headerPanel,
+                        bodyPanel,
+                        footerPanel
+                        ]
+                    });
+                    LOADMASK.hide();
+                },
+                exception : function() {
+                    LOG.debug('');
+                }
+            }
+        
+    });
+    parentCswStore.load();
     var cswRecordStore = new CIDA.CSWGetRecordsStore({
         url : "service/geonetwork/csw",
         storeId : 'cswStore',
@@ -65,7 +160,7 @@ Ext.onReady(function() {
                     ]
                 });
 
-                var body = new Ext.Panel({
+                var bodyPanel = new Ext.Panel({
                     region: 'center',
                     border: false,
                     layout : 'border',
@@ -98,7 +193,7 @@ Ext.onReady(function() {
                     layout : 'border',
                     items : [
                     headerPanel,
-                    body,
+                    bodyPanel,
                     footerPanel
                     ]
                 });
@@ -111,8 +206,8 @@ Ext.onReady(function() {
         
     });
         
-    cswRecordStore.load();
-    return;
+//    cswRecordStore.load();
+//    return;
 });
 
 function initializeAjax() {
