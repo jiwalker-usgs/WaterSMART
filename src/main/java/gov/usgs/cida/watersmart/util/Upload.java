@@ -26,12 +26,7 @@ public class Upload extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        try {
-            props = new DynamicReadOnlyProperties().addJNDIContexts(new String[0]);
-        }
-        catch (NamingException ex) {
-                // LOG
-        }
+        props = JNDISingleton.getInstance();
     }
 
     @Override
@@ -69,16 +64,31 @@ public class Upload extends HttpServlet {
             try {
                 List<FileItem> itemList = upload.parseRequest(request);
                 ModelType modelType = null;
+                String wfsUrl = null;
+                String layer = null;
+                String commonAttr = null;
                 for (FileItem item : itemList) {
                     String name = item.getFieldName();
                     // filename must come first
                     if (item.isFormField() && "modeltype".equals(item.getFieldName())) {
                         modelType = ModelType.valueOf(item.getString());
                     }
-                    else if (null != modelType) {
+                    else if (item.isFormField() && "wfsUrl".equals(item.getFieldName())) {
+                        wfsUrl = item.getString();
+                    }
+                    else if (item.isFormField() && "layer".equals(item.getFieldName())) {
+                        layer = item.getString();
+                    }
+                    else if (item.isFormField() && "commonAttr".equals(item.getFieldName())) {
+                        commonAttr = item.getString();
+                    }
+                    else if (null != modelType &&
+                             null != wfsUrl &&
+                             null != layer &&
+                             null != commonAttr) {
                         destinationFile = new File(tempDir + File.separator + item.getName());
                         saveFileFromRequest(item.getInputStream(), destinationFile);
-                        CreateDSGFromZip.create(destinationFile, modelType);
+                        CreateDSGFromZip.create(destinationFile, modelType, wfsUrl, layer, commonAttr);
                     }
                     else {
                         throw new Exception();
