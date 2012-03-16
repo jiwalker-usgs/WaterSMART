@@ -6,65 +6,113 @@ var VIEWPORT;
 
 Ext.onReady(function() {
     initializeLogging();
+    LOG.info('onReady.js::Logging Initialized');
     initializeAjax();
+    LOG.info('onReady.js::AJAX Initialized');
     initializeLoadMask();
+    LOG.info('onReady.js::Load Mask Initialized');
     initializeQuickTips();
+    LOG.info('onReady.js::Quick Tips Initialized');
     initializeNotification();
+    LOG.info('onReady.js::Notifications Initialized');
     LOADMASK.show();
 	
-    var map = new WaterSMART.Map();
-    var metaForm = new WaterSMART.ISOFormPanel();
-    var uploadForm = new WaterSMART.FileUploadPanel();
+    LOG.debug('onReady.js::Getting ready to load CSW Record Store');
+    
+    var cswRecordStore = new CIDA.CSWGetRecordsStore({
+        url : "service/geonetwork/csw",
+        storeId : 'cswStore',
+        opts : {
+            resultType : 'results',
+            outputSchema : 'http://www.isotc211.org/2005/gmd',
+            Query : {
+                ElementSetName : {
+                    value: 'full'
+                },
+                Constraint : {
+                    Filter : {
+                        type : '==',
+                        property : 'identifier',
+                        value : '5bd73fc6-4ad6-4e03-9afb-16d940ad9dd0'
+                    },
+                    version : '1.1.0'
+                }
+            }
+        },
+        listeners : {
+            load : function(store) {
+                LOG.debug('onReady.js::CSW Record Store loaded ' + store.totalLength + ' record(s)');
+        
+                var map = new WaterSMART.Map({
+                    cswRecordStore : store
+                });
+        
+                var metaForm = new WaterSMART.ISOFormPanel();
+        
+                var uploadForm = new WaterSMART.FileUploadPanel();
 
-    var forms = new Ext.Panel({
-        region: 'east',
-        border: false,
-        layout: 'border',
-        collapsed: true,
-        collapsible: true,
-        width: '60%',
-        autoShow: true,
-        items: [metaForm, uploadForm]
-    });
+                var forms = new Ext.Panel({
+                    region: 'east',
+                    border: false,
+                    layout: 'border',
+                    collapsed: true,
+                    collapsible: true,
+                    width: '60%',
+                    autoShow: true,
+                    items: [
+                    metaForm, 
+                    uploadForm
+                    ]
+                });
 
-    var body = new Ext.Panel({
-        region: 'center',
-        border: false,
-        layout : 'border',
-        autoShow: true,
-        items : [
-            forms,
-            map
-        ]
-    });
+                var body = new Ext.Panel({
+                    region: 'center',
+                    border: false,
+                    layout : 'border',
+                    autoShow: true,
+                    items : [
+                    forms,
+                    map
+                    ]
+                });
 	
-    var headerPanel = new Ext.Panel({
-        id: 'header-panel',
-        region: 'north',
-        height: 'auto',
-        border : false,
-        autoShow: true,
-        contentEl: 'usgs-header-panel'
-    });
-    var footerPanel = new Ext.Panel({
-        id: 'footer-panel',
-        region: 'south',
-        height: 'auto',
-        border : false,
-        autoShow: true,
-        contentEl: 'usgs-footer-panel'
-    });
+                var headerPanel = new Ext.Panel({
+                    id: 'header-panel',
+                    region: 'north',
+                    height: 'auto',
+                    border : false,
+                    autoShow: true,
+                    contentEl: 'usgs-header-panel'
+                });
+                var footerPanel = new Ext.Panel({
+                    id: 'footer-panel',
+                    region: 'south',
+                    height: 'auto',
+                    border : false,
+                    autoShow: true,
+                    contentEl: 'usgs-footer-panel'
+                });
 	
-    VIEWPORT = new Ext.Viewport({
-        renderTo : document.body,
-        layout : 'border',
-        items : [
-        headerPanel,
-        body,
-        footerPanel
-        ]
+                VIEWPORT = new Ext.Viewport({
+                    renderTo : document.body,
+                    layout : 'border',
+                    items : [
+                    headerPanel,
+                    body,
+                    footerPanel
+                    ]
+                });
+                LOADMASK.hide();
+            },
+            exception : function() {
+                
+            }
+        }
+        
     });
-    LOADMASK.hide();
+        
+    cswRecordStore.load();
+    return;
 });
 
 function initializeAjax() {

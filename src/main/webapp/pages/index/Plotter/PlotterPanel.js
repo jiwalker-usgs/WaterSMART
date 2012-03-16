@@ -20,12 +20,12 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
         config = config || {};
         this.plotterDiv = config.plotterDiv || 'dygraph-content';
         this.legendDiv = config.legendDiv || 'dygraph-legend';
-        this.legendWidth = config.legendWidth || 100;
+        this.legendWidth = config.legendWidth || 150;
         this.height = config.height || 250;
         this.plotterTitle = config.title || 'Demo';
         this.offering = config.offering;
         this.ownerWindow = config.ownerWindow;
-        this.url = config.url || "http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/SYE.nc";
+        this.url = config.url;
         this.vars = config.vars;
         
         this.contentPanel = new Ext.Panel({
@@ -67,7 +67,7 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
     loadSOSStore : function(options) {
         var url = "proxy/" + options.url + "?service=SOS&request=GetObservation&version=1.0.0&offering=" + encodeURI(options.offering) + "&observedProperty=" + options.vars;
         this.yLabels = options.vars.split(',');
-        this.sosStore = new GDP.SOSGetObservationStore({
+        this.sosStore = new CIDA.SOSGetObservationStore({
             url : url, // gmlid is url for now, eventually, use SOS endpoint + gmlid or whatever param
             autoLoad : true,
             proxy : new Ext.data.HttpProxy({
@@ -163,9 +163,6 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
             { // http://dygraphs.com/options.html
                 hideOverlayOnMouseOut : false,
                 legend: 'always',
-                //customBars: true,
-                //errorBars: true,
-                //fillAlpha: this.errorBarsOn ? 0.15 : 0.0,
                 labels: ["Date"].concat(this.yLabels),
                 labelsDiv: Ext.get(this.legendDiv).dom,
                 labelsDivWidth: this.legendWidth,
@@ -175,11 +172,8 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
                 },
                 rightGap : 5,
                 showRangeSelector: true,
-                //ylabel: record.data.dataRecord[1].name,                            
                 yAxisLabelWidth: 75,
                 ylabel: 'test',
-                //valueRange: [this.plotterYMin - (this.plotterYMin / 10) , this.plotterYMax + (this.plotterYMax / 10)],
-                //visibility : this.visibility,
                 axes: {
                     x: {
                         valueFormatter: function(ms) {
