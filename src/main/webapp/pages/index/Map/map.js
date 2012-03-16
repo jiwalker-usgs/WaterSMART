@@ -182,7 +182,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
         var layers = mco.layers.baseLayers.concat(mco.layers.layers);
         
         LOG.debug('map.js::processMapConfigObject(): Replacing map\'s layer store');
-        this.removeLayers();
+        this.removeLayers(null, false);
         this.layers = new GeoExt.data.LayerStore({
             initDir : GeoExt.data.LayerStore.STORE_TO_MAP,
             map : this.map,
@@ -221,10 +221,12 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
      * A hook to add additional functionality before calling 
      * the map's removeLayer function (which also has a hook)
      */
-    removeLayers : function(layers) {
+    removeLayers : function(layers, includeBaseLayers) {
         if (!layers) layers = this.layers.getRange();
         Ext.each(layers, function(record){
             LOG.debug('map.js::Removing layer : ' + record.getLayer().id);
+            var isBaseLayer = record.getLayer().isBaseLayer;
+            if (isBaseLayer && !includeBaseLayers) return;
             if (!record.getLayer().metadata.persist) {
                 this.layers.remove(record)
             }
