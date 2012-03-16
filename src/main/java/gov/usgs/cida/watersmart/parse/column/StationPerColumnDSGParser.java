@@ -2,6 +2,7 @@ package gov.usgs.cida.watersmart.parse.column;
 
 import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.watersmart.parse.DSGParser;
+import gov.usgs.cida.watersmart.parse.StationLookup;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.regex.Pattern;
@@ -14,8 +15,8 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public abstract class StationPerColumnDSGParser extends DSGParser {
 
-    public StationPerColumnDSGParser(InputStream instream, String wfsUrl, String typeName, String commonAttr) throws IOException, XMLStreamException {
-        super(instream, wfsUrl, typeName, commonAttr);
+    public StationPerColumnDSGParser(InputStream instream, StationLookup lookup) throws IOException, XMLStreamException {
+        super(instream, lookup);
     }
     
     @Override

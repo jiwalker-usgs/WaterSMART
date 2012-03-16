@@ -48,10 +48,10 @@ public abstract class DSGParser implements Iterator<Observation> {
     protected String stationNum;
     protected StationLookup stationLookup;
 
-    public DSGParser(InputStream input, String wfsUrl, String typeName, String commonAttr) throws IOException, XMLStreamException {
+    public DSGParser(InputStream input, StationLookup lookup) throws IOException, XMLStreamException {
         this.reader = new BufferedReader(new InputStreamReader(input));
         this.baseDate = new Instant(0L);
-        this.stationLookup = new StationLookup(wfsUrl, typeName, commonAttr);
+        this.stationLookup = lookup;
         this.stationNum = null;
     }
 

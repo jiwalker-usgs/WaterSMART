@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.xml.stream.XMLStreamException;
 import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormatterBuilder;
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Jordan Walker <jiwalker@usgs.gov>
  */
-public class SYEParser extends DSGParser {
+public class SYEParser extends StationPerFileDSGParser {
     
     private static final Logger LOG = LoggerFactory.getLogger(SYEParser.class);
     
@@ -55,10 +56,14 @@ public class SYEParser extends DSGParser {
      * Should check that all necessary patterns are defined at some point
      * @param input 
      * @param name 
-     * @throws FileNotFoundException 
+     * @param wfsUrl
+     * @param layerName
+     * @param commonAttr
+     * @throws IOException
+     * @throws XMLStreamException  
      */
-    public SYEParser(InputStream input, String name) throws FileNotFoundException {
-        super(input);
+    public SYEParser(InputStream input, String name, StationLookup lookup) throws IOException, XMLStreamException {
+        super(input, lookup);
         this.filename = name;
     }
     
@@ -102,9 +107,8 @@ public class SYEParser extends DSGParser {
     @Override
     public RecordType parseMetadata() {
         // define what we need for metadata
-        
-        this.stationIndex = StationLookup.lookup(getStationId(this.filename));
-        if (this.stationIndex == -1) {
+        this.stationIndex = stationLookup.lookup(getStationId(this.filename));
+        if (this.stationIndex < 0) {
             throw new RuntimeException("Station not found during lookup. "
                     + "If this is a valid station ID, the geoserver"
                     + " instance could be down.");

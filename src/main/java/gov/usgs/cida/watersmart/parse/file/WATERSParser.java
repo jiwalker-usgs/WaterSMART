@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.xml.stream.XMLStreamException;
 import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormatterBuilder;
@@ -24,7 +25,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Jordan Walker <jiwalker@usgs.gov>
  */
-public class WATERSParser extends DSGParser {
+public class WATERSParser extends StationPerFileDSGParser {
     
     private static final Logger LOG = LoggerFactory.getLogger(WATERSParser.class);
     
@@ -50,8 +51,8 @@ public class WATERSParser extends DSGParser {
             .toFormatter()
             .withZoneUTC();
     
-    public WATERSParser(InputStream input) throws FileNotFoundException {
-        super(input);
+    public WATERSParser(InputStream input, StationLookup lookup) throws IOException, XMLStreamException {
+        super(input, lookup);
     }
     
     /**
@@ -137,7 +138,7 @@ public class WATERSParser extends DSGParser {
                 else {
                     String station = getStationId(line);
                     if (station != null) {
-                        this.stationIndex = StationLookup.lookup(station);
+                        this.stationIndex = stationLookup.lookup(station);
                     }
                     else {
                         String user = getUser(line);

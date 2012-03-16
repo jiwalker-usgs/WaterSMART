@@ -53,10 +53,10 @@ public class CreateDSGFromZip {
                 DSGParser dsgParse = null;
                 switch (type) {
                     case SYE: 
-                        dsgParse = new SYEParser(inputStream, entry.getName());
+                        dsgParse = new SYEParser(inputStream, entry.getName(), lookerUpper);
                         break;
                     case WATERS:
-                        dsgParse = new WATERSParser(inputStream);
+                        dsgParse = new WATERSParser(inputStream, lookerUpper);
                         break;
                     default:
                         throw new NotImplementedException("Parser not written yet");
