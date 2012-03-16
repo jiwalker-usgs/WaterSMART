@@ -5,7 +5,6 @@ import gov.usgs.cida.watersmart.parse.CreateDSGFromZip;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ModelType;
 import java.io.*;
 import java.util.List;
-import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -64,26 +63,43 @@ public class Upload extends HttpServlet {
                 ModelType modelType = null;
                 String filename = null;
                 InputStream filein = null;
+                String wfsUrl = null;
+                String layer = null;
+                String commonAttr = null;
                 for (FileItem item : itemList) {
                     String name = item.getFieldName();
                     // filename must come first
                     if (item.isFormField() && "modeltype".equals(item.getFieldName())) {
                         modelType = ModelType.valueOf(item.getString());
-                    } else if (!item.isFormField()) {
+                    }
+                    else if (!item.isFormField()) {
                         filename = item.getName();
                         filein = item.getInputStream();
-                    } else {
-                        throw new Exception();
+                    }
+                    else if (item.isFormField() && "wfsUrl".equals(item.getFieldName())) {
+                        wfsUrl = item.getString();
+                    }
+                    else if (item.isFormField() && "layer".equals(item.getFieldName())) {
+                        layer = item.getString();
+                    }
+                    else if (item.isFormField() && "commonAttr".equals(item.getFieldName())) {
+                        commonAttr = item.getString();
                     }
                 }
-                if (modelType != null && filein != null && filename != null) {
+                if (modelType != null &&
+                    filein != null &&
+                    filename != null &&
+                    wfsUrl != null &&
+                    layer != null &&
+                    commonAttr != null) {
                     destinationFile = new File(tempDir + File.separator + filename);
                     saveFileFromRequest(filein, destinationFile);
-                    CreateDSGFromZip.create(destinationFile, modelType);
+                    CreateDSGFromZip.create(destinationFile, modelType, wfsUrl, layer, commonAttr);
                 } else {
-                    throw new Exception();
+                    throw new Exception("Must provide all required parameters: model, file, wfs URL, layer name, common attribute");
                 }
             } catch (Exception ex) {
+                // pass exception text along?
                 sendErrorResponse(response, "Unable to upload file");
                 return;
             }
