@@ -98,6 +98,18 @@ WaterSMART.ModelPanel = Ext.extend(Ext.Panel, {
                             runPanels : runPanelsClone,
                             panelInfo : activePanel.panelInfo
                         })
+                        
+                        Ext.each(me.ownerCt.modelPanels, function(modelPanel) {
+                            if (modelPanel !== this.activePanel) {
+                                modelPanel.collapse(true);
+                            }
+                        }, {
+                            me : me,
+                            activePanel : activePanel
+                        })
+                        
+                        activePanel.ownerCt.setDisabled(true);
+                        
                     }, me)
                 },
                 scope : this

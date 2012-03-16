@@ -24,7 +24,68 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
             title : 'Runs',
             width : '60%',
             region : 'east',
-            height : '100%'
+            height : '100%',
+            disabled : true,
+            currentlySelectedRun : undefined,
+            tbar : [
+            {
+                xtype : 'button',
+                id : 'select-another-model-button',
+                text : 'Select Another Model',
+                listeners : {
+                    click : function() {
+                        this.modelPanel.setDisabled(false);
+                        
+                        Ext.each(this.modelPanel.modelPanels, function(modelPanel) {
+                            modelPanel.expand(true);
+                        })
+                        
+                        this.runPanel.removeAll(true);
+                        
+                        this.runPanel.setDisabled(true);
+                        
+                    },
+                    scope : this
+                }
+            },
+            {
+                xtype : 'button',
+                id : 'edit-selected-run-button',
+                text : 'Edit Selected Run',
+                disabled : true,
+                listeners : {
+                    click : function() {
+                        
+                    },
+                    scope : this
+                }
+            },
+            {
+                xtype : 'button',
+                id : 'create-run-button',
+                text : 'Create A Run',
+                listeners : {
+                    click : function() {
+                        
+                    LOG.debug('')
+                    var isoFormPanel = new WaterSMART.ISOFormPanel({
+                        
+                    });
+                    
+                    var modalRunWindow = new Ext.Window({
+                        width: 'auto',
+                        height : 'auto',
+                        modal : true,
+                        items : [ isoFormPanel ]
+                    })
+                    
+                    modalRunWindow.show();
+                    
+                    },
+                    scope : this
+                }
+            }
+            ]
         })
         
         config = Ext.apply({
@@ -43,15 +104,21 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         LOG.debug('ModelRunSelectionpanel.js::A model has been selected');
         var runPanels = config.runPanels;
         
+        this.runPanel.getTopToolbar().get('edit-selected-run-button').setDisabled(true);
+        
         LOG.trace('ModelRunSelectionpanel.js::Removing all run panels')
         this.runPanel.removeAll();
         LOG.trace('ModelRunSelectionpanel.js::Adding new run panels to primary run panel ')
         this.runPanel.add(runPanels);
+        this.runPanel.setDisabled(false);
         this.runPanel.doLayout();
         
     },
     runSelected : function(panel) {
         LOG.debug('ModelRunSelectionpanel.js:: A run has been selected with the SOS endpoint of: ' + panel.panelInfo.operationURL);
+        
+        this.runPanel.currentlySelectedRun = panel;
+        this.runPanel.getTopToolbar().get('edit-selected-run-button').setDisabled(false);
         
         // TODO- We will need to change this when (if?) we get more than one sites layer on the map at any given time
         if (this.mapPanel.currentMapConfig.layers.layers.length 

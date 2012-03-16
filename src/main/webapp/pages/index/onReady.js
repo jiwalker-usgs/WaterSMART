@@ -50,10 +50,6 @@ Ext.onReady(function() {
                         mapPanel : map
                     });
         
-                    var metaForm = new WaterSMART.ISOFormPanel();
-        
-                    var uploadForm = new WaterSMART.FileUploadPanel();
-
                     var forms = new Ext.Panel({
                         region: 'east',
                         border: false,
@@ -62,11 +58,7 @@ Ext.onReady(function() {
                         collapsible: true,
                         width: '60%',
                         autoShow: true,
-                        items: [
-                            modelRunSelPanel
-//                        metaForm, 
-//                        uploadForm
-                        ]
+                        items: [ modelRunSelPanel ]
                     });
 
                     var bodyPanel = new Ext.Panel({

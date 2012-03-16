@@ -1,6 +1,5 @@
 package gov.usgs.cida.watersmart.util;
 
-
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
 import gov.usgs.cida.watersmart.netcdf.CreateDSGFromZip;
 import gov.usgs.cida.watersmart.netcdf.CreateDSGFromZip.ModelType;
@@ -18,9 +17,8 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 
-
 public class Upload extends HttpServlet {
-    
+
     private static DynamicReadOnlyProperties props = null;
 
     @Override
@@ -28,9 +26,8 @@ public class Upload extends HttpServlet {
         super.init();
         try {
             props = new DynamicReadOnlyProperties().addJNDIContexts(new String[0]);
-        }
-        catch (NamingException ex) {
-                // LOG
+        } catch (NamingException ex) {
+            // LOG
         }
     }
 
@@ -53,12 +50,12 @@ public class Upload extends HttpServlet {
         //String filename = request.getParameter("filename");
         String tempDir = props.getProperty("watersmart.file.location");
         File dirFile = new File(tempDir);
-        if(!dirFile.exists()) {
+        if (!dirFile.exists()) {
             dirFile.mkdirs();
         }
-        
+
         File destinationFile = null;
-        
+
         // Handle form-based upload (from IE)
         if (ServletFileUpload.isMultipartContent(request)) {
             FileItemFactory factory = new DiskFileItemFactory();
@@ -69,20 +66,26 @@ public class Upload extends HttpServlet {
             try {
                 List<FileItem> itemList = upload.parseRequest(request);
                 ModelType modelType = null;
+                String filename = null;
+                InputStream filein = null;
                 for (FileItem item : itemList) {
                     String name = item.getFieldName();
                     // filename must come first
                     if (item.isFormField() && "modeltype".equals(item.getFieldName())) {
                         modelType = ModelType.valueOf(item.getString());
-                    }
-                    else if (null != modelType) {
-                        destinationFile = new File(tempDir + File.separator + item.getName());
-                        saveFileFromRequest(item.getInputStream(), destinationFile);
-                        CreateDSGFromZip.create(destinationFile, modelType);
-                    }
-                    else {
+                    } else if (!item.isFormField()) {
+                        filename = item.getName();
+                        filein = item.getInputStream();
+                    } else {
                         throw new Exception();
                     }
+                }
+                if (modelType != null && filein != null && filename != null) {
+                    destinationFile = new File(tempDir + File.separator + filename);
+                    saveFileFromRequest(filein, destinationFile);
+                    CreateDSGFromZip.create(destinationFile, modelType);
+                } else {
+                    throw new Exception();
                 }
             } catch (Exception ex) {
                 sendErrorResponse(response, "Unable to upload file");
@@ -99,7 +102,7 @@ public class Upload extends HttpServlet {
 //                // LOG
 //            }
         }
-        
+
         String responseText = null;
         responseText = "{success: true, file: '" + destinationFile.getName() + "'}";
         // can do post processing stuff here
@@ -133,5 +136,4 @@ public class Upload extends HttpServlet {
             IOUtils.closeQuietly(os);
         }
     }
-
 }
