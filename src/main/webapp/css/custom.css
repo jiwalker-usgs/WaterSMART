@@ -1,3 +1,16 @@
+.run-label {
+    font-weight: bold;
+    color: #3D3D3D;
+}
+
+.run-value {
+    color: #5C5C5C;
+}
+
+.run-value-list-item {
+    color: #5C5C5C;
+}
+
 #watersmart-title-image {
     clear: right;
 }

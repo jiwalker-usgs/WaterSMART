@@ -39,15 +39,15 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
             })
         }, responsibleParties)
 
-        var html = 'Abstract: ' + this.panelInfo['abstract'];
-        html += '<br />Edition: ' + this.panelInfo.edition;
+        var html = '<div class="run-row"><span class="run-label">Abstract:</span> <span class="run-value">' + this.panelInfo['abstract'] + '</span></div>';
+        html += '<div class="run-row"><span class="run-label">Edition:</span> <span class="run-value">' + this.panelInfo.edition + '</span></div>';
         
         if (revisionDates.length) {
-            html += '<br />Revision Dates: <ul>'
+            html += '<div class="run-row"><span class="run-label">Revision Dates:</span> <span class="run-value-list"><ul>'
             for (var i = 0;i < revisionDates.length;i++) {
-                html +='<li>'+revisionDates[i]+'</li>'
+                html +='<li><span class="run-value-list-item">'+revisionDates[i]+'</span></li>'
             }
-            html += '</ul><br />'
+            html += '</ul></span></div>'
         }
         
         config = Ext.apply({

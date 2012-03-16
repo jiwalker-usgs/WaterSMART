@@ -64,9 +64,9 @@ WaterSMART.ModelPanel = Ext.extend(Ext.Panel, {
                 
             }, panelInfo)
             
-            var html = 'Language: ' + panelInfo.language;
-            html += '<br />Date: ' + panelInfo.dateStamp;
-            html += '<br />Date Last revised: ' + panelInfo.lastRevisedDate;
+            var html = '<div class="run-row"><span class="run-label">Language: </span> <span class="run-value">' + panelInfo.language + '</span></div>';
+            html += '<div class="run-row"><span class="run-label">Date: </span> <span class="run-value">' + panelInfo.dateStamp + '</span></div>';
+            html += '<div class="run-row"><span class="run-label">Date Last Revised: </span> <span class="run-value">' + panelInfo.lastRevisedDate + '</span></div>';
             
             this.modelPanels.push(new Ext.Panel({
                 title : panelInfo.title,
@@ -77,8 +77,8 @@ WaterSMART.ModelPanel = Ext.extend(Ext.Panel, {
                 panelInfo : panelInfo,
                 listeners : {
                 afterrender : function(me) {
-                    me.body.on('mouseover', function(event, element){
-                        var activePanel = Ext.ComponentMgr.get(element.parentElement.parentElement.attributes.id.value);
+                    me.body.on('mouseover', function(){
+                        var activePanel = Ext.ComponentMgr.get(this.id);
                         
                         // This has to be cloned because when a new model is selected, the previous
                         // set of panels belonging to that panel are destroyed in order to clear out 
@@ -92,7 +92,7 @@ WaterSMART.ModelPanel = Ext.extend(Ext.Panel, {
                             runPanels : runPanelsClone,
                             panelInfo : activePanel.panelInfo
                         })
-                    }, this)
+                    }, me)
                 },
                 scope : this
             }
