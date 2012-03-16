@@ -49,19 +49,23 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         this.runPanel.add(runPanels);
         this.runPanel.doLayout();
         
+    },
+    runSelected : function(panel) {
+        LOG.debug('ModelRunSelectionpanel.js:: A run has been selected with the SOS endpoint of: ' + panel.panelInfo.operationURL);
+        
         // TODO- We will need to change this when (if?) we get more than one sites layer on the map at any given time
         if (this.mapPanel.currentMapConfig.layers.layers.length 
-            && this.mapPanel.currentMapConfig.layers.layers[0].params.LAYERS === config.panelInfo.owsResourceName) {
+            && this.mapPanel.currentMapConfig.layers.layers[0].params.LAYERS === panel.panelInfo.owsResourceName) {
             LOG.debug('ModelRunSelectionpanel.js::New sites layer is the same as the current sites layer. New sites layer will not be created')
             return;
         }
         
         var newSitesLayerArray = [
         new OpenLayers.Layer.WMS(
-            config.panelInfo.fileIdentifier,
-            config.panelInfo.owsEndpoint,
+            panel.panelInfo.fileIdentifier,
+            panel.panelInfo.owsEndpoint,
             {
-                LAYERS: config.panelInfo.owsResourceName,
+                LAYERS: panel.panelInfo.owsResourceName,
                 transparent : true,
                 format: 'image/png'
             },
@@ -76,9 +80,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         
         this.mapPanel.currentMapConfig.layers.layers = newSitesLayerArray;
         this.mapPanel.processMapConfigObject(this.mapPanel.currentMapConfig);
-    },
-    runSelected : function(panel) {
-        LOG.debug('ModelRunSelectionpanel.js:: A run has been selected with the SOS endpoint of: ' + panel.panelInfo.operationURL);
+        
         this.mapPanel.sosEndpoint = panel.panelInfo.operationURL;
         this.mapPanel.plotterVars = 'Discharge';
         this.mapPanel.addIdentifyToolingToMap();

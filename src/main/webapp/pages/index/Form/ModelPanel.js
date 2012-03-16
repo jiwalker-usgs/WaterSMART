@@ -85,8 +85,14 @@ WaterSMART.ModelPanel = Ext.extend(Ext.Panel, {
                         // the panel they sit in. We don't want to destroy the originals
                         var runPanelsClone = [];
                         Ext.each(activePanel.panelInfo.runPanels, function(panel){
-                            this.push(panel.cloneConfig());
-                        }, runPanelsClone)
+                            panel.panelInfo.owsEndpoint = this.me.panelInfo.owsEndpoint
+                            panel.panelInfo.owsResourceName = this.me.panelInfo.owsResourceName
+                            panel.panelInfo.fileIdentifier = this.me.panelInfo.fileIdentifier
+                            this.runPanelsClone.push(panel.cloneConfig());
+                        }, {
+                            me : me,
+                            runPanelsClone : runPanelsClone
+                        })
                         
                         activePanel.ownerCt.ownerCt.modelSelected({
                             runPanels : runPanelsClone,
