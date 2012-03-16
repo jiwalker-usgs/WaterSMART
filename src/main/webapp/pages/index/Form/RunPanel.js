@@ -61,7 +61,7 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
                         
                     }, me)
                     me.body.on('click', function(){
-                        
+                        me.ownerCt.ownerCt.runSelected(me);
                     }, me)
                 },
                 scope : this

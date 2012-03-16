@@ -76,5 +76,11 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         
         this.mapPanel.currentMapConfig.layers.layers = newSitesLayerArray;
         this.mapPanel.processMapConfigObject(this.mapPanel.currentMapConfig);
+    },
+    runSelected : function(panel) {
+        LOG.debug('ModelRunSelectionpanel.js:: A run has been selected with the SOS endpoint of: ' + panel.panelInfo.operationURL);
+        this.mapPanel.sosEndpoint = panel.panelInfo.operationURL;
+        this.mapPanel.plotterVars = 'Discharge';
+        this.mapPanel.addIdentifyToolingToMap();
     }
 });

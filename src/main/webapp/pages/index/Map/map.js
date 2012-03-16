@@ -16,7 +16,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
         initialExtent : new OpenLayers.Bounds(-9847210.8347114,3508563.9150696,-9055506.6162999,4451100.8664317)
     },
     owsEndpoint : undefined,
-    plotterVars : undefined,
+    plotterVars : undefined, 
     popup : undefined,
     sitesLayerName : undefined,
     sosEndpoint : undefined,
@@ -96,7 +96,6 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
         //Get another way of doing a deep copy of a JSON object so we can
         //remove the JQuery lib from this project. 
         this.currentMapConfig = $.extend(true, {}, this.defaultMapConfig);
-        
         this.processMapConfigObject(this.defaultMapConfig);
         this.map.events.on({
             'preremovelayer' :  function () {
@@ -130,10 +129,17 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
         })
     },
     addIdentifyToolingToMap: function() {
+        LOG.debug('map.js::addIdentifyToolingToMap()');
+        var currentGetFeatureInfoControl = this.map.getControlsByClass("OpenLayers.Control.WMSGetFeatureInfo")[0];
+        if (currentGetFeatureInfoControl) {
+            LOG.debug('map.js::addIdentifyToolingToMap():Map already had this control on the map. Destroying and replacing with new control');
+            currentGetFeatureInfoControl.destroy();
+        }
+        
         var getFeatureInfoControl = new OpenLayers.Control.WMSGetFeatureInfo({
             infoFormat : 'application/vnd.ogc.gml',
             maxFeatures : 1,
-            layers : this.defaultMapConfig.layers.layers,
+            layers : this.currentMapConfig.layers.layers,
             eventListeners : {
                 getfeatureinfo : function(event) {
                     if (event.features && event.features[0]){
@@ -173,7 +179,9 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
             
         });
         this.map.addControl(getFeatureInfoControl);
+        LOG.debug('map.js::addIdentifyToolingToMap():New control added to map');
         getFeatureInfoControl.activate();
+        LOG.debug('map.js::addIdentifyToolingToMap():New control activated');
     },
     addLayers : function(layers) {
         if (Ext.isArray(layers)) {
