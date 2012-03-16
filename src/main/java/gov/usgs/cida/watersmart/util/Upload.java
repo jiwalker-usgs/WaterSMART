@@ -2,8 +2,8 @@ package gov.usgs.cida.watersmart.util;
 
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
-import gov.usgs.cida.watersmart.netcdf.CreateDSGFromZip;
-import gov.usgs.cida.watersmart.netcdf.CreateDSGFromZip.ModelType;
+import gov.usgs.cida.watersmart.parse.CreateDSGFromZip;
+import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ModelType;
 import java.io.*;
 import java.util.List;
 import javax.naming.NamingException;

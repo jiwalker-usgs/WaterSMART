@@ -1,7 +1,7 @@
 package gov.usgs.cida.watersmart.ldap;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
-import gov.usgs.cida.watersmart.netcdf.DSGParser;
+import gov.usgs.cida.watersmart.parse.DSGParser;
 import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;

@@ -1,8 +1,10 @@
-package gov.usgs.cida.watersmart.netcdf;
+package gov.usgs.cida.watersmart.parse.file;
 
 import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Variable;
 import gov.usgs.cida.netcdf.jna.NCUtil;
+import gov.usgs.cida.watersmart.parse.DSGParser;
+import gov.usgs.cida.watersmart.parse.StationLookup;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,37 +21,61 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Parses an individual file of the SYE R type (stations) need to be the filenames
+ * 
  * @author Jordan Walker <jiwalker@usgs.gov>
  */
-public class WATERSParser extends DSGParser {
+public class SYEParser extends DSGParser {
     
-    private static final Logger LOG = LoggerFactory.getLogger(WATERSParser.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SYEParser.class);
     
-    private static final Pattern userPattern = Pattern.compile("^User:\t(\\w+)$");
-    private static final Pattern stationIdPattern = Pattern.compile("^StationID:\t(\\d+)$");
+    private static final Pattern stationIdPattern = Pattern.compile("(\\w+)\\.txt");
     
-    // "Date\tVariable1 Name (units)\t..."
-    private static final Pattern headerLinePattern = Pattern.compile("^Date((?:\t[^\t\\(]+ \\(\\w+\\))+)$");
-    // "\tVariable Name (units)"
-    private static final Pattern headerVariablePattern = Pattern.compile("\t([^\t\\(]+) \\((\\w+)\\)");
+    private static final Pattern headerLinePattern = Pattern.compile("^\"date\"((?: \"\\w+\")+)$");
+    private static final Pattern headerVariablePattern = Pattern.compile(" \"(\\w+)\"");
     
-    // Line looks like 'mm/dd/yyyy\tval1\tval2...'
-    private static final Pattern dataLinePattern = Pattern.compile("^(\\d+/\\d+/\\d{4})((?:\t[^\t]+)+)$");
-    // Could have split on tabs but using this regex instead
-    private static final Pattern dataValuePattern = Pattern.compile("\t([^\t]+)");
+    // Line looks like '"x" "mm/dd/yyyy" val1 val2 ...'
+    private static final Pattern dataLinePattern = Pattern.compile("^\"\\d+\" \"(\\d+/\\d+/\\d{4})\"((?: [^ ]+)+)$");
+    // Could have split on spaces but using this regex instead
+    private static final Pattern dataValuePattern = Pattern.compile(" ([^ ]+)");
     
     public static final DateTimeFormatter inputDateFormatter = new DateTimeFormatterBuilder()
             .appendMonthOfYear(1)
             .appendLiteral('/')
             .appendDayOfMonth(1)
             .appendLiteral('/')
-            .appendYear(4, 4)
+            .appendYear(4,4)
             .toFormatter()
             .withZoneUTC();
     
-    public WATERSParser(InputStream input) throws FileNotFoundException {
+    private String filename;
+    
+    /**
+     * Define all the regular expressions needed for parsing here
+     * Should check that all necessary patterns are defined at some point
+     * @param input 
+     * @param name 
+     * @throws FileNotFoundException 
+     */
+    public SYEParser(InputStream input, String name) throws FileNotFoundException {
         super(input);
+        this.filename = name;
+    }
+    
+    /**
+     * StationId's will be included in the filename
+     * change the pattern or this function to reflect the actual format
+     * Used by parseMetadata to perform a lookup
+     * @param filename Name of the file being parsed
+     * @return station name for this data
+     */
+    @Override
+    protected String getStationId(String filename) {
+        Matcher matcher = stationIdPattern.matcher(filename);
+        if (matcher.matches()) {
+            return matcher.group(1);
+        }
+        return null;
     }
     
     /**
@@ -63,10 +89,8 @@ public class WATERSParser extends DSGParser {
         Matcher matcher = headerVariablePattern.matcher(headerLine);
         while (matcher.find()) {
             String varname = matcher.group(1);
-            String units = matcher.group(2);
             if (null != varname) {
                 Map<String,Object> attrs = new TreeMap<String,Object>();
-                attrs.put("units", units);
                 // assuming float for all var for now
                 Variable var = new Variable(varname, NCUtil.XType.NC_FLOAT, attrs);
                 vars.add(var);
@@ -75,32 +99,16 @@ public class WATERSParser extends DSGParser {
         return vars;
     }
     
-    /**
-     * StationId's will be included in file header
-     * change the pattern or this function to reflect the actual format
-     * Used by parseMetadata to perform a lookup
-     * @param filename Name of the file being parsed
-     * @return station name for this data
-     */
-    @Override
-    protected String getStationId(String possibleStationLine) {
-        Matcher matcher = stationIdPattern.matcher(possibleStationLine);
-        if (matcher.matches()) {
-            return matcher.group(1);
-        }
-        return null;
-    }
-    
-    private String getUser(String possibleUserLine) {
-        Matcher matcher = userPattern.matcher(possibleUserLine);
-        if (matcher.matches()) {
-            return matcher.group(1);
-        }
-        return null;
-    }
-
     @Override
     public RecordType parseMetadata() {
+        // define what we need for metadata
+        
+        this.stationIndex = StationLookup.lookup(getStationId(this.filename));
+        if (this.stationIndex == -1) {
+            throw new RuntimeException("Station not found during lookup. "
+                    + "If this is a valid station ID, the geoserver"
+                    + " instance could be down.");
+        }
 
         try {
             reader.mark(READ_AHEAD_LIMIT);
@@ -108,9 +116,13 @@ public class WATERSParser extends DSGParser {
             boolean headerRead = false;
             List<Variable> vars = null;
             while (null != (line = reader.readLine())) {
-                Matcher matcher = getHeaderLinePattern().matcher(line);
-                if (headerRead) {
-                    // common case
+                Matcher matcher = headerLinePattern.matcher(line);
+                if (matcher.matches()) {
+                    vars = headerVariables(matcher.group(1));
+                    reader.mark(READ_AHEAD_LIMIT);
+                    headerRead = true;
+                }
+                else if (headerRead) {
                     matcher = dataLinePattern.matcher(line);
                     if (matcher.matches()) {
                         String date = matcher.group(1);
@@ -124,24 +136,6 @@ public class WATERSParser extends DSGParser {
                         
                         reader.reset();
                         return recordType;
-                    }
-                }
-                else if (matcher.matches()) {
-                    // happens before data
-                    vars = headerVariables(matcher.group(1));
-                    reader.mark(READ_AHEAD_LIMIT);
-                    headerRead = true;
-                }
-                else {
-                    String station = getStationId(line);
-                    if (station != null) {
-                        this.stationIndex = StationLookup.lookup(station);
-                    }
-                    else {
-                        String user = getUser(line);
-                        if (user != null) {
-                            // do something with user?
-                        }
                     }
                 }
             }
@@ -177,5 +171,4 @@ public class WATERSParser extends DSGParser {
     protected DateTimeFormatter getInputDateFormatter() {
         return inputDateFormatter;
     }
-    
 }

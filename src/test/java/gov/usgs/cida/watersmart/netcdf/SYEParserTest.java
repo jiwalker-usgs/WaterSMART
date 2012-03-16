@@ -1,5 +1,6 @@
 package gov.usgs.cida.watersmart.netcdf;
 
+import gov.usgs.cida.watersmart.parse.file.SYEParser;
 import gov.usgs.cida.netcdf.dsg.Observation;
 import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Station;

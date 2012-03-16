@@ -1,4 +1,4 @@
-package gov.usgs.cida.watersmart.netcdf;
+package gov.usgs.cida.watersmart.parse;
 
 import com.ctc.wstx.stax.WstxInputFactory;
 import com.google.common.collect.Maps;

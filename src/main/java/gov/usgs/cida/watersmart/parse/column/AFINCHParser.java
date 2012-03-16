@@ -1,4 +1,4 @@
-package gov.usgs.cida.watersmart.netcdf;
+package gov.usgs.cida.watersmart.parse.column;
 
 import com.google.common.collect.*;
 import gov.usgs.cida.netcdf.dsg.Observation;
@@ -6,9 +6,11 @@ import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Station;
 import gov.usgs.cida.netcdf.dsg.Variable;
 import gov.usgs.cida.netcdf.jna.NCUtil;
+import gov.usgs.cida.watersmart.parse.DSGParser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.stream.XMLStreamException;
@@ -38,7 +40,7 @@ public class AFINCHParser extends DSGParser {
     
     // Create a hashmap for each station, collect Observations
     private ListMultimap<Station, Observation> allData;
-    private Iterator marker;
+    private Iterator<Observation> marker;
     private Collection<Station> stationsColl;
     private RecordType record;
     
@@ -112,9 +114,9 @@ public class AFINCHParser extends DSGParser {
                 record.addType(statVar);
             }
         }
-        
         // everything set up, start iterator
-        marker = allData.entries().iterator();
+        //allData.entries().iterator();
+        marker = allData.values().iterator();
     }
     
     @Override
@@ -129,12 +131,12 @@ public class AFINCHParser extends DSGParser {
     
     @Override
     public boolean hasNext() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return marker.hasNext();
     }
     
     @Override
     public Observation next() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return marker.next();
     }
     
     @Override
