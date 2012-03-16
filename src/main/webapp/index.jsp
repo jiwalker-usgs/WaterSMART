@@ -38,7 +38,8 @@
             CONFIG.GEOSERVER_URL = '<%= props.getProperty("watersmart.stations.url", "http://localhost:8080/geoserver/ows") %>';
             CONFIG.SITES_LAYER = '<%= props.getProperty("watersmart.stations.typeName", "watersmart:se_sites") %>';
             CONFIG.DEVELOPMENT = <%= development %>;
-
+            CONFIG.CSW_PARENT_IDENTIFIER = '<%= props.getProperty("watersmart.csw.identifier.parent", "497cf2db-56d6-4cad-9a56-a14b63fb232a") %>';
+            
             WATERSMART.USER = '<%= (user == null) ? "" : user.uid %>';
 
             /**
@@ -91,7 +92,7 @@
         </jsp:include>
         <jsp:include page="js/geoext/ux/SOS/SOS.jsp"/>
         <jsp:include page="js/geoext/ux/CSW/CSW.jsp"/>
-
+        <jsp:include page="js/jquery/jquery.jsp"/>
         <jsp:include page="js/log4javascript/log4javascript.jsp"/>
         <jsp:include page="js/ext/ux/notify/notify.jsp"/>
         <jsp:include page="js/ext/ux/cida-load/cida-load.jsp"/>
@@ -101,6 +102,9 @@
 
         <script type="text/javascript" src="pages/index/Form/isoFormPanel.js"></script>
         <script type="text/javascript" src="pages/index/Form/fileUploadPanel.js"></script>
+        <script type="text/javascript" src="pages/index/Form/ModelPanel.js"></script>
+        <script type="text/javascript" src="pages/index/Form/RunPanel.js"></script>
+        <script type="text/javascript" src="pages/index/Form/ModelRunSelectionPanel.js"></script>
         <script type="text/javascript" src="pages/index/Plotter/PlotterPanel.js"></script>
         <script type="text/javascript" src="pages/index/Map/map.js"></script>
         <script type="text/javascript" src="pages/index/onReady.js"></script>

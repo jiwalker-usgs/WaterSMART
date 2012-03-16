@@ -5,6 +5,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
     layersLoading : 0,
     controller : undefined,
     cswRecordStore : undefined,
+    currentMapConfig : {},
     defaultMapConfig : {
         layers : {
             baseLayers : [],
@@ -12,11 +13,10 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
         },
         initialZoom : undefined,
         // This is reprojected from -88.459,30.039,-81.347,37.086, the watersmart:se_sites bounds
-        initialExtent : new OpenLayers.Bounds(-9847210.8347114,3508563.9150696,-9055506.6162999,4451100.8664317),
-        center : new OpenLayers.LonLat(-9506240,395340)
+        initialExtent : new OpenLayers.Bounds(-9847210.8347114,3508563.9150696,-9055506.6162999,4451100.8664317)
     },
     owsEndpoint : undefined,
-    plotterVars : undefined,
+    plotterVars : undefined, 
     popup : undefined,
     sitesLayerName : undefined,
     sosEndpoint : undefined,
@@ -25,19 +25,6 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
     constructor : function(config) {
         LOG.debug('map.js::constructor()');
         var options = config || {};
-        
-        this.cswRecordStore = options.cswRecordStore;
-        Ext.each(this.cswRecordStore.data.items[0].get("identificationInfo"), function(idInfoItem) {
-            if (idInfoItem.serviceIdentification && idInfoItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
-                this.sosEndpoint = idInfoItem.serviceIdentification.operationMetadata.linkage.URL;
-                this.plotterVars = idInfoItem.serviceIdentification.operationMetadata.name.CharacterString.value;
-            }
-            if (idInfoItem.serviceIdentification && idInfoItem.serviceIdentification.id.toLowerCase() === 'geoserver') {
-                this.owsEndpoint = idInfoItem.serviceIdentification.operationMetadata.linkage.URL;
-                this.sitesLayerName = idInfoItem.serviceIdentification.operationMetadata.name.CharacterString.value;
-            }
-        }, this)
-        
         
         var EPSG900913Options = {
             sphericalMercator : true,
@@ -50,23 +37,6 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
             transitionEffect : 'resize'
         };
 					
-        var sitesLayer = new OpenLayers.Layer.WMS(
-            'WaterSMART: Stations',
-            this.owsEndpoint,
-            {
-                LAYERS: this.sitesLayerName,
-                transparent : true,
-                format: 'image/png'
-            },
-            {
-                extractAttributes : true,
-                opacity : '0.5',
-                displayOutsideMaxExtent: true,
-                isBaseLayer: false,
-                transitionEffect : 'resize'
-            });
-        this.defaultMapConfig.layers.layers =  [sitesLayer];
-      
         this.defaultMapConfig.layers.baseLayers = [
         new OpenLayers.Layer.XYZ(
             "USA Topo Map",
@@ -121,11 +91,15 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
             "layer-load-start",
             "layer-load-end"
             );
-       
+                
+        //TODO- $.extend(true...) performs a deep copy of a JSON object.
+        //Get another way of doing a deep copy of a JSON object so we can
+        //remove the JQuery lib from this project. 
+        this.currentMapConfig = $.extend(true, {}, this.defaultMapConfig);
         this.processMapConfigObject(this.defaultMapConfig);
-        this.addIdentifyToolingToMap();
         this.map.events.on({
-            'preremovelayer' :  function (event) {
+            'preremovelayer' :  function () {
+                LOG.debug('map.js::Layer is being removed');
             },
             'preaddlayer' : function (event) {
                 var layer = event.layer;
@@ -155,10 +129,17 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
         })
     },
     addIdentifyToolingToMap: function() {
+        LOG.debug('map.js::addIdentifyToolingToMap()');
+        var currentGetFeatureInfoControl = this.map.getControlsByClass("OpenLayers.Control.WMSGetFeatureInfo")[0];
+        if (currentGetFeatureInfoControl) {
+            LOG.debug('map.js::addIdentifyToolingToMap():Map already had this control on the map. Destroying and replacing with new control');
+            currentGetFeatureInfoControl.destroy();
+        }
+        
         var getFeatureInfoControl = new OpenLayers.Control.WMSGetFeatureInfo({
             infoFormat : 'application/vnd.ogc.gml',
             maxFeatures : 1,
-            layers : this.defaultMapConfig.layers.layers,
+            layers : this.currentMapConfig.layers.layers,
             eventListeners : {
                 getfeatureinfo : function(event) {
                     if (event.features && event.features[0]){
@@ -198,7 +179,9 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
             
         });
         this.map.addControl(getFeatureInfoControl);
+        LOG.debug('map.js::addIdentifyToolingToMap():New control added to map');
         getFeatureInfoControl.activate();
+        LOG.debug('map.js::addIdentifyToolingToMap():New control activated');
     },
     addLayers : function(layers) {
         if (Ext.isArray(layers)) {
@@ -212,7 +195,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
         var layers = mco.layers.baseLayers.concat(mco.layers.layers);
         
         LOG.debug('map.js::processMapConfigObject(): Replacing map\'s layer store');
-        this.layers.destroy();
+        this.removeLayers(null, false);
         this.layers = new GeoExt.data.LayerStore({
             initDir : GeoExt.data.LayerStore.STORE_TO_MAP,
             map : this.map,
@@ -227,7 +210,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
                     tileloaded : function(a) {
                         LOG.trace('map.js::' + a.object.name + ' tiles left to load ' + a.object.numLoadingTiles);
                         if (a.object.numLoadingTiles == 0) {
-                            
+                            LOG.trace('map.js::All layers have been loaded');
                         }
                     }
                 })
@@ -251,13 +234,15 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
      * A hook to add additional functionality before calling 
      * the map's removeLayer function (which also has a hook)
      */
-    removeLayers : function(layers) {
-        if (Ext.isArray(layers)) {
-            Ext.each(layers, function(layer) {
-                layer.map.removeLayer(layer);
-            });
-        } else {
-            layers.map.removeLayer(layers);
-        }
+    removeLayers : function(layers, includeBaseLayers) {
+        if (!layers) layers = this.layers.getRange();
+        Ext.each(layers, function(record){
+            LOG.debug('map.js::Removing layer : ' + record.getLayer().id);
+            var isBaseLayer = record.getLayer().isBaseLayer;
+            if (isBaseLayer && !includeBaseLayers) return;
+            if (!record.getLayer().metadata.persist) {
+                this.layers.remove(record)
+            }
+        }, this)
     }
 });
