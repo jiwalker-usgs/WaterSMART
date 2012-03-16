@@ -54,7 +54,18 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
             title : this.panelInfo.title,
             height : 'auto',
             width: '100%',
-            html : html
+            html : html,
+            listeners : {
+                afterrender : function(me) {
+                    me.body.on('mouseover', function(){
+                        
+                    }, me)
+                    me.body.on('click', function(){
+                        
+                    }, me)
+                },
+                scope : this
+            }
         }, config);
         WaterSMART.RunPanel.superclass.constructor.call(this, config);
     }

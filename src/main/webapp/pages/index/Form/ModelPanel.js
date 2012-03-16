@@ -44,7 +44,7 @@ WaterSMART.ModelPanel = Ext.extend(Ext.Panel, {
                     }
                 }
                 
-                // We have a service identification block. 
+                // We have a service identification block. We create run panels here
                 if (idItem.serviceIdentification !== undefined) { 
                     LOG.trace('ModelPanel.js::Service Identification block found. Parsing out service information');
                     if (idItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
@@ -85,7 +85,7 @@ WaterSMART.ModelPanel = Ext.extend(Ext.Panel, {
                         // the panel they sit in. We don't want to destroy the originals
                         var runPanelsClone = [];
                         Ext.each(activePanel.panelInfo.runPanels, function(panel){
-                            this.push($.extend(true, {}, panel));
+                            this.push(panel.cloneConfig());
                         }, runPanelsClone)
                         
                         activePanel.ownerCt.ownerCt.modelSelected({

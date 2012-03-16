@@ -91,7 +91,12 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
             "layer-load-start",
             "layer-load-end"
             );
+                
+        //TODO- $.extend(true...) performs a deep copy of a JSON object.
+        //Get another way of doing a deep copy of a JSON object so we can
+        //remove the JQuery lib from this project. 
         this.currentMapConfig = $.extend(true, {}, this.defaultMapConfig);
+        
         this.processMapConfigObject(this.defaultMapConfig);
         this.map.events.on({
             'preremovelayer' :  function () {
