@@ -77,7 +77,7 @@ WaterSMART.ModelPanel = Ext.extend(Ext.Panel, {
                 panelInfo : panelInfo,
                 listeners : {
                 afterrender : function(me) {
-                    me.body.on('mouseover', function(){
+                    me.body.on('click', function(){
                         var activePanel = Ext.ComponentMgr.get(this.id);
                         
                         // This has to be cloned because when a new model is selected, the previous
