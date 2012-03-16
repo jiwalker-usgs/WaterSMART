@@ -54,6 +54,14 @@ WaterSMART.ModelPanel = Ext.extend(Ext.Panel, {
                     }
                 }
                 
+                if (idItem.serviceIdentification !== undefined) { 
+                    LOG.trace('ModelPanel.js::Service Identification block found. Parsing out service information');
+                    if (idItem.serviceIdentification.id.toLowerCase() === 'ows') {
+                        this.owsEndpoint = idItem.serviceIdentification.operationMetadata.linkage.URL;
+                        this.owsResourceName = idItem.serviceIdentification.operationMetadata.name.CharacterString.value;
+                    }
+                }
+                
             }, panelInfo)
             
             var html = 'Language: ' + panelInfo.language;
@@ -72,13 +80,17 @@ WaterSMART.ModelPanel = Ext.extend(Ext.Panel, {
                     me.body.on('mouseover', function(event, element){
                         var activePanel = Ext.ComponentMgr.get(element.parentElement.parentElement.attributes.id.value);
                         
+                        // This has to be cloned because when a new model is selected, the previous
+                        // set of panels belonging to that panel are destroyed in order to clear out 
+                        // the panel they sit in. We don't want to destroy the originals
                         var runPanelsClone = [];
                         Ext.each(activePanel.panelInfo.runPanels, function(panel){
                             this.push($.extend(true, {}, panel));
                         }, runPanelsClone)
                         
-                        activePanel.ownerCt.ownerCt.populateRunPanel({
-                            runPanels : runPanelsClone//activePanel.panelInfo.runPanels
+                        activePanel.ownerCt.ownerCt.modelSelected({
+                            runPanels : runPanelsClone,
+                            panelInfo : activePanel.panelInfo
                         })
                     }, this)
                 },

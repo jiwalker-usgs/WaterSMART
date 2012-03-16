@@ -46,7 +46,8 @@ Ext.onReady(function() {
                     var map = new WaterSMART.Map();
         
                     var modelRunSelPanel = new WaterSMART.ModelRunSelectionPanel({
-                        cswStore : store
+                        cswStore : store,
+                        mapPanel : map
                     });
         
                     var metaForm = new WaterSMART.ISOFormPanel();
