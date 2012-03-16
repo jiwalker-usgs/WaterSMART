@@ -1,20 +1,21 @@
-package gov.usgs.cida.watersmart.netcdf
+package gov.usgs.cida.watersmart.parse
 
-import spock.lang.*;
+import spock.lang.*
+import gov.usgs.cida.watersmart.parse.StationLookup
 
 class StationLookupSpec extends Specification {
+    
+    def stations = new StationLookup("http://igsarm-cida-javadev1.er.usgs.gov:8081/geoserver/watersmart/ows", "watersmart:se_sites", "site_no")
+    
 	def "there should be 509 stations"() {
         expect:
-        stationList.size() == 509
-        
-        where:
-        stationList = StationLookup.getStationList()
+        stations.getStations().size() == 509
     }
     
     @Unroll
     def "#stationId has index #index"() {
         expect:
-        StationLookup.lookup(stationId) == index
+        stations.lookup(stationId) == index
         
         where:
         stationId  | index

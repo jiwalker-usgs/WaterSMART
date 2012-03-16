@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class DSGParser implements Iterator<Observation> {
 
-    private static Logger LOG = LoggerFactory.getLogger(DSGParser.class);
+    protected static Logger LOG = LoggerFactory.getLogger(DSGParser.class);
     public static final int READ_AHEAD_LIMIT = 4096;
 
     protected abstract Pattern getDataLinePattern();
@@ -69,58 +69,7 @@ public abstract class DSGParser implements Iterator<Observation> {
         }
     }
 
-    /**
-     * Reading of metadata needs to happen before this will work This should
-     * always be preceded by a hasNext()
-     *
-     * @return next Observation from the file, will be null if hasNext() was not
-     * called and end of file was reached or metadata hasn't been parsed yet
-     */
-    @Override
-    public Observation next() {
-        // go through the file and make a list of Observation elements
-        // Observation requires station index, so be wary of that
-        Observation observation = null;
-        
-        if (stationNum != null) {
-            try {
-                String line = reader.readLine();
-                if (null != line) {
-                    Matcher lineMatcher = getDataLinePattern().matcher(line);
-                    if (lineMatcher.matches()) {
-                        String date = lineMatcher.group(1);
-                        Instant timestep = Instant.parse(date,
-                                                         getInputDateFormatter());
-                        
-                        int days = calculateTimeOffset(timestep);
-
-                        String values = lineMatcher.group(2);
-                        Matcher valueMatcher = getDataValuePattern().matcher(
-                                values);
-                        List<Float> floatVals = new LinkedList<Float>();
-                        while (valueMatcher.find()) {
-                            float value = Float.parseFloat(valueMatcher.group(1));
-                            floatVals.add(value);
-                        }
-                        int stationIndex = stationLookup.lookup(stationNum);
-                        observation = new Observation(days, stationIndex,
-                                                      floatVals.toArray());
-                    }
-                }
-            }
-            catch (IOException ioe) {
-                LOG.debug("Error reading file", ioe);
-            }
-            finally {
-                return observation;
-            }
-        }
-        else {
-            throw new IllegalStateException(
-                    "Must obtain stationId before getting observations");
-        }
-
-    }
+    public abstract Observation next();
     
     protected int calculateTimeOffset(Instant time) {
         // may want to support other units (hours, months, years, etc)

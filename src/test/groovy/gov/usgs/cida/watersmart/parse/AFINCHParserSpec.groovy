@@ -1,5 +1,4 @@
-
-package gov.usgs.cida.watersmart.netcdf
+package gov.usgs.cida.watersmart.parse
 
 import spock.lang.*
 import com.google.common.collect.Sets

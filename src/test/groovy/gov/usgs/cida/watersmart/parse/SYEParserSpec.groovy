@@ -1,4 +1,4 @@
-package gov.usgs.cida.watersmart.netcdf
+package gov.usgs.cida.watersmart.parse
 
 import spock.lang.*
 import org.joda.time.*
@@ -6,6 +6,8 @@ import static spock.util.matcher.HamcrestMatchers.closeTo
 import gov.usgs.cida.netcdf.dsg.*
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
+import gov.usgs.cida.watersmart.parse.*
+import gov.usgs.cida.watersmart.parse.file.*
 
 /**
  *
@@ -14,7 +16,7 @@ import org.apache.commons.io.IOUtils
 class SYEParserSpec extends Specification {
 	
     def sampleFile = new File(
-        SYEParserTest.class.getClassLoader().getResource(
+        SYEParserSpec.class.getClassLoader().getResource(
             "gov/usgs/cida/watersmart/netcdf/02177000.txt"
         ).getFile())
     
@@ -40,7 +42,8 @@ class SYEParserSpec extends Specification {
     
     def "next called without calling getMetadata should fail"() {
         when:
-        def syeParser = new SYEParser(new FileInputStream(sampleFile), sampleFile.getName())
+        def lookup = Mock(StationLookup)
+        def syeParser = new SYEParser(new FileInputStream(sampleFile), sampleFile.getName(), lookup)
         syeParser.next()
         
         then:
@@ -49,7 +52,9 @@ class SYEParserSpec extends Specification {
     
     def "observations are parsed correctly"() {
         setup:
-        def syeParser = new SYEParser(new FileInputStream(sampleFile), sampleFile.getName())
+        def lookup = Mock(StationLookup)
+        lookup.lookup("02177000") << 0
+        def syeParser = new SYEParser(new FileInputStream(sampleFile), sampleFile.getName(), lookup)
         syeParser.parseMetadata()
         def ob = syeParser.next()
         
@@ -61,7 +66,8 @@ class SYEParserSpec extends Specification {
     
     def "NetCDF from SYE input completes successfully"() {
         setup:
-        def syeParser = new SYEParser(new FileInputStream(sampleFile), sampleFile.getName())
+        def lookup = Mock(StationLookup)
+        def syeParser = new SYEParser(new FileInputStream(sampleFile), sampleFile.getName(), lookup)
 //        StationTimeSeriesNetCDFFile nc = null;
 //        File ncFile = null;
         def ncFile = new File("/tmp/test.nc")
