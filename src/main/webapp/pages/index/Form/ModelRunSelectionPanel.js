@@ -2,8 +2,9 @@ Ext.ns("WaterSMART");
 
 WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
     cswStore : undefined,
+    modelStore : undefined,
     mapPanel : undefined,
-    modelPanel : undefined,
+//    modelPanel : undefined,
     runPanel : undefined,
     constructor : function(config) {
         if (!config) config = {};
@@ -11,43 +12,28 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         this.cswStore = config.cswStore;
         this.mapPanel = config.mapPanel;
         
-        this.modelPanel = new WaterSMART.ModelPanel({
-            cswStore : this.cswStore,
-            region : 'center',
-            title : 'Models',
-            width : '40%',
-            height : '100%'
+        // TODO- For quicktips, we should add more fields to this store from the underlying 
+        // store like Date, date last revised, language, etc
+        var modelArray = [];
+        Ext.each(this.cswStore.getRange(), function(storeItem){
+            this.push([
+                storeItem.get('identificationInfo')[0].citation.title.CharacterString.value,
+                storeItem])
+        }, modelArray)
+        this.modelStore = new Ext.data.ArrayStore({
+            fields : ['title', 'rec'],
+            idIndex : 0
         })
+        this.modelStore.loadData(modelArray);
         
         this.runPanel = new Ext.Panel({
             id : 'run-panel',
             title : 'Runs',
-            width : '60%',
-            region : 'east',
+            region : 'center',
             height : '100%',
             disabled : true,
             currentlySelectedRun : undefined,
             tbar : [
-            {
-                xtype : 'button',
-                id : 'select-another-model-button',
-                text : 'Select Another Model',
-                listeners : {
-                    click : function() {
-                        this.modelPanel.setDisabled(false);
-                        
-                        Ext.each(this.modelPanel.modelPanels, function(modelPanel) {
-                            modelPanel.expand(true);
-                        })
-                        
-                        this.runPanel.removeAll(true);
-                        
-                        this.runPanel.setDisabled(true);
-                        
-                    },
-                    scope : this
-                }
-            },
             {
                 xtype : 'button',
                 id : 'edit-selected-run-button',
@@ -67,19 +53,19 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                 listeners : {
                     click : function() {
                         
-                    LOG.debug('')
-                    var isoFormPanel = new WaterSMART.ISOFormPanel({
+                        LOG.debug('')
+                        var isoFormPanel = new WaterSMART.ISOFormPanel({
                         
-                    });
+                            });
                     
-                    var modalRunWindow = new Ext.Window({
-                        width: 'auto',
-                        height : 'auto',
-                        modal : true,
-                        items : [ isoFormPanel ]
-                    })
+                        var modalRunWindow = new Ext.Window({
+                            width: 'auto',
+                            height : 'auto',
+                            modal : true,
+                            items : [ isoFormPanel ]
+                        })
                     
-                    modalRunWindow.show();
+                        modalRunWindow.show();
                     
                     },
                     scope : this
@@ -92,8 +78,97 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
             id: 'model-run-selection-panel',
             region: 'center',
             layout : 'border',
+            tbar : [
+            {
+                xtype: 'tbtext',
+                text: 'Models:'
+            },
+            {
+                xtype: 'combo',
+                store: this.modelStore,
+                autoWidth: true,
+                triggerAction : 'all',
+                width : 'auto',
+                mode : 'local',
+                editable : false,
+                emptyText: 'Select A Model',
+                displayField : 'title',
+                listeners : {
+                    select : function(combo, record, index) {
+                        var panelInfo = {};
+                        var storeItem = record.get('rec');
+                        
+                        panelInfo.fileIdentifier = storeItem.get('fileIdentifier');
+                        panelInfo.metadataStandardName = storeItem.get('metadataStandardName') || '';
+                        panelInfo.metadataStandardVersion = storeItem.get('metadataStandardVersion') || '';
+                        panelInfo.dateStamp = storeItem.get('dateStamp') || '';
+                        panelInfo.language = storeItem.get('language') || '';
+                        panelInfo.runPanels = [];
+            
+                        Ext.each(storeItem.get('identificationInfo'), function(idItem) {
+                
+                            // We have a citation identification block
+                            if (idItem.citation !== undefined) { 
+                                LOG.trace('ModelPanel.js::Citation Identification block found. Parsing out citation information');
+                                this.title = idItem.citation.title.CharacterString.value
+                                this['abstract'] = idItem['abstract'].CharacterString.value || '';
+                    
+                    
+                                if (idItem.citation.date !== undefined && idItem.citation.date.length > 0) {
+                                    Ext.each(idItem.citation.date, function(dateItem) {
+                                        if (dateItem.dateType.codeListValue.toLowerCase() === 'revision') this.lastRevisedDate = dateItem.date[dateItem.date.length - 1].DateTime.value
+                                    }, this)
+                                } 
+                    
+                                if (idItem.graphicOverview !== undefined && idItem.graphicOverview.length > 0) {
+                                    this.graphicOverview = [];
+                                    Ext.each(idItem.graphicOverview, function(goItem) {
+                                        this.graphicOverview.push(goItem)
+                                    }, this)
+                                }
+                            }
+                
+                            // We have a service identification block. We create run panels here
+                            if (idItem.serviceIdentification !== undefined) { 
+                                LOG.trace('ModelPanel.js::Service Identification block found. Parsing out service information');
+                                if (idItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
+                                    this.runPanels.push(new WaterSMART.RunPanel({
+                                        serviceIdentification : idItem.serviceIdentification
+                                    }))
+                                }
+                            }
+                
+                            if (idItem.serviceIdentification !== undefined) { 
+                                LOG.trace('ModelPanel.js::Service Identification block found. Parsing out service information');
+                                if (idItem.serviceIdentification.id.toLowerCase() === 'ows') {
+                                    this.owsEndpoint = idItem.serviceIdentification.operationMetadata.linkage.URL;
+                                    this.owsResourceName = idItem.serviceIdentification.operationMetadata.name.CharacterString.value;
+                                }
+                            }
+                
+                        }, panelInfo)
+                        
+                        var runPanelsClone = [];
+                        Ext.each(panelInfo.runPanels, function(panel){
+                            panel.panelInfo.owsEndpoint = this.panelInfo.owsEndpoint
+                            panel.panelInfo.owsResourceName = this.panelInfo.owsResourceName
+                            panel.panelInfo.fileIdentifier = this.panelInfo.fileIdentifier
+                            this.runPanelsClone.push(panel.cloneConfig());
+                        }, {
+                            panelInfo : panelInfo,
+                            runPanelsClone : runPanelsClone
+                        })
+                        
+                        this.modelSelected({
+                            runPanels : runPanelsClone,
+                            panelInfo : panelInfo
+                        })
+                    },
+                    scope : this
+                }
+            }
+            ],
             items : [
-            this.modelPanel,
             this.runPanel
             ]
         }, config);
