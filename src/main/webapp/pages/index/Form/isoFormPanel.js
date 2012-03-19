@@ -167,7 +167,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                     uploadPanel.getForm().submit({
                         url: uploadPanel.url,
                         params : {
-                            modeltype : 'AFINCH',
+                            modeltype : this.modelName,
                             wfsUrl : 'http://igsarm-cida-javadev1.er.usgs.gov:8081/geoserver/watersmart/ows',
                             layer : 'watersmart:se_sites',
                             commonAttr : 'site_no'
