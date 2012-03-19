@@ -69,21 +69,21 @@ public class Upload extends HttpServlet {
                 for (FileItem item : itemList) {
                     String name = item.getFieldName();
                     // filename must come first
-                    if (item.isFormField() && "modeltype".equals(item.getFieldName())) {
+                    if (item.isFormField() && "modeltype".equals(item.getFieldName().toLowerCase())) {
                         modelType = ModelType.valueOf(item.getString());
+                    }
+                    else if (item.isFormField() && "wfsurl".equals(item.getFieldName().toLowerCase())) {
+                        wfsUrl = item.getString();
+                    }
+                    else if (item.isFormField() && "layer".equals(item.getFieldName().toLowerCase())) {
+                        layer = item.getString();
+                    }
+                    else if (item.isFormField() && "commonattr".equals(item.getFieldName().toLowerCase())) {
+                        commonAttr = item.getString();
                     }
                     else if (!item.isFormField()) {
                         filename = item.getName();
                         filein = item.getInputStream();
-                    }
-                    else if (item.isFormField() && "wfsUrl".equals(item.getFieldName())) {
-                        wfsUrl = item.getString();
-                    }
-                    else if (item.isFormField() && "layer".equals(item.getFieldName())) {
-                        layer = item.getString();
-                    }
-                    else if (item.isFormField() && "commonAttr".equals(item.getFieldName())) {
-                        commonAttr = item.getString();
                     }
                 }
                 if (modelType != null &&
