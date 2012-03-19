@@ -55,7 +55,7 @@ class SYEParserSpec extends Specification {
         def lookup = Mock(StationLookup)
         lookup.lookup("02177000") << 0
         def syeParser = new SYEParser(new FileInputStream(sampleFile), sampleFile.getName(), lookup)
-        syeParser.parseMetadata()
+        syeParser.parse()
         def ob = syeParser.next()
         
         expect:
@@ -71,7 +71,7 @@ class SYEParserSpec extends Specification {
 //        StationTimeSeriesNetCDFFile nc = null;
 //        File ncFile = null;
         def ncFile = new File("/tmp/test.nc")
-        def rt = syeParser.parseMetadata()
+        def rt = syeParser.parse()
         def sampleStation = new Station(34.8139814f, -83.305993f, "02177000")
         def nc = new StationTimeSeriesNetCDFFile(ncFile, rt, true, sampleStation)
         

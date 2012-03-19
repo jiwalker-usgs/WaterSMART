@@ -6,11 +6,13 @@ import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Station;
 import gov.usgs.cida.netcdf.dsg.Variable;
 import gov.usgs.cida.netcdf.jna.NCUtil;
-import gov.usgs.cida.watersmart.parse.DSGParser;
 import gov.usgs.cida.watersmart.parse.StationLookup;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.stream.XMLStreamException;
@@ -25,36 +27,42 @@ import org.tuckey.noclash.gzipfilter.org.apache.commons.lang.StringUtils;
  *
  * @author Jordan Walker <jiwalker@usgs.gov>
  */
-public class AFINCHParser extends DSGParser {
+public class AFINCHParser extends StationPerColumnDSGParser {
     
     private static final Logger LOG = LoggerFactory.getLogger(AFINCHParser.class);
     
     private static final Pattern propertyPattern = Pattern.compile("# (\\w+)");
     private static final Pattern stationLinePattern = Pattern.compile("^\\s+((?:\\d+\\s+)+)$");
-    private static final Pattern headerLinePattern = Pattern.compile("^TIMESTEP((?:\\s+[^\\s\\(]+\\(\\[^\\)]+\\))+)$");
-    private static final Pattern dataLinePattern = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2})((?:\\s+[^\\s]+)+)$");
+    private static final Pattern headerLinePattern = Pattern.compile("^TIMESTEP\\s+((?:[^\\s\\(]+\\([^\\)]+\\)\\s*)+)$");
+    private static final Pattern dataLinePattern = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z)\\s+((?:[^\\s]+\\s*)+)$");
     
-    private static final Pattern statisticAndUnitsPattern = Pattern.compile("([^\\(]+)\\(([^\\)])\\)");
+    private static final Pattern statisticAndUnitsPattern = Pattern.compile("([^\\(]+)\\(([^\\)]+)\\)");
 
     public static final DateTimeFormatter inputDateFormatter = ISODateTimeFormat.dateTimeParser();
     
     // Create a hashmap for each station, collect Observations
     private ListMultimap<Station, Observation> allData;
-    private Iterator<Observation> marker;
-    private Collection<Station> stationsColl;
+    private Iterator<Station> stationIterator;
+    private Iterator<Observation> observationIterator;
     private RecordType record;
     
     public AFINCHParser(InputStream input, StationLookup lookup) throws IOException, XMLStreamException {
         super(input, lookup);
         allData = LinkedListMultimap.create();
-        
+        stationIterator = null;
+        observationIterator = null;
+        record = null;
+    }
+    
+    @Override
+    public RecordType parse() throws IOException {
         String line = null;
         String property = null;
         String[] stations = null;
         String[] statistics = null;
         while (null != (line = reader.readLine())) {
             Matcher matcher = null;
-            matcher = dataLinePattern.matcher(line);
+            matcher = getDataLinePattern().matcher(line);
             if (matcher.matches()) { // actually happens last, put first as common case
                 Instant timestep = Instant.parse(matcher.group(1), getInputDateFormatter());
                 String observations = matcher.group(2);
@@ -70,6 +78,10 @@ public class AFINCHParser extends DSGParser {
                 }
                 for (String station : observationBuilderMap.keySet()) {
                     Station stationObj = stationLookup.get(station);
+                    if (stationObj == null) {
+                        LOG.debug("station doesn't match one from associated sites layer");
+                        continue; // skip this one
+                    }
                     List<Float> vals = observationBuilderMap.get(station);
                     Observation ob = new Observation(calculateTimeOffset(timestep),
                             stationObj.index,
@@ -89,7 +101,7 @@ public class AFINCHParser extends DSGParser {
                     stations = matcher.group(1).split("\\s+");
                     continue;
                 }
-                matcher = headerLinePattern.matcher(line);
+                matcher = getHeaderLinePattern().matcher(line);
                 if (matcher.matches()) {
                     statistics = matcher.group(1).split("\\s+");
                     continue;
@@ -102,7 +114,7 @@ public class AFINCHParser extends DSGParser {
         Set<String> uniqueStats = Sets.newLinkedHashSet(Lists.newArrayList(statistics));
         
         for (String stat : uniqueStats) {
-            Matcher statMatcher = stationLinePattern.matcher(stat);
+            Matcher statMatcher = statisticAndUnitsPattern.matcher(stat);
             if (statMatcher.matches()) {
                 String statname = statMatcher.group(1);
                 String units = statMatcher.group(2);
@@ -116,53 +128,41 @@ public class AFINCHParser extends DSGParser {
         }
         // everything set up, start iterator
         //allData.entries().iterator();
-        marker = allData.values().iterator();
-    }
-    
-    @Override
-    public RecordType parseMetadata() {
+        stationIterator = allData.keySet().iterator();
         return record;
-    }
-
-    @Override
-    protected String getStationId(String parseText) {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
     
     @Override
     public boolean hasNext() {
-        return marker.hasNext();
+        if (stationIterator == null) {
+            throw new RuntimeException("Must parse before iterating data");
+        }
+        return stationIterator.hasNext() || observationIterator.hasNext();
     }
     
     @Override
     public Observation next() {
-        return marker.next();
+        if (stationIterator == null) {
+            throw new RuntimeException("Must parse before iterating data");
+        }
+        while (observationIterator == null || !observationIterator.hasNext()) {
+            observationIterator = allData.get(stationIterator.next()).iterator();
+        }
+        return observationIterator.next();
     }
     
     @Override
     protected Pattern getDataLinePattern() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return dataLinePattern;
     }
-
-    @Override
-    protected Pattern getDataValuePattern() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
+    
     @Override
     protected Pattern getHeaderLinePattern() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    protected Pattern getHeaderVariablePattern() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return headerLinePattern;
     }
 
     @Override
     protected final DateTimeFormatter getInputDateFormatter() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    
+        return inputDateFormatter;
+    }  
 }

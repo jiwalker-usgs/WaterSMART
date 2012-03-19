@@ -28,38 +28,33 @@ public abstract class StationPerFileDSGParser extends DSGParser {
     }
     
     @Override
-    protected Pattern getDataLinePattern() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+    protected abstract Pattern getDataLinePattern();
+    protected abstract Pattern getDataValuePattern();
+    
+    @Override
+    protected abstract Pattern getHeaderLinePattern();
+    protected abstract Pattern getHeaderVariablePattern();
+    
+    protected abstract Pattern getStationIdPattern();
 
     @Override
-    protected Pattern getDataValuePattern() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+    protected abstract DateTimeFormatter getInputDateFormatter();
 
     @Override
-    protected Pattern getHeaderLinePattern() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+    public abstract RecordType parse() throws IOException;
 
-    @Override
-    protected Pattern getHeaderVariablePattern() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    protected DateTimeFormatter getInputDateFormatter() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public RecordType parseMetadata() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
+    /**
+     * Pulls the station out of the string passed in using the stationIdPattern
+     * @param parseText line with stationId contained
+     * @return String containing stationId
+     */
     @Override
     protected String getStationId(String parseText) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Matcher matcher = getStationIdPattern().matcher(parseText);
+        if (matcher.matches()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 
     /**
@@ -107,5 +102,4 @@ public abstract class StationPerFileDSGParser extends DSGParser {
             throw new IllegalStateException("Must obtain stationId before getting observations");
         }
     }
-    
 }

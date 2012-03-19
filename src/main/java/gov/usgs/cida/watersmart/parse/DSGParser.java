@@ -7,9 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.stream.XMLStreamException;
 import org.joda.time.Days;
@@ -29,8 +26,6 @@ public abstract class DSGParser implements Iterator<Observation> {
 
     protected abstract Pattern getDataLinePattern();
 
-    protected abstract Pattern getDataValuePattern();
-
     /**
      * this should match the last line before the data starts may want other
      * patterns for pieces of metadata (ex. stationId) and for some formats,
@@ -39,8 +34,6 @@ public abstract class DSGParser implements Iterator<Observation> {
      * @return Pattern describing the header line that precedes the data
      */
     protected abstract Pattern getHeaderLinePattern();
-
-    protected abstract Pattern getHeaderVariablePattern();
 
     protected abstract DateTimeFormatter getInputDateFormatter();
     protected BufferedReader reader;
@@ -82,11 +75,11 @@ public abstract class DSGParser implements Iterator<Observation> {
         throw new UnsupportedOperationException("remove doesn't make sense");
     }
 
-    public abstract RecordType parseMetadata();
+    public abstract RecordType parse() throws IOException;
 
     /**
      * StationId's are extracted on a per file basis change the pattern or this
-     * function to reflect the actual format Used by parseMetadata to perform a
+     * function to reflect the actual format Used by parse to perform a
      * lookup
      *
      * @param parseText Text to parse for stationId

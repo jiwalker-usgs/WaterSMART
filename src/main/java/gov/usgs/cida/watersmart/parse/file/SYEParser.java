@@ -66,22 +66,6 @@ public class SYEParser extends StationPerFileDSGParser {
     }
     
     /**
-     * StationId's will be included in the filename
-     * change the pattern or this function to reflect the actual format
-     * Used by parseMetadata to perform a lookup
-     * @param filename Name of the file being parsed
-     * @return station name for this data
-     */
-    @Override
-    protected String getStationId(String filename) {
-        Matcher matcher = stationIdPattern.matcher(filename);
-        if (matcher.matches()) {
-            return matcher.group(1);
-        }
-        return null;
-    }
-    
-    /**
      * Create a pattern that captures the variable names and gives null for
      * non-variable column headers
      * @param headerLine Line to parse which has been identified as a header
@@ -103,7 +87,7 @@ public class SYEParser extends StationPerFileDSGParser {
     }
     
     @Override
-    public RecordType parseMetadata() {
+    public RecordType parse() throws IOException {
         // define what we need for metadata
         this.stationIndex = stationLookup.lookup(getStationId(this.filename));
         if (this.stationIndex < 0) {
@@ -112,39 +96,33 @@ public class SYEParser extends StationPerFileDSGParser {
                     + " instance could be down.");
         }
 
-        try {
-            reader.mark(READ_AHEAD_LIMIT);
-            String line = null;
-            boolean headerRead = false;
-            List<Variable> vars = null;
-            while (null != (line = reader.readLine())) {
-                Matcher matcher = headerLinePattern.matcher(line);
+        reader.mark(READ_AHEAD_LIMIT);
+        String line = null;
+        boolean headerRead = false;
+        List<Variable> vars = null;
+        while (null != (line = reader.readLine())) {
+            Matcher matcher = headerLinePattern.matcher(line);
+            if (matcher.matches()) {
+                vars = headerVariables(matcher.group(1));
+                reader.mark(READ_AHEAD_LIMIT);
+                headerRead = true;
+            }
+            else if (headerRead) {
+                matcher = dataLinePattern.matcher(line);
                 if (matcher.matches()) {
-                    vars = headerVariables(matcher.group(1));
-                    reader.mark(READ_AHEAD_LIMIT);
-                    headerRead = true;
-                }
-                else if (headerRead) {
-                    matcher = dataLinePattern.matcher(line);
-                    if (matcher.matches()) {
-                        String date = matcher.group(1);
-                        Instant timestep = Instant.parse(date, getInputDateFormatter());
-                        this.baseDate = timestep;
-                        
-                        RecordType recordType = new RecordType("days since " + baseDate.toString());
-                        for (Variable var : vars) {
-                            recordType.addType(var);
-                        }
-                        
-                        reader.reset();
-                        return recordType;
+                    String date = matcher.group(1);
+                    Instant timestep = Instant.parse(date, getInputDateFormatter());
+                    this.baseDate = timestep;
+
+                    RecordType recordType = new RecordType("days since " + baseDate.toString());
+                    for (Variable var : vars) {
+                        recordType.addType(var);
                     }
+
+                    reader.reset();
+                    return recordType;
                 }
             }
-            
-        }
-        catch (IOException ex) {
-            LOG.debug("Error reading metadata", ex);
         }
         return null;
     }
@@ -172,5 +150,10 @@ public class SYEParser extends StationPerFileDSGParser {
     @Override
     protected DateTimeFormatter getInputDateFormatter() {
         return inputDateFormatter;
+    }
+
+    @Override
+    protected Pattern getStationIdPattern() {
+        return stationIdPattern;
     }
 }

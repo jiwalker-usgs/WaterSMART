@@ -5,9 +5,7 @@ import gov.usgs.cida.watersmart.parse.DSGParser;
 import gov.usgs.cida.watersmart.parse.StationLookup;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.regex.Pattern;
 import javax.xml.stream.XMLStreamException;
-import org.joda.time.format.DateTimeFormatter;
 
 /**
  *
@@ -20,7 +18,7 @@ public abstract class StationPerColumnDSGParser extends DSGParser {
     }
     
     @Override
-    public RecordType parseMetadata() {
+    public RecordType parse() throws IOException{
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

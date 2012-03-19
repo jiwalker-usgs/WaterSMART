@@ -6,6 +6,7 @@ import gov.usgs.cida.netcdf.dsg.Observation;
 import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Station;
 import gov.usgs.cida.netcdf.dsg.StationTimeSeriesNetCDFFile;
+import gov.usgs.cida.watersmart.parse.column.AFINCHParser;
 import gov.usgs.cida.watersmart.util.JNDISingleton;
 import java.io.File;
 import java.io.IOException;
@@ -58,12 +59,15 @@ public class CreateDSGFromZip {
                     case WATERS:
                         dsgParse = new WATERSParser(inputStream, lookerUpper);
                         break;
+                    case AFINCH:
+                        dsgParse = new AFINCHParser(inputStream, lookerUpper);
+                        break;
                     default:
                         throw new NotImplementedException("Parser not written yet");
                 }
 
                 // must parse Metadata for each file
-                RecordType meta = dsgParse.parseMetadata();
+                RecordType meta = dsgParse.parse();
                 
                 // first file sets the rhythm
                 if (nc == null) {
