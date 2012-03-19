@@ -18,7 +18,7 @@ public class JNDISingleton {
     public static DynamicReadOnlyProperties getInstance() {
         if (null == props) {
             try {
-                props = new DynamicReadOnlyProperties().addJNDIContexts((String[]) null);
+                props = new DynamicReadOnlyProperties().addJNDIContexts(new String[0]);
             } catch (NamingException e) {
                 LOG.warn("Error occured during initProps()", e);
             }
