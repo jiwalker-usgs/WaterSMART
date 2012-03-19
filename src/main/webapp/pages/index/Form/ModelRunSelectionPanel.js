@@ -4,7 +4,6 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
     cswStore : undefined,
     modelStore : undefined,
     mapPanel : undefined,
-//    modelPanel : undefined,
     runPanel : undefined,
     constructor : function(config) {
         if (!config) config = {};
@@ -54,12 +53,35 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                     click : function() {
                         
                         LOG.debug('')
-                        var isoFormPanel = new WaterSMART.ISOFormPanel({
+                        var comboValue = this.getTopToolbar().get('model-combobox').getValue();
+                        var modelStore = this.getTopToolbar().get('model-combobox').getStore().getById(comboValue);
                         
-                            });
+                        var modelVersion = 0;
+                        var runIdentifier = 0;
+                        Ext.each(modelStore.data.rec.data.identificationInfo, function(iiItem) {
+                            if (iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
+                                var runVersion = iiItem.serviceIdentification.citation.edition.CharacterString.value.split('.')[0];
+                                
+                                if (parseInt(runVersion) > this.runVersion) this.runVersion = runVersion;
+                                this.modelVersion = iiItem.serviceIdentification.citation.edition.CharacterString.value.split('.')[0];
+                                
+                            }
+                        }, {
+                            modelVersion : modelVersion,
+                            runVersion : runIdentifier
+                        })
+                        runIdentifier++;
+                        
+                        var isoFormPanel = new WaterSMART.ISOFormPanel({
+                            modelerName : WATERSMART.USER_NAME,
+                            modelName : comboValue,
+                            modelVersion : modelVersion,
+                            runIdentifier : runIdentifier,
+                            runDate : new Date()
+                        });
                     
                         var modalRunWindow = new Ext.Window({
-                            width: 'auto',
+                            width: '30%',
                             height : 'auto',
                             modal : true,
                             items : [ isoFormPanel ]
@@ -85,6 +107,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
             },
             {
                 xtype: 'combo',
+                id : 'model-combobox',
                 store: this.modelStore,
                 autoWidth: true,
                 triggerAction : 'all',
