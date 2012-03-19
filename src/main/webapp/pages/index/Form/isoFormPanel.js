@@ -3,9 +3,21 @@ Ext.ns("WaterSMART");
 WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
     htmlTransform : undefined,
     xmlTransform : undefined,
+    modelName : undefined,
+    modelerName : undefined,
+    modelVersion : undefined,
+    runVersion : undefined,
+    runIdentifier : undefined,
+    runDate : undefined,
     constructor : function(config) {
+        
         if (!config) config = {};
         
+        this.modelName = config.modelName || '';
+        this.modelerName = config.modelerName || '';
+        this.runIdentifier = config.runIdentifier || 0;
+        this.modelVersion = config.modelVersion || 0;
+        this.runDate = config.runDate || undefined;
         Ext.Ajax.request({
             url: 'xsl/csw-metadata.xsl',
             success: function(response) {
@@ -34,6 +46,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
             id: 'test_form',
             bodyPadding: 5,
             region: 'center',
+            width: '100%',
             // The form will submit an AJAX request to this URL when submitted
             url: 'pages/index/Utils/isorecord.jsp',
             // Fields will be arranged vertically, stretched to full width
@@ -43,23 +56,29 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
             items: [{
                 fieldLabel: 'Modeler Name',
                 name: 'name',
+                value : this.modelerName,
                 allowBlank: false
             },{
+                xtype : 'displayfield',
                 fieldLabel: 'Model Name',
                 name: 'model',
+                value : this.modelName,
                 allowBlank: false
             },{
                 fieldLabel: 'Model Version',
                 name: 'version',
+                value : this.modelVersion,
                 allowBlank: false
             },{
                 fieldLabel: 'Run Identifier',
                 name: 'runIdent',
+                value : this.runIdentifier,
                 allowBlank: false
             },{
                 xtype : 'datefield',
                 fieldLabel: 'Run Date',
                 name: 'creationDate',
+                value : this.runDate,
                 allowBlank: false
             },{
                 fieldLabel: 'Calibration/ Validation Scenario',
@@ -147,14 +166,11 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                     
                     uploadPanel.getForm().submit({
                         url: uploadPanel.url,
-                        params : {
-                            modeltype : 'SYE'
-                        },
                         success: function(x, action) {
                             var form = Ext.getCmp('test_form');
                             form.getForm().submit({
                                 url: form.url,
-                                modeltype : 'SYE',
+                                modeltype : this.modelName,
                                 success: function(x, action) {
                                     LOG.debug('');
 //                                    var form = Ext.getCmp('test_form');
@@ -174,7 +190,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
 //                                    });
                                 },
                                 failure: function(panel, fail) {
-                                    LOG.debug(fail);
+                                    NOTIFY.error({ msg : fail.result.message})
                                 },
                                 params: {
                                     transaction: true
@@ -183,7 +199,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                             });
                         },
                         failure: function(panel, fail) {
-                            LOG.debug(fail);
+                            NOTIFY.error({ msg : fail.result.message})
                         },
                         waitMsg: 'Saving...'
                     });

@@ -41,7 +41,8 @@
             CONFIG.CSW_PARENT_IDENTIFIER = '<%= props.getProperty("watersmart.csw.identifier.parent", "497cf2db-56d6-4cad-9a56-a14b63fb232a") %>';
             
             WATERSMART.USER = '<%= (user == null) ? "" : user.uid %>';
-
+            WATERSMART.USER_NAME = '<%= (user == null) ? "" : user.fullName %>';
+            
             /**
              * Takes an element, checks the array for that element
              * and if found, returns the index of that element. 
