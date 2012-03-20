@@ -55,29 +55,39 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         LOG.debug('')
                         var comboValue = this.getTopToolbar().get('model-combobox').getValue();
                         var modelStore = this.getTopToolbar().get('model-combobox').getStore().getById(comboValue);
-                        
+                        var wfsUrl = '';
+                        var layer = '';
+                        var commonAttr = 'site_no';
                         var modelVersion = 0;
                         var runIdentifier = 0;
-                        Ext.each(modelStore.data.rec.data.identificationInfo, function(iiItem) {
+                        
+                        for (var i = 0;i < modelStore.data.rec.data.identificationInfo.length;i++) {
+                            var iiItem = modelStore.data.rec.data.identificationInfo[i];
+                            
                             if (iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
                                 var runVersion = iiItem.serviceIdentification.citation.edition.CharacterString.value.split('.')[0];
                                 
                                 if (parseInt(runVersion) > this.runVersion) this.runVersion = runVersion;
-                                this.modelVersion = iiItem.serviceIdentification.citation.edition.CharacterString.value.split('.')[0];
+                                modelVersion = iiItem.serviceIdentification.citation.edition.CharacterString.value.split('.')[0];
                                 
+                            } 
+                            
+                            if (!wfsUrl && iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ows') {
+                                wfsUrl = iiItem.serviceIdentification.operationMetadata.linkage.URL;
+                                layer = iiItem.serviceIdentification.operationMetadata.name.CharacterString.value;
                             }
-                        }, {
-                            modelVersion : modelVersion,
-                            runVersion : runIdentifier
-                        })
+                        }
                         runIdentifier++;
                         
                         var isoFormPanel = new WaterSMART.ISOFormPanel({
+                            commonAttr : commonAttr,
+                            layer : layer,
                             modelerName : WATERSMART.USER_NAME,
                             modelName : comboValue,
                             modelVersion : modelVersion,
                             runIdentifier : runIdentifier,
-                            runDate : new Date()
+                            runDate : new Date(),
+                            wfsUrl : wfsUrl
                         });
                     
                         var modalRunWindow = new Ext.Window({
@@ -117,7 +127,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                 emptyText: 'Select A Model',
                 displayField : 'title',
                 listeners : {
-                    select : function(combo, record, index) {
+                    select : function(combo, record) {
                         var panelInfo = {};
                         var storeItem = record.get('rec');
                         
