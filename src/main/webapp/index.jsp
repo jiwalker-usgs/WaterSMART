@@ -42,6 +42,7 @@
             
             WATERSMART.USER = '<%= (user == null) ? "" : user.uid %>';
             WATERSMART.USER_NAME = '<%= (user == null) ? "" : user.fullName %>';
+            WATERSMART.USER_EMAIL = '<%= (user == null) ? "" : user.email %>';
             
             /**
              * Takes an element, checks the array for that element

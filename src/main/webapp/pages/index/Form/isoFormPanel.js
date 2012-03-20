@@ -1,23 +1,29 @@
 Ext.ns("WaterSMART");
 
 WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
+    commonAttr : undefined,
     htmlTransform : undefined,
-    xmlTransform : undefined,
+    layer : undefined,
     modelName : undefined,
     modelerName : undefined,
     modelVersion : undefined,
     runVersion : undefined,
     runIdentifier : undefined,
     runDate : undefined,
+    wfsUrl : undefined,
+    xmlTransform : undefined,
     constructor : function(config) {
         
         if (!config) config = {};
         
+        this.commonAttr = config.commonAttr || 'site_no';
+        this.layer = config.layer || '';
         this.modelName = config.modelName || '';
         this.modelerName = config.modelerName || '';
         this.runIdentifier = config.runIdentifier || 0;
         this.modelVersion = config.modelVersion || 0;
         this.runDate = config.runDate || undefined;
+        this.wfsUrl = config.wfsUrl || '';
         Ext.Ajax.request({
             url: 'xsl/csw-metadata.xsl',
             success: function(response) {
@@ -43,7 +49,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
         
         config = Ext.apply({
             title: 'Metadata',
-            id: 'test_form',
+            id: 'metadata-form',
             bodyPadding: 5,
             region: 'center',
             width: '100%',
@@ -97,13 +103,13 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                 disabled : true,
                 formBind: true,
                 handler: function(button) {
-                    var form = Ext.getCmp('test_form');
+                    var form = Ext.getCmp('metadata-form');
                     form.getForm().submit({
                         url: form.url,
                         params:{},
                         waitMsg:'Loading...',
                         success: function(x, action) {
-                            var form = Ext.getCmp('test_form');
+                            var form = Ext.getCmp('metadata-form');
                             var xml = action.response.responseXML;
                             var htmlDom = form.htmlTransform.transformToDocument(xml);
                             var xmlDom = form.xmlTransform.transformToDocument(xml);
@@ -158,17 +164,29 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
             }, {
                 text: 'Submit',
                 type: 'submit',
-                disabled : true,
+//                disabled : true,
                 formBind: true,
                 handler: function(button) {
                     var uploadPanel = Ext.getCmp('uploadPanel');
+                    var metadataForm = Ext.getCmp('metadata-form').getForm().getValues();
+                    var isoFormPanel = button.ownerCt.ownerCt;
                     
                     LOG.debug('isoFormPanel.js::Preparing to upload file.');
                     
                     uploadPanel.getForm().submit({
                         url: uploadPanel.url,
                         params: {
-                            modeltype : button.ownerCt.ownerCt.modelName
+                            name : metadataForm.name,
+                            version : metadataForm.version,
+                            runIdent : metadataForm.runIdent,
+                            creationDate : metadataForm.creationDate,
+                            scenario : metadataForm.scenario,
+                            comments : metadataForm.comments,
+                            email : WATERSMART.USER_EMAIL,
+                            modeltype : isoFormPanel.modelName,
+                            wfsUrl : isoFormPanel.wfsUrl,
+                            layer : isoFormPanel.layer,
+                            commonAttr : isoFormPanel.commonAttr
                         },
                         waitMsg: 'Saving...',
                         success: function(x, action) {
@@ -177,7 +195,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                             
                             NOTIFY.info({msg:'Upload succeeded'})
                             
-                            var form = Ext.getCmp('test_form');
+                            var form = Ext.getCmp('metadata-form');
                             form.getForm().submit({
                                 url: form.url,
                                 params: {
@@ -187,7 +205,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                                 waitMsg: 'Saving...',
                                 success: function(x, action) {
                                     LOG.debug('');
-                                //                                    var form = Ext.getCmp('test_form');
+                                //                                    var form = Ext.getCmp('metadata-form');
                                 //                                    var xml = action.response.responseXML;
                                 //                            
                                 //                                    Ext.Ajax.request({
