@@ -31,6 +31,10 @@ public class StationLookup {
             StationLookup.class);
     private final LinkedHashMap<String, Station> stationLookupTable = Maps.newLinkedHashMap();
 
+    public StationLookup(RunMetadata meta) throws IOException, XMLStreamException {
+        this(meta.getWfsUrl(), meta.getLayerName(), meta.getCommonAttribute());
+    }
+    
     public StationLookup(String wfsUrl, String typeName, String nameAttr) throws
             IOException, XMLStreamException {
         // has to be better way to do this call
