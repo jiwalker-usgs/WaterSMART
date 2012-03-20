@@ -69,22 +69,22 @@
         <dispatcher>FORWARD</dispatcher>
     </filter-mapping>
     
-    <servlet>
+<!--    <servlet>
         <servlet-name>OWSProxy</servlet-name>
         <servlet-class>gov.usgs.service.OWSProxyServletX</servlet-class>
         <init-param>
             <param-name>getRequestURIKey</param-name>
             <param-value>/proxy/*</param-value>
         </init-param>
-    </servlet>
+    </servlet>-->
     <servlet>
         <servlet-name>ISORecord</servlet-name>
         <servlet-class>gov.usgs.cida.watersmart.iso.ISORecord</servlet-class>
     </servlet>
-    <servlet-mapping>
+<!--    <servlet-mapping>
         <servlet-name>OWSProxy</servlet-name>
         <url-pattern>/proxy/*</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping>-->
     <servlet>
         <servlet-name>Export</servlet-name>
         <servlet-class>gov.usgs.cida.watersmart.util.Export</servlet-class>

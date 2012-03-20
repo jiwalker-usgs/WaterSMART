@@ -1,66 +1,60 @@
-package gov.usgs.cida.watersmart.netcdf;
+package gov.usgs.cida.watersmart.parse.file;
 
 import gov.usgs.cida.netcdf.dsg.Observation;
 import gov.usgs.cida.netcdf.dsg.RecordType;
-import java.io.*;
-import java.util.Iterator;
+import gov.usgs.cida.watersmart.parse.DSGParser;
+import gov.usgs.cida.watersmart.parse.StationLookup;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.joda.time.Days;
+import javax.xml.stream.XMLStreamException;
 import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormatter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Jordan Walker <jiwalker@usgs.gov>
  */
-public abstract class DSGParser implements Iterator<Observation> {
-
-    private static Logger LOG = LoggerFactory.getLogger(DSGParser.class);
-    public static final int READ_AHEAD_LIMIT = 4096;
-
-    protected abstract Pattern getDataLinePattern();
-
-    protected abstract Pattern getDataValuePattern();
-
-    /**
-     * this should match the last line before the data starts may want other
-     * patterns for pieces of metadata (ex. stationId) and for some formats,
-     * there could be a data separator (when not broken up into separate files)
-     *
-     * @return Pattern describing the header line that precedes the data
-     */
-    protected abstract Pattern getHeaderLinePattern();
-
-    protected abstract Pattern getHeaderVariablePattern();
-
-    protected abstract DateTimeFormatter getInputDateFormatter();
-    protected BufferedReader reader;
-    protected Instant baseDate;
+public abstract class StationPerFileDSGParser extends DSGParser {
+    
     protected int stationIndex;
 
-    public DSGParser(InputStream input) throws FileNotFoundException {
-        this.reader = new BufferedReader(new InputStreamReader(input));
-        this.baseDate = new Instant(0L);
+    public StationPerFileDSGParser(InputStream instream, StationLookup lookup) throws IOException, XMLStreamException {
+        super(instream, lookup);
         this.stationIndex = -1;
     }
+    
+    @Override
+    protected abstract Pattern getDataLinePattern();
+    protected abstract Pattern getDataValuePattern();
+    
+    @Override
+    protected abstract Pattern getHeaderLinePattern();
+    protected abstract Pattern getHeaderVariablePattern();
+    
+    protected abstract Pattern getStationIdPattern();
 
     @Override
-    public boolean hasNext() {
-        try {
-            reader.mark(READ_AHEAD_LIMIT);
-            String line = reader.readLine();
-            reader.reset();
-            return (line != null);
+    protected abstract DateTimeFormatter getInputDateFormatter();
+
+    @Override
+    public abstract RecordType parse() throws IOException;
+
+    /**
+     * Pulls the station out of the string passed in using the stationIdPattern
+     * @param parseText line with stationId contained
+     * @return String containing stationId
+     */
+    @Override
+    protected String getStationId(String parseText) {
+        Matcher matcher = getStationIdPattern().matcher(parseText);
+        if (matcher.matches()) {
+            return matcher.group(1);
         }
-        catch (IOException ex) {
-            LOG.debug("Failure reading file", ex);
-            return false;
-        }
+        return null;
     }
 
     /**
@@ -75,8 +69,7 @@ public abstract class DSGParser implements Iterator<Observation> {
         // go through the file and make a list of Observation elements
         // Observation requires station index, so be wary of that
         Observation observation = null;
-
-        if (stationIndex >= 0) {
+        if (this.stationIndex >= 0) {
             try {
                 String line = reader.readLine();
                 if (null != line) {
@@ -85,12 +78,9 @@ public abstract class DSGParser implements Iterator<Observation> {
                         String date = lineMatcher.group(1);
                         Instant timestep = Instant.parse(date,
                                                          getInputDateFormatter());
-                        // may want to support other units (hours, months, years, etc)
-                        int days = Days.daysBetween(this.baseDate, timestep).getDays();
-
+                        int days = calculateTimeOffset(timestep);
                         String values = lineMatcher.group(2);
-                        Matcher valueMatcher = getDataValuePattern().matcher(
-                                values);
+                        Matcher valueMatcher = getDataValuePattern().matcher(values);
                         List<Float> floatVals = new LinkedList<Float>();
                         while (valueMatcher.find()) {
                             float value = Float.parseFloat(valueMatcher.group(1));
@@ -109,26 +99,7 @@ public abstract class DSGParser implements Iterator<Observation> {
             }
         }
         else {
-            throw new IllegalStateException(
-                    "Must obtain stationId before getting observations");
+            throw new IllegalStateException("Must obtain stationId before getting observations");
         }
-
     }
-
-    @Override
-    public void remove() {
-        // since this is a parser, remove doesn't make sense
-    }
-
-    public abstract RecordType parseMetadata();
-
-    /**
-     * StationId's are extracted on a per file basis change the pattern or this
-     * function to reflect the actual format Used by parseMetadata to perform a
-     * lookup
-     *
-     * @param parseText Text to parse for stationId
-     * @return station name for this data
-     */
-    protected abstract String getStationId(String parseText);
 }

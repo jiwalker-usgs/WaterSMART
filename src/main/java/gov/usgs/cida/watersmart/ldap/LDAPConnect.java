@@ -1,7 +1,8 @@
 package gov.usgs.cida.watersmart.ldap;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
-import gov.usgs.cida.watersmart.netcdf.DSGParser;
+import gov.usgs.cida.watersmart.parse.DSGParser;
+import gov.usgs.cida.watersmart.util.JNDISingleton;
 import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -20,16 +21,7 @@ import org.slf4j.LoggerFactory;
 public class LDAPConnect {
 
     private static final Logger LOG = LoggerFactory.getLogger(DSGParser.class);
-    private static DynamicReadOnlyProperties jndiProps = null;
-
-    static {
-        try {
-            jndiProps = new DynamicReadOnlyProperties().addJNDIContexts(new String[0]);
-        }
-        catch (NamingException ex) {
-            // LOG
-        }
-    }
+    private static DynamicReadOnlyProperties jndiProps = JNDISingleton.getInstance();
 
     public static User authenticate(String username, String password) {
         Properties props = new Properties();

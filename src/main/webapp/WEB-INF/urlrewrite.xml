@@ -9,12 +9,4 @@
 		<from>^/proxy/?\?url=(.*)$</from>
 		<to type="proxy">${unescape:$1}</to>
 	</rule>
-	<rule>
-		<from>^/custom-sld.xml(.*)$</from>
-		<to>/customstyle.jsp$1</to>
-	</rule>
-	<outbound-rule>
-		<from>^/customstyle.jsp(.*)$</from>
-		<to>/custom-sld.xml$1</to>
-	</outbound-rule>
 </urlrewrite>

@@ -1,9 +1,9 @@
-package gov.usgs.cida.watersmart.netcdf;
+package gov.usgs.cida.watersmart.parse.file;
 
 import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Variable;
 import gov.usgs.cida.netcdf.jna.NCUtil;
-import java.io.FileNotFoundException;
+import gov.usgs.cida.watersmart.parse.StationLookup;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.xml.stream.XMLStreamException;
 import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormatterBuilder;
@@ -23,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Jordan Walker <jiwalker@usgs.gov>
  */
-public class SYEParser extends DSGParser {
+public class SYEParser extends StationPerFileDSGParser {
     
     private static final Logger LOG = LoggerFactory.getLogger(SYEParser.class);
     
@@ -53,27 +54,15 @@ public class SYEParser extends DSGParser {
      * Should check that all necessary patterns are defined at some point
      * @param input 
      * @param name 
-     * @throws FileNotFoundException 
+     * @param wfsUrl
+     * @param layerName
+     * @param commonAttr
+     * @throws IOException
+     * @throws XMLStreamException  
      */
-    public SYEParser(InputStream input, String name) throws FileNotFoundException {
-        super(input);
+    public SYEParser(InputStream input, String name, StationLookup lookup) throws IOException, XMLStreamException {
+        super(input, lookup);
         this.filename = name;
-    }
-    
-    /**
-     * StationId's will be included in the filename
-     * change the pattern or this function to reflect the actual format
-     * Used by parseMetadata to perform a lookup
-     * @param filename Name of the file being parsed
-     * @return station name for this data
-     */
-    @Override
-    protected String getStationId(String filename) {
-        Matcher matcher = stationIdPattern.matcher(filename);
-        if (matcher.matches()) {
-            return matcher.group(1);
-        }
-        return null;
     }
     
     /**
@@ -98,49 +87,42 @@ public class SYEParser extends DSGParser {
     }
     
     @Override
-    public RecordType parseMetadata() {
+    public RecordType parse() throws IOException {
         // define what we need for metadata
-        
-        this.stationIndex = StationLookup.lookup(getStationId(this.filename));
-        if (this.stationIndex == -1) {
+        this.stationIndex = stationLookup.lookup(getStationId(this.filename));
+        if (this.stationIndex < 0) {
             throw new RuntimeException("Station not found during lookup. "
                     + "If this is a valid station ID, the geoserver"
                     + " instance could be down.");
         }
 
-        try {
-            reader.mark(READ_AHEAD_LIMIT);
-            String line = null;
-            boolean headerRead = false;
-            List<Variable> vars = null;
-            while (null != (line = reader.readLine())) {
-                Matcher matcher = headerLinePattern.matcher(line);
+        reader.mark(READ_AHEAD_LIMIT);
+        String line = null;
+        boolean headerRead = false;
+        List<Variable> vars = null;
+        while (null != (line = reader.readLine())) {
+            Matcher matcher = headerLinePattern.matcher(line);
+            if (matcher.matches()) {
+                vars = headerVariables(matcher.group(1));
+                reader.mark(READ_AHEAD_LIMIT);
+                headerRead = true;
+            }
+            else if (headerRead) {
+                matcher = dataLinePattern.matcher(line);
                 if (matcher.matches()) {
-                    vars = headerVariables(matcher.group(1));
-                    reader.mark(READ_AHEAD_LIMIT);
-                    headerRead = true;
-                }
-                else if (headerRead) {
-                    matcher = dataLinePattern.matcher(line);
-                    if (matcher.matches()) {
-                        String date = matcher.group(1);
-                        Instant timestep = Instant.parse(date, getInputDateFormatter());
-                        this.baseDate = timestep;
-                        
-                        RecordType recordType = new RecordType("days since " + baseDate.toString());
-                        for (Variable var : vars) {
-                            recordType.addType(var);
-                        }
-                        
-                        reader.reset();
-                        return recordType;
+                    String date = matcher.group(1);
+                    Instant timestep = Instant.parse(date, getInputDateFormatter());
+                    this.baseDate = timestep;
+
+                    RecordType recordType = new RecordType("days since " + baseDate.toString());
+                    for (Variable var : vars) {
+                        recordType.addType(var);
                     }
+
+                    reader.reset();
+                    return recordType;
                 }
             }
-            
-        }
-        catch (IOException ex) {
-            LOG.debug("Error reading metadata", ex);
         }
         return null;
     }
@@ -168,5 +150,10 @@ public class SYEParser extends DSGParser {
     @Override
     protected DateTimeFormatter getInputDateFormatter() {
         return inputDateFormatter;
+    }
+
+    @Override
+    protected Pattern getStationIdPattern() {
+        return stationIdPattern;
     }
 }

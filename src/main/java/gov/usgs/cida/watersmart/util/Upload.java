@@ -1,11 +1,10 @@
 package gov.usgs.cida.watersmart.util;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
-import gov.usgs.cida.watersmart.netcdf.CreateDSGFromZip;
-import gov.usgs.cida.watersmart.netcdf.CreateDSGFromZip.ModelType;
+import gov.usgs.cida.watersmart.parse.CreateDSGFromZip;
+import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ModelType;
 import java.io.*;
 import java.util.List;
-import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -24,11 +23,7 @@ public class Upload extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        try {
-            props = new DynamicReadOnlyProperties().addJNDIContexts(new String[0]);
-        } catch (NamingException ex) {
-            // LOG
-        }
+        props = JNDISingleton.getInstance();
     }
 
     @Override
@@ -68,26 +63,43 @@ public class Upload extends HttpServlet {
                 ModelType modelType = null;
                 String filename = null;
                 InputStream filein = null;
+                String wfsUrl = null;
+                String layer = null;
+                String commonAttr = null;
                 for (FileItem item : itemList) {
                     String name = item.getFieldName();
                     // filename must come first
-                    if (item.isFormField() && "modeltype".equals(item.getFieldName())) {
+                    if (item.isFormField() && "modeltype".equals(item.getFieldName().toLowerCase())) {
                         modelType = ModelType.valueOf(item.getString());
-                    } else if (!item.isFormField()) {
+                    }
+                    else if (item.isFormField() && "wfsurl".equals(item.getFieldName().toLowerCase())) {
+                        wfsUrl = item.getString();
+                    }
+                    else if (item.isFormField() && "layer".equals(item.getFieldName().toLowerCase())) {
+                        layer = item.getString();
+                    }
+                    else if (item.isFormField() && "commonattr".equals(item.getFieldName().toLowerCase())) {
+                        commonAttr = item.getString();
+                    }
+                    else if (!item.isFormField()) {
                         filename = item.getName();
                         filein = item.getInputStream();
-                    } else {
-                        throw new Exception();
                     }
                 }
-                if (modelType != null && filein != null && filename != null) {
+                if (modelType != null &&
+                    filein != null &&
+                    filename != null &&
+                    wfsUrl != null &&
+                    layer != null &&
+                    commonAttr != null) {
                     destinationFile = new File(tempDir + File.separator + filename);
                     saveFileFromRequest(filein, destinationFile);
-                    CreateDSGFromZip.create(destinationFile, modelType);
+                    CreateDSGFromZip.create(destinationFile, modelType, wfsUrl, layer, commonAttr);
                 } else {
-                    throw new Exception();
+                    throw new Exception("Must provide all required parameters: model, file, wfs URL, layer name, common attribute");
                 }
             } catch (Exception ex) {
+                // pass exception text along?
                 sendErrorResponse(response, "Unable to upload file");
                 return;
             }

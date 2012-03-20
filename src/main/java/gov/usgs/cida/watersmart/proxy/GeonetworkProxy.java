@@ -1,6 +1,7 @@
 package gov.usgs.cida.watersmart.proxy;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
+import gov.usgs.cida.watersmart.util.JNDISingleton;
 import gov.usgs.service.OWSProxyServletX;
 import java.io.IOException;
 import java.net.URI;
@@ -42,15 +43,8 @@ public class GeonetworkProxy extends OWSProxyServletX {
     
     private static CookieStore cookieJar;
     private static Date selfExpireCookieDate;
-    private static final DynamicReadOnlyProperties props = new DynamicReadOnlyProperties();
-    static {
-        try {
-            props.addJNDIContexts(new String[0]);
-        }
-        catch (NamingException ex) {
-            LOGGER.debug("Unable to add JNDI constants", ex);
-        }
-    }
+    private static final DynamicReadOnlyProperties props = JNDISingleton.getInstance();
+
     // currently defaults to gdp2 geonetwork
     private static final String geonetworkAddr = props.getProperty("watersmart.geonetwork.addr");
     private static final String GEONETWORK_CSW = geonetworkAddr + "/srv/en/csw";
