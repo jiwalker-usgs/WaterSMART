@@ -3,6 +3,7 @@ Ext.ns("WaterSMART");
 WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
     cswStore : undefined,
     modelStore : undefined,
+    processStore : undefined,
     mapPanel : undefined,
     runPanel : undefined,
     constructor : function(config) {
@@ -207,6 +208,89 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         }, config);
         WaterSMART.ModelRunSelectionPanel.superclass.constructor.call(this, config);
     
+        var wpsCapsStore = new CIDA.WPSCapabilitiesStore({
+            url : CONFIG.WPS_URL + '/WebProcessingService?Service=WPS&Request=GetCapabilities',
+            listeners : {
+                load : function(store) {
+                    var processArray = [];
+                    
+                    Ext.iterate(store.getRange()[0].get("processOfferings"), function(key, val){
+                        this.push([
+                            val.title,
+                            val
+                            ])
+                    }, processArray)
+                    this.processStore = new Ext.data.ArrayStore({
+                        fields : ['title', 'process'],
+                        idIndex : 0
+                    })
+                    this.processStore.loadData(processArray);
+                    
+                    this.getTopToolbar().addField({
+                        xtype: 'tbseparator'
+                    })
+                    
+                    this.getTopToolbar().addField({
+                        xtype: 'tbtext',
+                        text: 'Processes:'
+                    })
+                    
+                    this.getTopToolbar().addField({
+                        xtype : 'combo',
+                        id : 'wps-process-combo',
+                        store : this.processStore,
+                        autoWidth : true,
+                        triggerAction : 'all',
+                        width : 'auto',
+                        mode : 'local',
+                        editable : false,
+                        emptyText : 'Select A Process',
+                        displayField : 'title',
+                        disabled : true,
+                        listeners : {
+                            select : function(combo, record) {
+                                LOG.debug('ModelRunSelectionPanel.js:: User selected a WPS process: ' + record.id);
+                                var describeProcessStore = new CIDA.WPSDescribeProcessStore({
+                                    url : CONFIG.WPS_URL + '/WebProcessingService?Service=WPS&Request=DescribeProcess&Identifier=' + record.get('process').identifier,
+                                    listeners : {
+                                        load : function(store) {
+                                            
+                                            var processFormPanel = new WaterSMART.ProcessFormPanel({
+                                            width: '100%',
+                                            url : CONFIG.WPS_URL + '/WebProcessingService?Service=WPS&Request=Execute&Identifier=' + record.get('process').identifier,
+                                            processIdentifier : record.get('process').identifier,
+                                            processTitle : record.id,
+                                            processStore : store,
+                                            wfsUrl : this.runPanel.currentlySelectedRun.panelInfo.owsEndpoint,
+                                            layerName : this.runPanel.currentlySelectedRun.panelInfo.owsResourceName,
+                                            commonAttribute : 'site_no',
+                                            sosEndpoint : this.runPanel.currentlySelectedRun.panelInfo.operationURL
+                                        });
+
+                                        var modalRunWindow = new Ext.Window({
+                                            width: '30%',
+                                            height : 'auto',
+                                            modal : true,
+                                            items : [ processFormPanel ]
+                                        })
+
+                                        modalRunWindow.show();
+                                        },
+                                        scope : this
+                                    }
+                                })
+                                describeProcessStore.load();
+                            },
+                            scope : this
+                        }
+                    })
+                    
+                    this.doLayout();
+                },
+                scope : this
+            }
+        })
+        wpsCapsStore.load();
     },
     modelSelected : function(config) {
         LOG.debug('ModelRunSelectionpanel.js::A model has been selected');
@@ -227,6 +311,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         
         this.runPanel.currentlySelectedRun = panel;
         this.runPanel.getTopToolbar().get('edit-selected-run-button').setDisabled(false);
+        this.getTopToolbar().get('wps-process-combo').setDisabled(false)
         
         // TODO- We will need to change this when (if?) we get more than one sites layer on the map at any given time
         if (this.mapPanel.currentMapConfig.layers.layers.length 
