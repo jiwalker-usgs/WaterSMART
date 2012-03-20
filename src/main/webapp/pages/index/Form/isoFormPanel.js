@@ -96,118 +96,127 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                 type: 'submit',
                 disabled : true,
                 formBind: true,
-                handler: function(a, b, c) {
-                //                    var form = Ext.getCmp('test_form');
-                //                    form.getForm().submit({
-                //                        url: form.url,
-                //                        success: function(x, action) {
-                //                            var form = Ext.getCmp('test_form');
-                //                            var xml = action.response.responseXML;
-                //                            var htmlDom = form.htmlTransform.transformToDocument(xml);
-                //                            var xmlDom = form.xmlTransform.transformToDocument(xml);
-                //                            var serializer = new XMLSerializer();
-                //                            var htmlOutput = serializer.serializeToString(htmlDom.documentElement);
-                //                            var xmlOutput = serializer.serializeToString(xmlDom.documentElement);
-                //                                
-                //                            var outputDiv = document.getElementById("xslt-output-div");
-                //                            var htmlDiv = document.createElement("div");
-                //                            htmlDiv.setAttribute("id", "html-tmp-div");
-                //                            htmlDiv.setAttribute("class", "x-hidden");
-                //                            var xmlDiv = document.createElement("div");
-                //                            xmlDiv.setAttribute("id", "xml-tmp-div");
-                //                            htmlDiv.setAttribute("class", "x-hidden");
-                //                            outputDiv.appendChild(htmlDiv);
-                //                            outputDiv.appendChild(xmlDiv);
-                //                                
-                //                            htmlDiv.innerHTML = WaterSMART.replaceURLWithHTMLLinks(htmlOutput);
-                //                            xmlDiv.innerHTML = xmlOutput;
-                //                                
-                //                            new Ext.Window({
-                //                                items: [
-                //                                new Ext.TabPanel({
-                //                                    activeTab: 0,
-                //                                    overflow: 'auto',
-                //                                    autoScroll: true,
-                //                                    items: [
-                //                                    new Ext.Panel({
-                //                                        title: 'Metadata',
-                //                                        autoScroll: true,
-                //                                        overflow: 'auto',
-                //                                        contentEl: 'html-tmp-div'
-                //                                    }),
-                //                                    new Ext.Panel({
-                //                                        title: 'XML Output',
-                //                                        autoScroll: true,
-                //                                        overflow: 'auto',
-                //                                        contentEl: 'xml-tmp-div'
-                //                                    })
-                //                                    ]
-                //                                })
-                //                                ],
-                //                                modal: true,
-                //                                autoScroll: true,
-                //                                width: '70%',
-                //                                height: VIEWPORT.getHeight() - 150
-                //                            }).show();
-                //                            LOG.debug(action);
-                //                        },
-                //                        params:{},
-                //                        waitMsg:'Loading...'
-                //                    });
+                handler: function(button) {
+                    var form = Ext.getCmp('test_form');
+                    form.getForm().submit({
+                        url: form.url,
+                        params:{},
+                        waitMsg:'Loading...',
+                        success: function(x, action) {
+                            var form = Ext.getCmp('test_form');
+                            var xml = action.response.responseXML;
+                            var htmlDom = form.htmlTransform.transformToDocument(xml);
+                            var xmlDom = form.xmlTransform.transformToDocument(xml);
+                            var serializer = new XMLSerializer();
+                            var htmlOutput = serializer.serializeToString(htmlDom.documentElement);
+                            var xmlOutput = serializer.serializeToString(xmlDom.documentElement);
+                                
+                            var outputDiv = document.getElementById("xslt-output-div");
+                            var htmlDiv = document.createElement("div");
+                            htmlDiv.setAttribute("id", "html-tmp-div");
+                            htmlDiv.setAttribute("class", "x-hidden");
+                            var xmlDiv = document.createElement("div");
+                            xmlDiv.setAttribute("id", "xml-tmp-div");
+                            htmlDiv.setAttribute("class", "x-hidden");
+                            outputDiv.appendChild(htmlDiv);
+                            outputDiv.appendChild(xmlDiv);
+                                
+                            htmlDiv.innerHTML = WaterSMART.replaceURLWithHTMLLinks(htmlOutput);
+                            xmlDiv.innerHTML = xmlOutput;
+                                
+                            new Ext.Window({
+                                items: [
+                                new Ext.TabPanel({
+                                    activeTab: 0,
+                                    overflow: 'auto',
+                                    autoScroll: true,
+                                    items: [
+                                    new Ext.Panel({
+                                        title: 'Metadata',
+                                        autoScroll: true,
+                                        overflow: 'auto',
+                                        contentEl: 'html-tmp-div'
+                                    }),
+                                    new Ext.Panel({
+                                        title: 'XML Output',
+                                        autoScroll: true,
+                                        overflow: 'auto',
+                                        contentEl: 'xml-tmp-div'
+                                    })
+                                    ]
+                                })
+                                ],
+                                modal: true,
+                                autoScroll: true,
+                                width: '70%',
+                                height: VIEWPORT.getHeight() - 150
+                            }).show();
+                            LOG.debug(action);
+                        }
+                    });
                 }
             }, {
                 text: 'Submit',
                 type: 'submit',
+                disabled : true,
                 formBind: true,
-                handler: function(a, b, c) {
-//                    var form = Ext.getCmp('test_form');
-                    
+                handler: function(button) {
                     var uploadPanel = Ext.getCmp('uploadPanel');
+                    
+                    LOG.debug('isoFormPanel.js::Preparing to upload file.');
                     
                     uploadPanel.getForm().submit({
                         url: uploadPanel.url,
-                        params : {
-                            modeltype : this.modelName,
-                            wfsUrl : 'http://igsarm-cida-javadev1.er.usgs.gov:8081/geoserver/watersmart/ows',
-                            layer : 'watersmart:se_sites',
-                            commonAttr : 'site_no'
+                        params: {
+                            modeltype : button.ownerCt.ownerCt.modelName
                         },
+                        waitMsg: 'Saving...',
                         success: function(x, action) {
+                            
+                            LOG.info('isoFormPanel.js::User upload succeeded.');
+                            
+                            NOTIFY.info({msg:'Upload succeeded'})
+                            
                             var form = Ext.getCmp('test_form');
                             form.getForm().submit({
                                 url: form.url,
-                                modeltype : this.modelName,
+                                params: {
+                                    transaction: true,
+                                    modeltype : ''
+                                },
+                                waitMsg: 'Saving...',
                                 success: function(x, action) {
                                     LOG.debug('');
-//                                    var form = Ext.getCmp('test_form');
-//                                    var xml = action.response.responseXML;
-//                            
-//                                    Ext.Ajax.request({
-//                                        url: 'service/geonetwork/csw',
-//                                        method: 'POST',
-//                                        xmlData: xml,
-//                                        success: function(response) {
-//                                            var result = response.responseText;
-//                                            LOG.debug(result);
-//                                        },
-//                                        failure: function(panel, fail) {
-//                                            LOG.debug(fail);
-//                                        }
-//                                    });
+                                //                                    var form = Ext.getCmp('test_form');
+                                //                                    var xml = action.response.responseXML;
+                                //                            
+                                //                                    Ext.Ajax.request({
+                                //                                        url: 'service/geonetwork/csw',
+                                //                                        method: 'POST',
+                                //                                        xmlData: xml,
+                                //                                        success: function(response) {
+                                //                                            var result = response.responseText;
+                                //                                            LOG.debug(result);
+                                //                                        },
+                                //                                        failure: function(panel, fail) {
+                                //                                            LOG.debug(fail);
+                                //                                        }
+                                //                                    });
                                 },
                                 failure: function(panel, fail) {
-                                    NOTIFY.error({ msg : fail.result.message})
-                                },
-                                params: {
-                                    transaction: true
-                                },
-                                waitMsg: 'Saving...'
+                                    LOG.info('')
+                                    NOTIFY.error({
+                                        msg : fail.result.message
+                                    })
+                                }
                             });
                         },
                         failure: function(panel, fail) {
-                            NOTIFY.error({ msg : fail.result.message})
-                        },
-                        waitMsg: 'Saving...'
+                            LOG.info('isoFormPanel.js:: User upload failed.');
+                            NOTIFY.error({
+                                msg : fail.result.message
+                            })
+                        }
                     });
                 }
             }]
