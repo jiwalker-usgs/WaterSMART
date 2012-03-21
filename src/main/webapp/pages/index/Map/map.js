@@ -146,6 +146,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
 
                         if(!this.popup) {
                             this.popup = new GeoExt.Popup({
+                                id: 'plotter-window',
                                 title: event.features[0].attributes.station_nm,
                                 anchored: false,
                                 width: 600,
