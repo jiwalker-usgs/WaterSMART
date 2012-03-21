@@ -186,7 +186,9 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         panelInfo.dateStamp = storeItem.get('dateStamp') || '';
                         panelInfo.language = storeItem.get('language') || '';
                         panelInfo.runPanels = [];
-            
+                        panelInfo.metadataStandardName = storeItem.get('metadataStandardName');
+                        panelInfo.metadataStandardVersion = storeItem.get('metadataStandardVersion');
+                        
                         Ext.each(storeItem.get('identificationInfo'), function(idItem) {
                 
                             // We have a citation identification block
@@ -232,9 +234,11 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         
                         var runPanelsClone = [];
                         Ext.each(panelInfo.runPanels, function(panel){
-                            panel.panelInfo.owsEndpoint = this.panelInfo.owsEndpoint
-                            panel.panelInfo.owsResourceName = this.panelInfo.owsResourceName
-                            panel.panelInfo.fileIdentifier = this.panelInfo.fileIdentifier
+                            panel.panelInfo.owsEndpoint = this.panelInfo.owsEndpoint;
+                            panel.panelInfo.owsResourceName = this.panelInfo.owsResourceName;
+                            panel.panelInfo.fileIdentifier = this.panelInfo.fileIdentifier;
+                            panel.panelInfo.metadataStandardName = this.panelInfo.metadataStandardName;
+                            panel.panelInfo.metadataStandardVersion = this.panelInfo.metadataStandardVersion;
                             this.runPanelsClone.push(panel.cloneConfig());
                         }, {
                             panelInfo : panelInfo,

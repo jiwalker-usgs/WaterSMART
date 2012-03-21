@@ -18,7 +18,7 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
         this.panelInfo.citedResponsibleParty = this.serviceIdentification.citation.citedResponsibleParty; // Array
         this.panelInfo.date = this.serviceIdentification.citation.date; // Array
         this.panelInfo.presentationForm = this.serviceIdentification.citation.presentationForm; // Array
-
+        
         var revisionDates = [];
         Ext.each(this.panelInfo.date, function(dateItem){
             if (dateItem.dateType.codeListValue.toLowerCase() === 'revision') {
@@ -39,16 +39,15 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
             })
         }, responsibleParties)
 
-        var html = '<div class="run-row"><span class="run-label">Abstract:</span> <span class="run-value">' + this.panelInfo['abstract'] + '</span></div>';
-        html += '<div class="run-row"><span class="run-label">Edition:</span> <span class="run-value">' + this.panelInfo.edition + '</span></div>';
+        var html = '<div class="run-row"><span class="run-label">Calibration/Validation Scenario:</span> <span class="run-value">' + this.serviceIdentification.citation.title.CharacterString.value + '</span></div>';
+        html += '<div class="run-row"><span class="run-label">Model Version and Run:</span> <span class="run-value">' + this.panelInfo.edition + '</span></div>';
+        html += '<div class="run-row"><span class="run-label">Modeler Name:</span> <span class="run-value">' + responsibleParties[0].name + '</span></div>';
         
-        if (revisionDates.length) {
-            html += '<div class="run-row"><span class="run-label">Revision Dates:</span> <span class="run-value-list"><ul>'
-            for (var i = 0;i < revisionDates.length;i++) {
-                html +='<li><span class="run-value-list-item">'+revisionDates[i]+'</span></li>'
-            }
-            html += '</ul></span></div>'
+        for (var i = 0;i < this.panelInfo.date.length;i++) {
+            html += '<div class="run-row"><span class="run-label">Run Date:</span> <span class="run-value">' + this.panelInfo.date[i].date[0].DateTime.value + '</span></div>';
         }
+        
+        html += '<div class="run-row"><span class="run-label">Other Information:</span> <span class="run-value">' + this.panelInfo['abstract'] + '</span></div>';
         
         config = Ext.apply({
             title : this.panelInfo.title,
