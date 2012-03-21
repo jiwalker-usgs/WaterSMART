@@ -3,6 +3,7 @@ Ext.ns("WaterSMART");
 WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
     cswStore : undefined,
     modelStore : undefined,
+    processStore : undefined,
     mapPanel : undefined,
     runPanel : undefined,
     constructor : function(config) {
@@ -40,7 +41,55 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                 disabled : true,
                 listeners : {
                     click : function() {
+                        LOG.debug('ModelRunSelectionPanel.js::User clicked on "Edit Selected Run" button.')
+                        var selectedRun = this.runPanel.currentlySelectedRun;
+                        var comboValue = this.getTopToolbar().get('model-combobox').getValue();
+                        var modelStore = this.getTopToolbar().get('model-combobox').getStore().getById(comboValue);
+                        var serviceIdentification = selectedRun.serviceIdentification;
+                        var wfsUrl = '';
+                        var layer = '';
+                        var commonAttr = 'site_no';
+                        var modelVersion = 0;
+                        var runIdentifier = 0;
+                        var abstrakt = '';
+                        var runDate;
                         
+                        modelVersion = serviceIdentification.citation.edition.CharacterString.value.split('.')[0];
+                        runIdentifier = serviceIdentification.citation.edition.CharacterString.value.split('.')[1];
+                        abstrakt = serviceIdentification['abstract'].CharacterString.value;
+                        runDate = Date.parseDate(serviceIdentification.citation.date[0].date[0].DateTime.value.split('T')[0], 'Y-m-d');
+                        
+                        for (var i = 0;i < modelStore.data.rec.data.identificationInfo.length;i++) {
+                            var iiItem = modelStore.data.rec.data.identificationInfo[i];
+                            
+                            if (!wfsUrl && iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ows') {
+                                wfsUrl = iiItem.serviceIdentification.operationMetadata.linkage.URL;
+                                layer = iiItem.serviceIdentification.operationMetadata.name.CharacterString.value;
+                            }
+                        }
+                        
+                        var isoFormPanel = new WaterSMART.ISOFormPanel({
+                            title : selectedRun.title,
+                            'abstract' : abstrakt,
+                            commonAttr : commonAttr,
+                            create : false,
+                            layer : layer,
+                            modelerName : WATERSMART.USER_NAME,
+                            modelName : comboValue,
+                            modelVersion : modelVersion,
+                            runIdentifier : runIdentifier,
+                            wfsUrl : wfsUrl,
+                            runDate : runDate
+                        });
+                    
+                        var modalRunWindow = new Ext.Window({
+                            width: '30%',
+                            height : 'auto',
+                            modal : true,
+                            items : [ isoFormPanel ]
+                        })
+                    
+                        modalRunWindow.show();
                     },
                     scope : this
                 }
@@ -52,7 +101,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                 listeners : {
                     click : function() {
                         
-                        LOG.debug('')
+                        LOG.debug('ModelRunSelectionPanel.js::User clicked on "Create A Run" button.')
                         var comboValue = this.getTopToolbar().get('model-combobox').getValue();
                         var modelStore = this.getTopToolbar().get('model-combobox').getStore().getById(comboValue);
                         var wfsUrl = '';
@@ -65,11 +114,10 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                             var iiItem = modelStore.data.rec.data.identificationInfo[i];
                             
                             if (iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
-                                var runVersion = iiItem.serviceIdentification.citation.edition.CharacterString.value.split('.')[0];
-                                
-                                if (parseInt(runVersion) > this.runVersion) this.runVersion = runVersion;
                                 modelVersion = iiItem.serviceIdentification.citation.edition.CharacterString.value.split('.')[0];
                                 
+                                var runVersion = iiItem.serviceIdentification.citation.edition.CharacterString.value.split('.')[1];
+                                if (parseInt(runVersion) > this.runVersion) this.runVersion = runVersion;
                             } 
                             
                             if (!wfsUrl && iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ows') {
@@ -80,13 +128,14 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         runIdentifier++;
                         
                         var isoFormPanel = new WaterSMART.ISOFormPanel({
+                            title : 'Create A New Run',
                             commonAttr : commonAttr,
+                            create : true,
                             layer : layer,
                             modelerName : WATERSMART.USER_NAME,
                             modelName : comboValue,
                             modelVersion : modelVersion,
                             runIdentifier : runIdentifier,
-                            runDate : new Date(),
                             wfsUrl : wfsUrl
                         });
                     
@@ -137,7 +186,9 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         panelInfo.dateStamp = storeItem.get('dateStamp') || '';
                         panelInfo.language = storeItem.get('language') || '';
                         panelInfo.runPanels = [];
-            
+                        panelInfo.metadataStandardName = storeItem.get('metadataStandardName');
+                        panelInfo.metadataStandardVersion = storeItem.get('metadataStandardVersion');
+                        
                         Ext.each(storeItem.get('identificationInfo'), function(idItem) {
                 
                             // We have a citation identification block
@@ -183,9 +234,11 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         
                         var runPanelsClone = [];
                         Ext.each(panelInfo.runPanels, function(panel){
-                            panel.panelInfo.owsEndpoint = this.panelInfo.owsEndpoint
-                            panel.panelInfo.owsResourceName = this.panelInfo.owsResourceName
-                            panel.panelInfo.fileIdentifier = this.panelInfo.fileIdentifier
+                            panel.panelInfo.owsEndpoint = this.panelInfo.owsEndpoint;
+                            panel.panelInfo.owsResourceName = this.panelInfo.owsResourceName;
+                            panel.panelInfo.fileIdentifier = this.panelInfo.fileIdentifier;
+                            panel.panelInfo.metadataStandardName = this.panelInfo.metadataStandardName;
+                            panel.panelInfo.metadataStandardVersion = this.panelInfo.metadataStandardVersion;
                             this.runPanelsClone.push(panel.cloneConfig());
                         }, {
                             panelInfo : panelInfo,
@@ -207,6 +260,89 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         }, config);
         WaterSMART.ModelRunSelectionPanel.superclass.constructor.call(this, config);
     
+        var wpsCapsStore = new CIDA.WPSCapabilitiesStore({
+            url : CONFIG.WPS_URL + '/WebProcessingService?Service=WPS&Request=GetCapabilities',
+            listeners : {
+                load : function(store) {
+                    var processArray = [];
+                    
+                    Ext.iterate(store.getRange()[0].get("processOfferings"), function(key, val){
+                        this.push([
+                            val.title,
+                            val
+                            ])
+                    }, processArray)
+                    this.processStore = new Ext.data.ArrayStore({
+                        fields : ['title', 'process'],
+                        idIndex : 0
+                    })
+                    this.processStore.loadData(processArray);
+                    
+                    this.getTopToolbar().addField({
+                        xtype: 'tbseparator'
+                    })
+                    
+                    this.getTopToolbar().addField({
+                        xtype: 'tbtext',
+                        text: 'Processes:'
+                    })
+                    
+                    this.getTopToolbar().addField({
+                        xtype : 'combo',
+                        id : 'wps-process-combo',
+                        store : this.processStore,
+                        autoWidth : true,
+                        triggerAction : 'all',
+                        width : 'auto',
+                        mode : 'local',
+                        editable : false,
+                        emptyText : 'Select A Process',
+                        displayField : 'title',
+                        disabled : true,
+                        listeners : {
+                            select : function(combo, record) {
+                                LOG.debug('ModelRunSelectionPanel.js:: User selected a WPS process: ' + record.id);
+                                var describeProcessStore = new CIDA.WPSDescribeProcessStore({
+                                    url : CONFIG.WPS_URL + '/WebProcessingService?Service=WPS&Request=DescribeProcess&Identifier=' + record.get('process').identifier,
+                                    listeners : {
+                                        load : function(store) {
+                                            
+                                            var processFormPanel = new WaterSMART.ProcessFormPanel({
+                                            width: '100%',
+                                            url : CONFIG.WPS_URL + '/WebProcessingService?Service=WPS&Request=Execute',
+                                            processIdentifier : record.get('process').identifier,
+                                            processTitle : record.id,
+                                            processStore : store,
+                                            wfsUrl : this.runPanel.currentlySelectedRun.panelInfo.owsEndpoint,
+                                            layerName : this.runPanel.currentlySelectedRun.panelInfo.owsResourceName,
+                                            commonAttribute : 'site_no',
+                                            sosEndpoint : this.runPanel.currentlySelectedRun.panelInfo.operationURL
+                                        });
+
+                                        var modalRunWindow = new Ext.Window({
+                                            width: '30%',
+                                            height : 'auto',
+                                            modal : true,
+                                            items : [ processFormPanel ]
+                                        })
+
+                                        modalRunWindow.show();
+                                        },
+                                        scope : this
+                                    }
+                                })
+                                describeProcessStore.load();
+                            },
+                            scope : this
+                        }
+                    })
+                    
+                    this.doLayout();
+                },
+                scope : this
+            }
+        })
+        wpsCapsStore.load();
     },
     modelSelected : function(config) {
         LOG.debug('ModelRunSelectionpanel.js::A model has been selected');
@@ -227,6 +363,15 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         
         this.runPanel.currentlySelectedRun = panel;
         this.runPanel.getTopToolbar().get('edit-selected-run-button').setDisabled(false);
+        this.getTopToolbar().get('wps-process-combo').setDisabled(false)
+
+        // Close any current plotter windows
+        if (Ext.getCmp('plotter-window')) Ext.getCmp('plotter-window').hide();
+
+        Ext.each(this.runPanel.items.getRange(), function(runPanel) {
+            runPanel.body.removeClass('run-panel-selected');
+        })
+        this.runPanel.currentlySelectedRun.body.addClass('run-panel-selected');
         
         // TODO- We will need to change this when (if?) we get more than one sites layer on the map at any given time
         if (this.mapPanel.currentMapConfig.layers.layers.length 

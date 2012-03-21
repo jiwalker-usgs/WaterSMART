@@ -36,6 +36,7 @@
             CONFIG.LOG4JS_PATTERN_LAYOUT = '<%= props.getProperty("watersmart.frontend.log4js.pattern.layout","%rms - %-5p - %m%n") %>';
             CONFIG.LOG4JS_LOG_THRESHOLD = '<%= props.getProperty("watersmart.frontend.log4js.threshold", "info") %>';
             CONFIG.GEOSERVER_URL = '<%= props.getProperty("watersmart.stations.url", "http://localhost:8080/geoserver/ows") %>';
+            CONFIG.WPS_URL = '<%= props.getProperty("watersmart.wps.url", "http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/gdp-process-wps") %>';
             CONFIG.SITES_LAYER = '<%= props.getProperty("watersmart.stations.typeName", "watersmart:se_sites") %>';
             CONFIG.DEVELOPMENT = <%= development %>;
             CONFIG.CSW_PARENT_IDENTIFIER = '<%= props.getProperty("watersmart.csw.identifier.parent", "497cf2db-56d6-4cad-9a56-a14b63fb232a") %>';
@@ -92,6 +93,7 @@
         <jsp:include page="js/geoext/geoext.jsp" >
             <jsp:param name="debug-qualifier" value="<%= development %>" />
         </jsp:include>
+        <jsp:include page="js/geoext/ux/WPS/WPS.jsp"/>
         <jsp:include page="js/geoext/ux/SOS/SOS.jsp"/>
         <jsp:include page="js/geoext/ux/CSW/CSW.jsp"/>
         <jsp:include page="js/jquery/jquery.jsp"/>
@@ -102,6 +104,9 @@
         <jsp:include page="js/sarissa/sarissa.jsp"/>
         <jsp:include page="js/dygraphs/dygraphs.jsp"/>
 
+        <script type="text/javascript" src="pages/index/WPSProcesses/ExampleEmailWPSWrapperProcess.js"></script>
+        <script type="text/javascript" src="pages/index/WPSProcesses/ExampleWPSProcess.js"></script>
+        <script type="text/javascript" src="pages/index/Form/ProcessFormPanel.js"></script>
         <script type="text/javascript" src="pages/index/Form/isoFormPanel.js"></script>
         <script type="text/javascript" src="pages/index/Form/fileUploadPanel.js"></script>
         <script type="text/javascript" src="pages/index/Form/ModelPanel.js"></script>
