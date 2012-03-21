@@ -3,6 +3,14 @@
     color: #3D3D3D;
 }
 
+.run-panel-mouseover {
+    background-color: #EBEBEB !important;
+    cursor: pointer !important; 
+}
+.run-panel-selected{
+    background-color: #CCCCCC !important;
+}
+
 .run-value {
     color: #5C5C5C;
 }

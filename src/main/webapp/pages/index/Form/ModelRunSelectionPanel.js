@@ -361,6 +361,11 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         this.runPanel.getTopToolbar().get('edit-selected-run-button').setDisabled(false);
         this.getTopToolbar().get('wps-process-combo').setDisabled(false)
         
+        Ext.each(this.runPanel.items.getRange(), function(runPanel) {
+            runPanel.body.removeClass('run-panel-selected');
+        })
+        this.runPanel.currentlySelectedRun.body.addClass('run-panel-selected');
+        
         // TODO- We will need to change this when (if?) we get more than one sites layer on the map at any given time
         if (this.mapPanel.currentMapConfig.layers.layers.length 
             && this.mapPanel.currentMapConfig.layers.layers[0].params.LAYERS === panel.panelInfo.owsResourceName) {

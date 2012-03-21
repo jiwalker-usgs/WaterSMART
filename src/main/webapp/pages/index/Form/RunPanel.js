@@ -58,8 +58,13 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
             listeners : {
                 afterrender : function(me) {
                     me.body.on('mouseover', function(){
-                        
+                        this.body.addClass('run-panel-mouseover')
                     }, me)
+                    
+                    me.body.on('mouseout', function() {
+                        this.body.removeClass('run-panel-mouseover')
+                    }, me)
+                    
                     me.body.on('click', function(){
                         me.ownerCt.ownerCt.runSelected(me);
                     }, me)
