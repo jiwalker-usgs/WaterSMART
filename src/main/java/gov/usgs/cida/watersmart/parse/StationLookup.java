@@ -31,6 +31,10 @@ public class StationLookup {
             StationLookup.class);
     private final LinkedHashMap<String, Station> stationLookupTable = Maps.newLinkedHashMap();
 
+    public StationLookup(RunMetadata meta) throws IOException, XMLStreamException {
+        this(meta.getWfsUrl(), meta.getLayerName(), meta.getCommonAttribute());
+    }
+    
     public StationLookup(String wfsUrl, String typeName, String nameAttr) throws
             IOException, XMLStreamException {
         // has to be better way to do this call
@@ -98,12 +102,12 @@ public class StationLookup {
      * @return index of station for referencing in NetCDF file, -1 if not found
      */
     public int lookup(String stationName) {
-        Station station = stationLookupTable.get(stationName);
+        Station station = this.get(stationName);
         if (null != station) {
             return station.index;
         }
         else {
-            return -1;
+            return -1;    
         }
     }
 
@@ -114,6 +118,12 @@ public class StationLookup {
      * @return Station or null if not found
      */
     public Station get(String stationName) {
-        return stationLookupTable.get(stationName);
+        Station station = stationLookupTable.get(stationName);
+        if (null != station) {
+            return station;
+        }
+        // sometimes leading zero may be dropped
+        station = stationLookupTable.get("0" + stationName);
+        return station;
     }
 }

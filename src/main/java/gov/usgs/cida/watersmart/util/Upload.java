@@ -2,7 +2,7 @@ package gov.usgs.cida.watersmart.util;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip;
-import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ModelType;
+import gov.usgs.cida.watersmart.parse.RunMetadata;
 import java.io.*;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -60,41 +60,22 @@ public class Upload extends HttpServlet {
             FileItemIterator iter;
             try {
                 List<FileItem> itemList = upload.parseRequest(request);
-                ModelType modelType = null;
-                String filename = null;
-                InputStream filein = null;
-                String wfsUrl = null;
-                String layer = null;
-                String commonAttr = null;
+                InputStream fileIn = null;
+                RunMetadata meta = new RunMetadata();
                 for (FileItem item : itemList) {
                     String name = item.getFieldName();
                     // filename must come first
-                    if (item.isFormField() && "modeltype".equals(item.getFieldName().toLowerCase())) {
-                        modelType = ModelType.valueOf(item.getString());
-                    }
-                    else if (item.isFormField() && "wfsurl".equals(item.getFieldName().toLowerCase())) {
-                        wfsUrl = item.getString();
-                    }
-                    else if (item.isFormField() && "layer".equals(item.getFieldName().toLowerCase())) {
-                        layer = item.getString();
-                    }
-                    else if (item.isFormField() && "commonattr".equals(item.getFieldName().toLowerCase())) {
-                        commonAttr = item.getString();
-                    }
-                    else if (!item.isFormField()) {
-                        filename = item.getName();
-                        filein = item.getInputStream();
+                    if (item.isFormField()) {
+                        meta.set(item);
+                    }                    
+                    else {
+                        fileIn = item.getInputStream();
                     }
                 }
-                if (modelType != null &&
-                    filein != null &&
-                    filename != null &&
-                    wfsUrl != null &&
-                    layer != null &&
-                    commonAttr != null) {
-                    destinationFile = new File(tempDir + File.separator + filename);
-                    saveFileFromRequest(filein, destinationFile);
-                    CreateDSGFromZip.create(destinationFile, modelType, wfsUrl, layer, commonAttr);
+                if (meta.isFilledIn() && fileIn != null) {
+                    destinationFile = meta.getFile(tempDir);
+                    saveFileFromRequest(fileIn, destinationFile);
+                    CreateDSGFromZip.create(destinationFile, meta);
                 } else {
                     throw new Exception("Must provide all required parameters: model, file, wfs URL, layer name, common attribute");
                 }

@@ -12,6 +12,20 @@
         <cida.maven.url>http://cida-wiwsc-maven.er.usgs.gov:8080/maven</cida.maven.url>
     </properties>
     
+    <licenses>
+        <license>
+            <name>Public Domain</name>
+            <url>http://www.usgs.gov/visual-id/credit_usgs.html#copyright</url>
+            <comments>
+                This software is in the public domain because it contains materials
+                that originally came from the United States Geological Survey,
+                an agency of the United States Department of Interior.
+                For more information, see the official USGS copyright policy
+                at http://www.usgs.gov/visual-id/credit_usgs.html#copyright
+            </comments>
+        </license>
+    </licenses>
+    
     <repositories>
         <repository>
             <id>nexus</id>
@@ -128,7 +142,7 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.0</version>
+            <version>2.1</version>
         </dependency>
         <dependency>
             <groupId>joda-time</groupId>
