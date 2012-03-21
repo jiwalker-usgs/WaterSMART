@@ -366,7 +366,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         this.getTopToolbar().get('wps-process-combo').setDisabled(false)
 
         // Close any current plotter windows
-        if (Ext.getCmp('plotter-window')) Ext.getCmp('plotter-window').close();
+        if (Ext.getCmp('plotter-window')) Ext.getCmp('plotter-window').hide();
 
         Ext.each(this.runPanel.items.getRange(), function(runPanel) {
             runPanel.body.removeClass('run-panel-selected');
