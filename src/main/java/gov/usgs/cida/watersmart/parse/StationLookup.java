@@ -102,12 +102,12 @@ public class StationLookup {
      * @return index of station for referencing in NetCDF file, -1 if not found
      */
     public int lookup(String stationName) {
-        Station station = stationLookupTable.get(stationName);
+        Station station = this.get(stationName);
         if (null != station) {
             return station.index;
         }
         else {
-            return -1;
+            return -1;    
         }
     }
 
@@ -118,6 +118,12 @@ public class StationLookup {
      * @return Station or null if not found
      */
     public Station get(String stationName) {
-        return stationLookupTable.get(stationName);
+        Station station = stationLookupTable.get(stationName);
+        if (null != station) {
+            return station;
+        }
+        // sometimes leading zero may be dropped
+        station = stationLookupTable.get("0" + stationName);
+        return station;
     }
 }
