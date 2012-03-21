@@ -177,7 +177,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                         url: uploadPanel.url,
                         params: {
                             name : metadataForm.name,
-                            version : metadataForm.version,
+                            modelVersion : metadataForm.version,
                             runIdent : metadataForm.runIdent,
                             creationDate : metadataForm.creationDate,
                             scenario : metadataForm.scenario,
