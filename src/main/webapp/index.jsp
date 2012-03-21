@@ -104,6 +104,7 @@
         <jsp:include page="js/sarissa/sarissa.jsp"/>
         <jsp:include page="js/dygraphs/dygraphs.jsp"/>
 
+        <script type="text/javascript" src="pages/index/WPSProcesses/ExampleEmailWPSWrapperProcess.js"></script>
         <script type="text/javascript" src="pages/index/WPSProcesses/ExampleWPSProcess.js"></script>
         <script type="text/javascript" src="pages/index/Form/ProcessFormPanel.js"></script>
         <script type="text/javascript" src="pages/index/Form/isoFormPanel.js"></script>

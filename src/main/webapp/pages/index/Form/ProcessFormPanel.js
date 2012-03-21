@@ -41,17 +41,32 @@ WaterSMART.ProcessFormPanel = Ext.extend(Ext.form.FormPanel, {
                     var processPanel = this.ownerCt.ownerCt;
                     var processPanelFormValues = processPanel.getForm().getValues();
                     
-                    var data = new WaterSMART.ExampleProcess({
+                    var data = '';
+                    if (processPanelFormValues['checkbox-email'] === 'on') {
+                        data = new WaterSMART.ExampleProcess({
+                            subProcess : new WaterSMART.ExampleProcess({
                                 sendEmail : (processPanelFormValues['checkbox-email'] === 'on') ? 'true' : 'false',
                                 wfsUrl : processPanel.wfsUrl,
                                 layerName : processPanel.layerName,
                                 commonAttribute : processPanel.commonAttribute,
                                 sosEndpoint : processPanel.sosEndpoint,
                                 email : WATERSMART.USER_EMAIL
-                            }).createWpsExecuteRequest()
+                            }).createWpsExecuteRequest(),
+                            email : WATERSMART.USER_EMAIL
+                        }).createWpsExecuteRequest()
+                    } else {
+                        data = new WaterSMART.ExampleProcess({
+                            wfsUrl : processPanel.wfsUrl,
+                            layerName : processPanel.layerName,
+                            commonAttribute : processPanel.commonAttribute,
+                            sosEndpoint : processPanel.sosEndpoint
+                        }).createWpsExecuteRequest()
+                    }
                     
                     processPanel.wpsResponseStore = new CIDA.WPSExecuteResponseStore({
-                        url : processPanel.url,
+                        // TODO - Check if we need the identifier here - we may not since it's in the WPS POST but I don't remember right now
+                        // and the identifier changes based on if we need to wrap in an email-when-finished envelope or not
+                        url : processPanel.url + '&Identifier=' + processPanel.processIdentifier,
                         method : 'POST',
                         baseParams : {
                             xmlData : data

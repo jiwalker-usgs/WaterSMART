@@ -1,6 +1,6 @@
 Ext.ns('WaterSMART');
 
-WaterSMART.ExampleProcess  = function(args) {
+WaterSMART.ExampleEmailWPSWrapperProcess  = function(args) {
     if (!args) args = {};
     var _identifier = 'gov.usgs.cida.gdp.wps.algorithm.FeatureCoverageIntersectionAlgorithm';
     var _outId = args.outId || 'output';
@@ -9,58 +9,36 @@ WaterSMART.ExampleProcess  = function(args) {
             that.valueName = args.identifier || '';
             that.outId = args.outId || that.outId;
         },
-        // This should point at a real WPS process
-        wpsEndpoint : "/WebProcessingService?Service=WPS&Request=DescribeProcess&Identifier=gov.usgs.cida.gdp.wps.algorithm.FeatureCoverageIntersectionAlgorithm",
+        // This should point at the email-when-finished algorithm we set up 
+        wpsEndpoint : "/WebProcessingService?Service=WPS&Request=DescribeProcess&Identifier=gov.usgs.cida.gdp.wps.algorithm.FeatureCoverageIntersectionAlgorithm", 
         identifier : _identifier,
-        wfsUrl : args.wfsUrl,
-        layerName : args.layerName,
-        commonAttribute : args.commonAttribute,
-        sosEndpoint : args.sosEndpoint,
+        email : args.email,
+        subProcess : args.subProcess,
         outId : _outId,
         createWpsExecuteReference : function() {
                     
             var dataInputs = [];
             
             dataInputs.push({
-                title : 'wfs-url',
-                identifier : 'wfs-url',
+                title : 'email',
+                identifier : 'email',
                 data : {
                     literalData : {
-                        value : that.wfsUrl
+                        value : that.email
                     }
                 }
             })
             
             dataInputs.push({
-                title : 'layer-name',
-                identifier : 'layer-name',
+                title : 'sub-process',
+                identifier : 'sub-process',
                 data : {
                     literalData : {
-                        value : that.layerName
+                        value : that.subProcess
                     }
                 }
             })
             
-            dataInputs.push({
-                title : 'common-attribute',
-                identifier : 'common-attribute',
-                data : {
-                    literalData : {
-                        value : that.commonAttribute
-                    }
-                }
-            })
-               
-            dataInputs.push({
-                title : 'sos-endpoint',
-                identifier : 'sos-endpoint',
-                data : {
-                    literalData : {
-                        value : that.sosEndpoint
-                    }
-                }
-            })
-               
             return {
                 mimeType : "text/xml; subtype=wfs-collection/1.0",
                 href : "http://geoserver/wps",

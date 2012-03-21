@@ -257,7 +257,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                                             
                                             var processFormPanel = new WaterSMART.ProcessFormPanel({
                                             width: '100%',
-                                            url : CONFIG.WPS_URL + '/WebProcessingService?Service=WPS&Request=Execute&Identifier=' + record.get('process').identifier,
+                                            url : CONFIG.WPS_URL + '/WebProcessingService?Service=WPS&Request=Execute',
                                             processIdentifier : record.get('process').identifier,
                                             processTitle : record.id,
                                             processStore : store,
