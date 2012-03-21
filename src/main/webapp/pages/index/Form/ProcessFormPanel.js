@@ -43,7 +43,7 @@ WaterSMART.ProcessFormPanel = Ext.extend(Ext.form.FormPanel, {
                     
                     var data = '';
                     if (processPanelFormValues['checkbox-email'] === 'on') {
-                        data = new WaterSMART.ExampleProcess({
+                        data = new WaterSMART.ExampleEmailWPSWrapperProcess({
                             subProcess : new WaterSMART.ExampleProcess({
                                 sendEmail : (processPanelFormValues['checkbox-email'] === 'on') ? 'true' : 'false',
                                 wfsUrl : processPanel.wfsUrl,
