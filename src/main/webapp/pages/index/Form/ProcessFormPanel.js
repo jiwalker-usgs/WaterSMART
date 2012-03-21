@@ -48,7 +48,7 @@ WaterSMART.ProcessFormPanel = Ext.extend(Ext.form.FormPanel, {
                                 wfsUrl : processPanel.wfsUrl,
                                 layerName : processPanel.layerName,
                                 commonAttribute : processPanel.commonAttribute,
-                                sosEndpoint : processPanel.sosEndpoint,
+                                sosEndpoint : processPanel.sosEndpoint
                             }).createWpsExecuteRequest(),
                             email : WATERSMART.USER_EMAIL
                         }).createWpsExecuteRequest()
