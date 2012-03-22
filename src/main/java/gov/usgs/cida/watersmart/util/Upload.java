@@ -1,6 +1,7 @@
 package gov.usgs.cida.watersmart.util;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
+import gov.usgs.cida.watersmart.csw.CSWTransactionHelper;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip;
 import gov.usgs.cida.watersmart.parse.RunMetadata;
 import java.io.*;
@@ -75,9 +76,11 @@ public class Upload extends HttpServlet {
                 if (meta.isFilledIn() && fileIn != null) {
                     destinationFile = meta.getFile(tempDir);
                     saveFileFromRequest(fileIn, destinationFile);
-                    CreateDSGFromZip.create(destinationFile, meta);
+                    String filename = CreateDSGFromZip.create(destinationFile, meta);
+                    CSWTransactionHelper helper = new CSWTransactionHelper(meta);
+                    helper.insert();
                 } else {
-                    throw new Exception("Must provide all required parameters: model, file, wfs URL, layer name, common attribute");
+                    throw new Exception("Must provide all required parameters");
                 }
             } catch (Exception ex) {
                 // pass exception text along?

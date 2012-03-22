@@ -35,12 +35,13 @@ public class CreateDSGFromZip {
         AFINCH;
     }
     
-    public static void create(File srcZip, RunMetadata runMeta) throws IOException, XMLStreamException {
+    public static String create(File srcZip, RunMetadata runMeta) throws IOException, XMLStreamException {
         // Need to put the resulting NetCDF file somewhere that ncSOS knows about
         String sosPath = JNDISingleton.getInstance().getProperty("watersmart.sos.location", System.getProperty("java.io.tmpdir"));
         String filename = srcZip.getName().replace(".zip", ".nc");
         
-        File ncFile = new File(sosPath + File.separator + filename);
+        File ncFile = new File(sosPath + File.separator + runMeta.getTypeString() +
+                               File.separator +filename);
         ZipFile zip = new ZipFile(srcZip);
         Enumeration<? extends ZipEntry> entries = zip.entries();
         StationTimeSeriesNetCDFFile nc = null;
@@ -91,6 +92,7 @@ public class CreateDSGFromZip {
             }
         }
         IOUtils.closeQuietly(nc);
+        return filename;
     }
     
     private static Map<String, String> applyBusinessRulesToMeta(RunMetadata meta) {

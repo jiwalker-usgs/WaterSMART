@@ -17,6 +17,7 @@ public class RunMetadata {
     private static final String UPLOAD_EXTENSION = ".zip";
     
     private ModelType type;
+    private String modelId;
     private String name;
     private String modelVersion;
     private String runIdent;
@@ -30,6 +31,7 @@ public class RunMetadata {
     
     public RunMetadata() {
         type = null;
+        modelId = null;
         name = null;
         modelVersion = null;
         runIdent = null;
@@ -44,16 +46,17 @@ public class RunMetadata {
     
     public boolean isFilledIn() {
         return (type != null &&
-                name != null &&
-                modelVersion != null &&
-                runIdent != null &&
-                creationDate != null &&
-                scenario != null &&
-                comments != null &&
-                email != null &&
-                wfsUrl != null &&
-                layerName != null &&
-                commonAttribute != null);
+                StringUtils.isNotBlank(modelId) &&
+                StringUtils.isNotBlank(name) &&
+                StringUtils.isNotBlank(modelVersion) &&
+                StringUtils.isNotBlank(runIdent) &&
+                StringUtils.isNotBlank(creationDate) &&
+                StringUtils.isNotBlank(scenario) &&
+                StringUtils.isNotBlank(email) &&
+                StringUtils.isNotBlank(wfsUrl) &&
+                StringUtils.isNotBlank(layerName) &&
+                StringUtils.isNotBlank(commonAttribute) &&
+                comments != null);
     }
     
     /**
@@ -66,6 +69,10 @@ public class RunMetadata {
         if ("modeltype".equals(param)) {
             ModelType mt = ModelType.valueOf(item.getString());
             setType(mt);
+            return true;
+        }
+        if ("modelid".equals(param)) {
+            setModelId(item.getString());
             return true;
         }
         if("name".equals(param)) {
@@ -190,6 +197,10 @@ public class RunMetadata {
     public ModelType getType() {
         return type;
     }
+    
+    public String getTypeString() {
+        return getType().toString().toLowerCase();
+    }
 
     public void setType(ModelType type) {
         this.type = type;
@@ -217,5 +228,19 @@ public class RunMetadata {
 
     public void setWfsUrl(String wfsUrl) {
         this.wfsUrl = wfsUrl;
+    }
+
+    /**
+     * @return the modelId
+     */
+    public String getModelId() {
+        return modelId;
+    }
+
+    /**
+     * @param modelId the modelId to set
+     */
+    public void setModelId(String modelId) {
+        this.modelId = modelId;
     }
 }
