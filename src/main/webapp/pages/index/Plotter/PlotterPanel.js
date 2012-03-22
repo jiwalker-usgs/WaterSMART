@@ -173,21 +173,19 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
                 rightGap : 5,
                 showRangeSelector: true,
                 yAxisLabelWidth: 75,
-                ylabel: 'test',
+                ylabel: 'Discharge',
                 axes: {
                     x: {
                         valueFormatter: function(ms) {
-                            return '<span style="font-weight: bold; text-size: big">' +
-                            new Date(ms).strftime('%Y') +
-                            '</span>';
+                            return '<span id="plotter-year-output-display">' + new Date(ms).format('Y-m-d') + '</span>';
                         },
                         axisLabelFormatter: function(d) {
-                            return d.strftime('%Y');
+                            return '<span class="plotter-x-label-display">' + d.strftime('%Y') + '</span>';
                         }
                     },
                     y: {
                         valueFormatter: function(y) {
-                            return Math.round(y) + " " + yaxisUnits + "<br />";
+                            return "<span id='plotter-value-output-display'>" + Math.round(y) + " " + yaxisUnits + "</span><br />";
                         }
                     }
                 }

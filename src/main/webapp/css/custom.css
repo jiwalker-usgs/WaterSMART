@@ -11,10 +11,27 @@
     background-color: #CCCCCC !important;
 }
 
+
+#plotter-year-output-display {
+    font-weight: bold; 
+}
+
+.plotter-x-label-display {
+/*    font-weight: bold; */
+}
+
+#plotter-value-output-display {
+    font-weight: bold; 
+}
+
+.dygraph-ylabel {
+    color: #008080;
+    font-weight: bold;
+}
+
 .run-value {
     color: #5C5C5C;
 }
-
 .run-value-list-item {
     color: #5C5C5C;
 }
