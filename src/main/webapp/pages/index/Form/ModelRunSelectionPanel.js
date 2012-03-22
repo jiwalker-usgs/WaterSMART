@@ -1,14 +1,16 @@
 Ext.ns("WaterSMART");
 
 WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
+    commonAttr : undefined,
     cswStore : undefined,
+    mapPanel : undefined,
     modelStore : undefined,
     processStore : undefined,
-    mapPanel : undefined,
     runPanel : undefined,
     constructor : function(config) {
         if (!config) config = {};
         
+        this.commonAttr = config.commonAttr;
         this.cswStore = config.cswStore;
         this.mapPanel = config.mapPanel;
         
@@ -48,7 +50,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         var serviceIdentification = selectedRun.serviceIdentification;
                         var wfsUrl = '';
                         var layer = '';
-                        var commonAttr = 'site_no';
+                        var commonAttr = this.commonAttr;
                         var modelVersion = 0;
                         var runIdentifier = 0;
                         var abstrakt = '';
@@ -106,7 +108,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         var modelStore = this.getTopToolbar().get('model-combobox').getStore().getById(comboValue);
                         var wfsUrl = '';
                         var layer = '';
-                        var commonAttr = 'site_no';
+                        var commonAttr = this.commonAttr;
                         var modelVersion = 0;
                         var runIdentifier = 0;
                         
@@ -308,25 +310,25 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                                         load : function(store) {
                                             
                                             var processFormPanel = new WaterSMART.ProcessFormPanel({
-                                            width: '100%',
-                                            url : CONFIG.WPS_URL + '/WebProcessingService?Service=WPS&Request=Execute',
-                                            processIdentifier : record.get('process').identifier,
-                                            processTitle : record.id,
-                                            processStore : store,
-                                            wfsUrl : this.runPanel.currentlySelectedRun.panelInfo.owsEndpoint,
-                                            layerName : this.runPanel.currentlySelectedRun.panelInfo.owsResourceName,
-                                            commonAttribute : 'site_no',
-                                            sosEndpoint : this.runPanel.currentlySelectedRun.panelInfo.operationURL
-                                        });
+                                                width: '100%',
+                                                url : CONFIG.WPS_URL + '/WebProcessingService?Service=WPS&Request=Execute',
+                                                processIdentifier : record.get('process').identifier,
+                                                processTitle : record.id,
+                                                processStore : store,
+                                                wfsUrl : this.runPanel.currentlySelectedRun.panelInfo.owsEndpoint,
+                                                layerName : this.runPanel.currentlySelectedRun.panelInfo.owsResourceName,
+                                                commonAttribute : this.commonAttr,
+                                                sosEndpoint : this.runPanel.currentlySelectedRun.panelInfo.operationURL
+                                            });
 
-                                        var modalRunWindow = new Ext.Window({
-                                            width: '30%',
-                                            height : 'auto',
-                                            modal : true,
-                                            items : [ processFormPanel ]
-                                        })
+                                            var modalRunWindow = new Ext.Window({
+                                                width: '30%',
+                                                height : 'auto',
+                                                modal : true,
+                                                items : [ processFormPanel ]
+                                            })
 
-                                        modalRunWindow.show();
+                                            modalRunWindow.show();
                                         },
                                         scope : this
                                     }

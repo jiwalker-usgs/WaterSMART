@@ -46,10 +46,15 @@ Ext.onReady(function() {
             listeners : {
                 load : function(store) {
                     LOG.debug('onReady.js::CSW Record Store loaded ' + store.totalLength + ' record(s)');
-        
-                    var map = new WaterSMART.Map();
+
+                    var commonAttr = CONFIG.COMMON_ATTR;
+
+                    var map = new WaterSMART.Map({
+                        commonAttr : commonAttr
+                    });
         
                     var modelRunSelPanel = new WaterSMART.ModelRunSelectionPanel({
+                        commonAttr : commonAttr,
                         cswStore : store,
                         mapPanel : map
                     });
