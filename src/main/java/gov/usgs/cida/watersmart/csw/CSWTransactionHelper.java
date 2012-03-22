@@ -3,6 +3,7 @@ package gov.usgs.cida.watersmart.csw;
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
 import gov.usgs.cida.watersmart.parse.RunMetadata;
 import gov.usgs.cida.watersmart.util.JNDISingleton;
+import java.util.Map;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
