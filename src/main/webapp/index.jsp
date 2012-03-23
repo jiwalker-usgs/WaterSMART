@@ -40,7 +40,8 @@
             CONFIG.SITES_LAYER = '<%= props.getProperty("watersmart.stations.typeName", "watersmart:se_sites") %>';
             CONFIG.DEVELOPMENT = <%= development %>;
             CONFIG.CSW_PARENT_IDENTIFIER = '<%= props.getProperty("watersmart.csw.identifier.parent", "497cf2db-56d6-4cad-9a56-a14b63fb232a") %>';
-            
+            CONFIG.COMMON_ATTR = '<%= props.getProperty("watersmart.stations.primaryAttribute", "site_no") %>';
+
             WATERSMART.USER = '<%= (user == null) ? "" : user.uid %>';
             WATERSMART.USER_NAME = '<%= (user == null) ? "" : user.fullName %>';
             WATERSMART.USER_EMAIL = '<%= (user == null) ? "" : user.email %>';

@@ -3,6 +3,7 @@ Ext.ns("WaterSMART");
 
 WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
     layersLoading : 0,
+    commonAttr : undefined,
     controller : undefined,
     cswRecordStore : undefined,
     currentMapConfig : {},
@@ -36,7 +37,9 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
             buffer : 3,
             transitionEffect : 'resize'
         };
-					
+
+        this.commonAttr = options.commonAttr;
+        
         this.defaultMapConfig.layers.baseLayers = [
         new OpenLayers.Layer.XYZ(
             "USA Topo Map",
@@ -175,7 +178,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
                         new WaterSMART.Plotter({
                             url : this.sosEndpoint,
                             vars : this.plotterVars,
-                            offering : event.features[0].attributes.site_no,
+                            offering : event.features[0].attributes[this.commonAttr],
                             ownerWindow : this.popup
                         })
                     }

@@ -10,10 +10,11 @@
     <Environment name="watersmart.stations.typeName" type="java.lang.String" value="watersmart:se_sites" />
     <Environment name="watersmart.stations.primaryAttribute" type="java.lang.String" value="site_no" />
     <Environment name="watersmart.sos.location" type="java.lang.String" value="/mnt/gdp/data/thredds/watersmart/sos" />
+    <Environment name="watersmart.sos.model.repo" type="java.lang.String" value="http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/" />
     <Environment name="watersmart.ldap.url" type="java.lang.String" value="ldaps://gsvaresh02.er.usgs.gov:636" />
-    <Environment name="watersmart.ldap.group" type="java.lang.String" value="GS-W-WImdn CIDA Javadev" override="false" />
+    <Environment name="watersmart.ldap.group" type="java.lang.String" value="GS-W-WImdn CIDA Javadev"/>
     <Environment name="watersmart.wps.url" type="java.lang.String" value="http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/gdp-process-wps" />
-    <Environment name="watersmart.geonetwork.addr" type="java.lang.String" value="http://130.11.165.241:8081/geonetwork" override="false" />
-    <Environment name="watersmart.geonetwork.user" type="java.lang.String" value="watersmart" override="false" />
-    <Environment name="watersmart.geonetwork.pass" type="java.lang.String" value="not_the_password" override="false" />
+    <Environment name="watersmart.geonetwork.addr" type="java.lang.String" value="http://130.11.165.241:8081/geonetwork"/>
+    <Environment name="watersmart.geonetwork.user" type="java.lang.String" value="watersmart" />
+    <Environment name="watersmart.geonetwork.pass" type="java.lang.String" value="not_the_password" />
 </Context>

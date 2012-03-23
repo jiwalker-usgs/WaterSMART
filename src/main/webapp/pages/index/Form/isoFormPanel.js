@@ -17,7 +17,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
         
         if (!config) config = {};
         
-        this.commonAttr = config.commonAttr || 'site_no';
+        this.commonAttr = config.commonAttr;
         this.layer = config.layer || '';
         this.modelName = config.modelName || '';
         this.modelerName = config.modelerName || '';
