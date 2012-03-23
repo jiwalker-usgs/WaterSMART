@@ -18,7 +18,16 @@ public class CSWTransactionHelper {
     
     private static DynamicReadOnlyProperties props = JNDISingleton.getInstance();
     private final String TRANSACTION_HEADER = "<csw:Transaction service=\"CSW\" version=\"2.0.2\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:dc=\"http://www.purl.org/dc/elements/1.1/\">";
+    private static final String XPATH_SUBSTITUTION_SCENARIO = "{scenario}";
+    private static final String XPATH_SUBSTITUTION_MODEL_VERSION = "{modelVersion}";
+    private static final String XPATH_SUBSTITUTION_RUN_IDENTIFIER = "{runIdentifier}";
+    
     private RunMetadata metadataBean;
+    
+    private String updateXpathTemplate = "/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification[@id='ncSOS']/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString[text()='" +
+                               XPATH_SUBSTITUTION_SCENARIO + "']/../../gmd:edition/gco:CharacterString[text()='" + 
+                               XPATH_SUBSTITUTION_MODEL_VERSION + "." + XPATH_SUBSTITUTION_RUN_IDENTIFIER + 
+                               "']/../../../..";
     
     public CSWTransactionHelper(RunMetadata runMeta) {
         this.metadataBean = runMeta;

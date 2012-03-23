@@ -29,6 +29,14 @@ public class RunMetadata {
     private String layerName;
     private String commonAttribute;
     
+    public static final String XPATH_LOCATOR_NAME = "/gmd:citation/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:individualName/gco:CharacterString";
+    // Edition is modelVersion and runIdentifier, need to be changed at same time
+    public static final String XPATH_LOCATOR_EDITION = "/gmd:citation/gmd:CI_Citation/gmd:edition/gco:CharacterString";
+    public static final String XPATH_LOCATOR_DATE = "/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:DateTime";
+    public static final String XPATH_LOCATOR_SCENARIO = "/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString";
+    public static final String XPATH_LOCATOR_EMAIL = "/gmd:citation/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gco:CharacterString";
+    public static final String XPATH_LOCATOR_COMMENTS = "/gmd:abstract/gco:CharacterString";
+    
     public RunMetadata() {
         type = null;
         modelId = null;
