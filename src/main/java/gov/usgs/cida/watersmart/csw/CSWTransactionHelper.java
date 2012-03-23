@@ -122,7 +122,7 @@ public class CSWTransactionHelper {
         filterXml.append("<csw:Constraint version=\"1.1.0\">")
                 .append("<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\">")
                 .append("<ogc:PropertyIsEqualTo>")
-                .append("<ogc:PropertyName>FileIdentifier</ogc:PropertyName>")
+                .append("<ogc:PropertyName>Identifier</ogc:PropertyName>")
                 .append("<ogc:Literal>").append(identifier).append("</ogc:Literal>")
                 .append("</ogc:PropertyIsEqualTo>")
                 .append("</ogc:Filter>")
