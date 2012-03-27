@@ -35,6 +35,7 @@ public class CSWTransactionHelper {
     
     private static DynamicReadOnlyProperties props = JNDISingleton.getInstance();
     private final String TRANSACTION_HEADER = "<csw:Transaction service=\"CSW\" version=\"2.0.2\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:dc=\"http://www.purl.org/dc/elements/1.1/\">";
+    private final String TRANSACTION_FOOTER = "</csw:Transaction>";
     private static final String XPATH_SUBSTITUTION_SCENARIO = "{scenario}";
     private static final String XPATH_SUBSTITUTION_MODEL_VERSION = "{modelVersion}";
     private static final String XPATH_SUBSTITUTION_RUN_IDENTIFIER = "{runIdentifier}";
@@ -59,9 +60,11 @@ public class CSWTransactionHelper {
     public void insert() throws IOException, UnsupportedEncodingException, URISyntaxException, ParserConfigurationException, SAXException {
         Document getRecordsDoc = getRecordsCall();
         NodeList nodes = getRecordsDoc.getElementsByTagNameNS(NAMESPACE_GMD, "MD_Metadata");
+        
         if (nodes.getLength() != 1) {
             throw new RuntimeException("Record not inserted, could not narrow search down to one record");
         }
+        
         Node recordNode = nodes.item(0);
         // not complete, node will be lacking
         recordNode.appendChild(buildServiceIdentificationNode(getRecordsDoc));
@@ -72,7 +75,7 @@ public class CSWTransactionHelper {
         }
         
         String insertXml = buildUpdateEnvelope(recordNode.toString(), metadataBean.getModelId());
-        HttpResponse performCSWPost = performCSWPost(insertXml);
+//        HttpResponse postResponse = performCSWPost(insertXml);
         // check that it updated alright
     }
     
@@ -138,7 +141,7 @@ public class CSWTransactionHelper {
                 .append("<csw:Insert>")
                 .append(record)
                 .append("</csw:Insert>")
-                .append("</csw:Transaction>");
+                .append(this.TRANSACTION_FOOTER);
         
         return insertXml.toString();
     }
@@ -150,7 +153,7 @@ public class CSWTransactionHelper {
                 .append("<csw:Delete typeName=\"csw:Record\">")
                 .append(this.buildIdentifierFilter(identifier))
                 .append("</csw:Delete>")
-                .append("</csw:Transaction>");
+                .append(this.TRANSACTION_FOOTER);
         return deleteXml.toString();
     }
     
@@ -177,7 +180,7 @@ public class CSWTransactionHelper {
                 
         updateXml.append(this.buildIdentifierFilter(identifier))
                 .append("</csw:Update>")
-                .append("</csw:Transaction>");
+                .append(this.TRANSACTION_FOOTER);
         
         return updateXml.toString();
     }
