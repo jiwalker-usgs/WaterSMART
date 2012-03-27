@@ -152,7 +152,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
                                 id: 'plotter-window',
                                 title: event.features[0].attributes.station_nm,
                                 anchored: false,
-                                width: 600,
+                                width: 900,
                                 height: 300,
                                 map: this.map,
                                 collapsible: true,
@@ -166,7 +166,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
                                         popup.removeAll(false);
                                     },
                                     'show' : function(popup) {
-                                        if (popup.anchored) popup.unanchorPopup();
+                                        if (popup.anc != null) popup.unanchorPopup();
                                     }
                                 }
                             });
