@@ -56,11 +56,13 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         var runIdentifier = 0;
                         var abstrakt = '';
                         var runDate;
+                        var scenario;
                         
                         modelVersion = serviceIdentification.citation.edition.CharacterString.value.split('.')[0];
                         runIdentifier = serviceIdentification.citation.edition.CharacterString.value.split('.')[1];
                         abstrakt = serviceIdentification['abstract'].CharacterString.value;
                         runDate = Date.parseDate(serviceIdentification.citation.date[0].date[0].DateTime.value.split('T')[0], 'Y-m-d');
+                        scenario = serviceIdentification.citation.title.CharacterString.value;
                         
                         for (var i = 0;i < modelStore.data.rec.data.identificationInfo.length;i++) {
                             var iiItem = modelStore.data.rec.data.identificationInfo[i];
@@ -83,7 +85,8 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                             modelVersion : modelVersion,
                             runIdentifier : runIdentifier,
                             wfsUrl : wfsUrl,
-                            runDate : runDate
+                            runDate : runDate,
+                            scenario : scenario
                         });
                     
                         var modalRunWindow = new Ext.Window({
@@ -142,6 +145,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                             modelName : comboValue,
                             modelVersion : modelVersion,
                             runIdentifier : runIdentifier,
+                            scenario : '',
                             wfsUrl : wfsUrl
                         });
                     
