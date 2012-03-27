@@ -41,7 +41,7 @@ public class CreateDSGFromZip {
         String filename = srcZip.getName().replace(".zip", ".nc");
         
         File ncFile = new File(sosPath + File.separator + runMeta.getTypeString() +
-                               File.separator +filename);
+                               File.separator + filename);
         ZipFile zip = new ZipFile(srcZip);
         Enumeration<? extends ZipEntry> entries = zip.entries();
         StationTimeSeriesNetCDFFile nc = null;

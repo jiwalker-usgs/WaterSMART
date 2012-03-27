@@ -1,16 +1,11 @@
 package gov.usgs.cida.watersmart.parse;
 
-import static gov.usgs.cida.watersmart.csw.CSWTransactionHelper.*;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ModelType;
 import java.io.File;
 import org.apache.commons.fileupload.FileItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tuckey.noclash.gzipfilter.org.apache.commons.lang.StringUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.Text;
 
 /**
  *
@@ -141,7 +136,7 @@ public class RunMetadata {
         if (StringUtils.isNotBlank(dirPath)) {
             File dir = new File(dirPath);
             if (dir.exists() && dir.canWrite()) {
-                String file = type.toString().toLowerCase() + "-" + scenario + "-" + modelVersion + "." + runIdent + UPLOAD_EXTENSION;
+                String file = getFileName() + UPLOAD_EXTENSION;
                 return new File(dirPath + File.separator + file);
             }
         }
@@ -149,6 +144,16 @@ public class RunMetadata {
         String err = "Must pass in a valid directory in which to create file";
         LOG.debug(err);
         throw new IllegalArgumentException(err);
+    }
+    
+    public String getFileName() {
+        StringBuilder str = new StringBuilder();
+        str.append(getTypeString())
+           .append("-")
+           .append(scenario)
+           .append("-")
+           .append(getEditionString());
+        return str.toString();
     }
 
     public String getComments() {
@@ -259,86 +264,5 @@ public class RunMetadata {
     
     public String getEditionString() {
         return modelVersion + "." + runIdent;
-    }
-    
-    public Node makeIdentificationInfo(Document doc) {
-        Node identificationInfo = doc.createElementNS(NAMESPACE_GMD, "identificationInfo");
-        Element serviceIdentification = doc.createElementNS(NAMESPACE_SRV, "SV_ServiceIdentification");
-        serviceIdentification.setAttribute("id", "ncSOS");
-        serviceIdentification.appendChild(makeCitation(doc));
-        serviceIdentification.appendChild(makeDate(doc));
-        serviceIdentification.appendChild(makeAbstract(doc));
-        serviceIdentification.appendChild(makeServiceType(doc));
-        serviceIdentification.appendChild(makeCouplingType(doc));
-        serviceIdentification.appendChild(makeContainsOperations(doc));
-        serviceIdentification.appendChild(makeOperatesOn(doc));
-        return identificationInfo;
-    }
-    
-    private Node makeCitation(Document doc) {
-        Element citation = doc.createElementNS(NAMESPACE_GMD, "citation");
-        Element CIcitation = doc.createElementNS(NAMESPACE_GMD, "CI_Citation");
-        Node title = makeTitle(doc);
-        // Do other sections
-        CIcitation.appendChild(title);
-        citation.appendChild(CIcitation);
-        return citation;
-    }
-    
-    private Node makeTitle(Document doc) {
-        Element title = doc.createElementNS(NAMESPACE_GMD, "title");
-        Element charString = doc.createElementNS(NAMESPACE_GCO, "CharacterString");
-        Text text = doc.createTextNode(getScenario());
-        charString.appendChild(text);
-        title.appendChild(charString);
-        return title;
-    }
-    
-    private Node makeDate(Document doc) {
-        Element date = doc.createElementNS(NAMESPACE_GMD, "date");
-        Element CIdate = doc.createElementNS(NAMESPACE_GMD, "CI_Date");
-        Element innerDate = doc.createElementNS(NAMESPACE_GMD, "date");
-        Element dateTime = doc.createElementNS(NAMESPACE_GCO, "DateTime");
-        Text text = doc.createTextNode(getCreationDate());
-        dateTime.appendChild(text);
-        innerDate.appendChild(dateTime);
-        Element dateType = doc.createElementNS(NAMESPACE_GMD, "dateType");
-        Element CIDateTypeCode = doc.createElementNS(NAMESPACE_GMD, "CI_DateTypeCode");
-        CIDateTypeCode.setAttribute("codeListValue", "revision");
-        CIDateTypeCode.setAttribute("codeList", "http://www.isotc211.org/2005/resources/codeList.xml#CI_DateTypeCode");
-        dateType.appendChild(CIDateTypeCode);
-        CIdate.appendChild(innerDate);
-        CIdate.appendChild(CIDateTypeCode);
-        date.appendChild(CIdate);
-        return date;
-    }
-    
-    private Node makeEdition(Document doc) {
-        Element edition = doc.createElementNS(NAMESPACE_GMD, "edition");
-        Element charString = doc.createElementNS(NAMESPACE_GCO, "CharacterString");
-        Text text = doc.createTextNode(getEditionString());
-        charString.appendChild(text);
-        edition.appendChild(charString);
-        return edition;
-    }
-    
-    private Node makeAbstract(Document doc) {
-        return null;
-    }
-    
-    private Node makeServiceType(Document doc) {
-        return null;
-    }
-    
-    private Node makeCouplingType(Document doc) {
-        return null;
-    }
-    
-    private Node makeContainsOperations(Document doc) {
-        return null;
-    }
-    
-    private Node makeOperatesOn(Document doc) {
-        return null;
     }
 }

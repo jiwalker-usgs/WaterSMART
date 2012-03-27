@@ -1,6 +1,7 @@
 package gov.usgs.cida.watersmart.csw;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
+import gov.usgs.cida.watersmart.iso.ISOServiceIdentification;
 import gov.usgs.cida.watersmart.parse.RunMetadata;
 import gov.usgs.cida.watersmart.util.JNDISingleton;
 import java.io.IOException;
@@ -46,8 +47,10 @@ public class CSWTransactionHelper {
     public static final String NAMESPACE_GMD = "http://www.isotc211.org/2005/gmd";
     public static final String NAMESPACE_SRV = "http://www.isotc211.org/2005/srv";
     public static final String NAMESPACE_GCO = "http://www.isotc211.org/2005/gco";
+    public static final String NAMESPACE_XLINK = "http://www.w3.org/1999/xlink";
     
     private RunMetadata metadataBean;
+    private String ncFile;
     private GeonetworkSession cswSession;
     
     private String updateXpathTemplate = "/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification[@id='ncSOS']/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString[text()='" +
@@ -55,8 +58,9 @@ public class CSWTransactionHelper {
                                XPATH_SUBSTITUTION_MODEL_VERSION + "." + XPATH_SUBSTITUTION_RUN_IDENTIFIER + 
                                "']/../../../..";
     
-    public CSWTransactionHelper(RunMetadata runMeta) {
+    public CSWTransactionHelper(RunMetadata runMeta, String ncFile) {
         this.metadataBean = runMeta;
+        this.ncFile = ncFile;
         this.cswSession = new GeonetworkSession();
     }
     
@@ -70,12 +74,14 @@ public class CSWTransactionHelper {
         
         Node recordNode = nodes.item(0);
         // not complete, node will be lacking
-        recordNode.appendChild(buildServiceIdentificationNode(getRecordsDoc));
         
         String sosRepo = props.getProperty("watersmart.sos.model.repo");
         if (sosRepo == null) {
             throw new RuntimeException("Record not inserted, must specify thredds location");
         }
+        recordNode.appendChild(buildServiceIdentificationNode(sosRepo, getRecordsDoc));
+        
+
         
         String insertXml = buildUpdateEnvelope(recordNode.toString(), metadataBean.getModelId());
 //        HttpResponse postResponse = performCSWPost(insertXml);
@@ -214,8 +220,11 @@ public class CSWTransactionHelper {
         return filterXml.toString();
     }
     
-    private Node buildServiceIdentificationNode(Document doc) {
-        Node idNode = metadataBean.makeIdentificationInfo(doc);
+    private Node buildServiceIdentificationNode(String sosRepo, Document doc) {
+        String sosEndpoint = sosRepo + "/" + metadataBean.getTypeString() + "/" + ncFile;
+        
+        ISOServiceIdentification iso = new ISOServiceIdentification(metadataBean, sosEndpoint, doc);
+        Node idNode = iso.makeIdentificationInfo();
         return idNode;
     }
     

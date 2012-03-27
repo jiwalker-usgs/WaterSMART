@@ -77,7 +77,7 @@ public class Upload extends HttpServlet {
                     destinationFile = meta.getFile(tempDir);
                     saveFileFromRequest(fileIn, destinationFile);
                     String filename = CreateDSGFromZip.create(destinationFile, meta);
-                    CSWTransactionHelper helper = new CSWTransactionHelper(meta);
+                    CSWTransactionHelper helper = new CSWTransactionHelper(meta, filename);
                     helper.insert();
                 } else {
                     throw new Exception("Must provide all required parameters");
