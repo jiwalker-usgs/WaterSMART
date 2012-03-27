@@ -22,7 +22,9 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -36,6 +38,7 @@ public class CSWTransactionHelper {
     private static DynamicReadOnlyProperties props = JNDISingleton.getInstance();
     private final String TRANSACTION_HEADER = "<csw:Transaction service=\"CSW\" version=\"2.0.2\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:dc=\"http://www.purl.org/dc/elements/1.1/\">";
     private final String TRANSACTION_FOOTER = "</csw:Transaction>";
+    
     private static final String XPATH_SUBSTITUTION_SCENARIO = "{scenario}";
     private static final String XPATH_SUBSTITUTION_MODEL_VERSION = "{modelVersion}";
     private static final String XPATH_SUBSTITUTION_RUN_IDENTIFIER = "{runIdentifier}";
@@ -174,11 +177,9 @@ public class CSWTransactionHelper {
         StringBuilder updateXml = new StringBuilder();
         
         updateXml.append(this.TRANSACTION_HEADER)
-                .append("<csw:Update>");
-        
-        updateXml.append(recordXml);
-                
-        updateXml.append(this.buildIdentifierFilter(identifier))
+                .append("<csw:Update>")
+                .append(recordXml)
+                .append(this.buildIdentifierFilter(identifier))
                 .append("</csw:Update>")
                 .append(this.TRANSACTION_FOOTER);
         
