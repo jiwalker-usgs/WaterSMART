@@ -47,6 +47,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         var selectedRun = this.runPanel.currentlySelectedRun;
                         var comboValue = this.getTopToolbar().get('model-combobox').getValue();
                         var modelStore = this.getTopToolbar().get('model-combobox').getStore().getById(comboValue);
+                        var modelId = modelStore.data.rec.data.fileIdentifier;
                         var serviceIdentification = selectedRun.serviceIdentification;
                         var wfsUrl = '';
                         var layer = '';
@@ -72,6 +73,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         
                         var isoFormPanel = new WaterSMART.ISOFormPanel({
                             title : selectedRun.title,
+                            modelId : modelId,
                             'abstract' : abstrakt,
                             commonAttr : commonAttr,
                             create : false,
@@ -106,6 +108,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         LOG.debug('ModelRunSelectionPanel.js::User clicked on "Create A Run" button.')
                         var comboValue = this.getTopToolbar().get('model-combobox').getValue();
                         var modelStore = this.getTopToolbar().get('model-combobox').getStore().getById(comboValue);
+                        var modelId = modelStore.data.rec.data.fileIdentifier;
                         var wfsUrl = '';
                         var layer = '';
                         var commonAttr = this.commonAttr;
@@ -131,6 +134,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         
                         var isoFormPanel = new WaterSMART.ISOFormPanel({
                             title : 'Create A New Run',
+                            modelId : modelId,
                             commonAttr : commonAttr,
                             create : true,
                             layer : layer,

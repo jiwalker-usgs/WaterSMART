@@ -84,7 +84,7 @@ public class Upload extends HttpServlet {
                 }
             } catch (Exception ex) {
                 // pass exception text along?
-                sendErrorResponse(response, "Unable to upload file");
+                sendErrorResponse(response, "Unable to upload file: " + ex.getMessage());
                 return;
             }
         } else {
