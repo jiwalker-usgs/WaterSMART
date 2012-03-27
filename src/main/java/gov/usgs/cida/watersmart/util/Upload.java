@@ -99,8 +99,7 @@ public class Upload extends HttpServlet {
 //            }
         }
 
-        String responseText = null;
-        responseText = "{success: true, file: '" + destinationFile.getName() + "'}";
+        String responseText = "{success: true, file: '" + destinationFile.getName() + "'}";
         // can do post processing stuff here
         sendResponse(response, responseText);
     }

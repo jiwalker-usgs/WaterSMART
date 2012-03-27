@@ -11,9 +11,19 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
     modelVersion : undefined,
     runIdentifier : undefined,
     runDate : undefined,
+    scenario : undefined,
     wfsUrl : undefined,
     xmlTransform : undefined,
     'abstract' : undefined,
+    
+    originalAbstract : undefined,
+    originalModelerName : undefined,
+    originalModelName : undefined,
+    originalModelVersion : undefined,
+    originalRunIdentifier : undefined,
+    originalRunDate : undefined,
+    originalScenario : undefined,
+    
     constructor : function(config) {
         
         if (!config) config = {};
@@ -21,21 +31,22 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
         this.commonAttr = config.commonAttr;
         this.layer = config.layer || '';
         this.modelId = config.modelId || '';
-        this.modelName = config.modelName || '';
-        this.modelerName = config.modelerName || '';
-        this.runIdentifier = config.runIdentifier || 0;
-        this.modelVersion = config.modelVersion || 0;
-        this.runDate = config.runDate || new Date();
+        this.modelName = this.originalModelName = config.modelName || '';
+        this.modelerName = this.originalModelerName = config.modelerName || '';
+        this.runIdentifier = this.originalRunIdentifier = config.runIdentifier || 0;
+        this.modelVersion = this.originalModelVersion = config.modelVersion || 0;
+        this.runDate = this.originalRunDate = config.runDate || new Date();
+        this.scenario = this.originalScenario = config.scenario;
         this.wfsUrl = config.wfsUrl || '';
         this.create = config.create;
-        this['abstract'] = config['abstract'] || '';
+        this['abstract'] = this.originalAbstract = config['abstract'] || '';
         
         config = Ext.apply({
             id: 'metadata-form',
             bodyPadding: 5,
             region: 'center',
             width: '100%',
-            url: 'pages/index/Utils/isorecord.jsp',
+            url: 'update',
             defaultType: 'textfield',
             items: [{
                 fieldLabel: 'Modeler Name',
@@ -68,6 +79,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                 fieldLabel: 'Calibration/ Validation Scenario',
                 name: 'scenario',
                 allowBlank: false,
+                value : this.create ? '' : this.scenario,
                 anchor: '95%'
             },{
                 fieldLabel: 'Comments',
@@ -115,39 +127,39 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                                     msg:'Upload succeeded'
                                 })
                             
-                                var form = Ext.getCmp('metadata-form');
-                                form.getForm().submit({
-                                    url: form.url,
-                                    params: {
-                                        transaction: true,
-                                        modeltype : ''
-                                    },
-                                    waitMsg: 'Saving...',
-                                    success: function(x, action) {
-                                        LOG.debug('');
-                                    var form = Ext.getCmp('metadata-form');
-                                    var xml = action.response.responseXML;
-
-                                    Ext.Ajax.request({
-                                        url: 'updatecsw',
-                                        method: 'POST',
-                                        xmlData: xml,
-                                        success: function(response) {
-                                            var result = response.responseText;
-                                            LOG.debug(result);
-                                        },
-                                        failure: function(panel, fail) {
-                                            LOG.debug(fail);
-                                        }
-                                    });
-                                    },
-                                    failure: function(panel, fail) {
-                                        LOG.info('')
-                                        NOTIFY.error({
-                                            msg : fail.result.message
-                                        })
-                                    }
-                                });
+//                                var form = Ext.getCmp('metadata-form');
+//                                form.getForm().submit({
+//                                    url: form.url,
+//                                    params: {
+//                                        transaction: true,
+//                                        modeltype : ''
+//                                    },
+//                                    waitMsg: 'Saving...',
+//                                    success: function(x, action) {
+//                                        LOG.debug('');
+//                                    var form = Ext.getCmp('metadata-form');
+//                                    var xml = action.response.responseXML;
+//
+//                                    Ext.Ajax.request({
+//                                        url: 'updatecsw',
+//                                        method: 'POST',
+//                                        xmlData: xml,
+//                                        success: function(response) {
+//                                            var result = response.responseText;
+//                                            LOG.debug(result);
+//                                        },
+//                                        failure: function(panel, fail) {
+//                                            LOG.debug(fail);
+//                                        }
+//                                    });
+//                                    },
+//                                    failure: function(panel, fail) {
+//                                        LOG.info('')
+//                                        NOTIFY.error({
+//                                            msg : fail.result.message
+//                                        })
+//                                    }
+//                                });
                             },
                             failure: function(panel, fail) {
                                 LOG.info('isoFormPanel.js:: User upload failed.');
@@ -160,14 +172,43 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                         var form = Ext.getCmp('metadata-form');
                         form.getForm().submit({
                             url: form.url,
+                            scope : this,
                             params: {
-                                transaction: true,
-                                modeltype : ''
+                                name : metadataForm.name,
+                                originalName : this.ownerCt.ownerCt.orginalModelerName,
+                                
+                                modelId : isoFormPanel.modelId,
+                                
+                                modelVersion : metadataForm.version,
+                                originalModelVersion : form.originalModelVersion,
+                                
+                                runIdent : metadataForm.runIdent,
+                                originalRunIdent : form.originalRunIdentifier,
+                                
+                                creationDate : metadataForm.creationDate,
+                                originalCreationDate : form.originalRunDate.format('m/d/Y'),
+                                
+                                scenario : metadataForm.scenario,
+                                originalScenario : form.originalScenario,
+                                
+                                comments : metadataForm.comments,
+                                originalComments : form.originalAbstract,
+                                
+                                email : WATERSMART.USER_EMAIL,
+                                
+                                modeltype : isoFormPanel.modelName,
+                                wfsUrl : isoFormPanel.wfsUrl,
+                                layer : isoFormPanel.layer,
+                                commonAttr : isoFormPanel.commonAttr,
+                                transaction: true
                             },
                             waitMsg: 'Saving...',
-                            success: function(x, action) {
+                            success: function(form, action) {
+                                NOTIFY.info({ msg : action.result.msg });
+                                this.ownerCt.ownerCt.ownerCt.close();
                             },
-                            failure: function(panel, fail) {
+                            failure: function(form, action) {
+                                NOTIFY.warn({ msg : action.result.msg });
                             }
                         });
                     }
