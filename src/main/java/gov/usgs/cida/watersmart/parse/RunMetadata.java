@@ -52,6 +52,21 @@ public class RunMetadata {
         commonAttribute = null;
     }
     
+    public RunMetadata(ModelType type, String modelId, String name, String modelVersion, String runIdent, String creationDate, String scenario, String comments, String email, String wfsUrl, String layerName, String commonAttribute) {
+        this.type = type;
+        this.modelId = modelId;
+        this.name = name;
+        this.modelVersion = modelVersion;
+        this.runIdent = runIdent;
+        this.creationDate = creationDate;
+        this.scenario = scenario;
+        this.comments = comments;
+        this.email = email;
+        this.wfsUrl = wfsUrl;
+        this.layerName = layerName;
+        this.commonAttribute = commonAttribute;
+    }
+    
     public boolean isFilledIn() {
         return (type != null &&
                 StringUtils.isNotBlank(modelId) &&
