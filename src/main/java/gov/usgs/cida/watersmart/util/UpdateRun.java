@@ -1,5 +1,8 @@
 package gov.usgs.cida.watersmart.util;
 
+import gov.usgs.cida.watersmart.parse.CreateDSGFromZip;
+import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ModelType;
+import gov.usgs.cida.watersmart.parse.RunMetadata;
 import java.io.IOException;
 import java.io.Writer;
 import javax.servlet.ServletException;
@@ -30,8 +33,66 @@ public class UpdateRun extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         LOG.debug("Received new update request");
+        
+        String modelerName = request.getParameter("name");
+        String originalModelerName = request.getParameter("originalName");
+        String modelId = request.getParameter("modelId");
+        String modelType = request.getParameter("modeltype");
+        String modelVersion = request.getParameter("version");
+        String originalModelVersion = request.getParameter("originalModelVersion");
+        String runIdent = request.getParameter("runIdent");
+        String originalRunIdent = request.getParameter("originalRunIdent");
+        String runDate = request.getParameter("creationDate");
+        String originalRunDate = request.getParameter("originalCreationDate");
+        String scenario = request.getParameter("scenario");
+        String originalScenario = request.getParameter("originalScenario");
+        String comments = request.getParameter("comments");
+        String originalComments = request.getParameter("originalComments");
+        String email = request.getParameter("email");
+        String wfsUrl = request.getParameter("wfsUrl");
+        String layer = request.getParameter("layer");
+        String commonAttr = request.getParameter("commonAttr");
+        
+        ModelType modelTypeEnum = null;
+        if ("prms".equals(modelType.toLowerCase())) modelTypeEnum = ModelType.PRMS;
+        if ("afinch".equals(modelType.toLowerCase())) modelTypeEnum = ModelType.AFINCH;
+        if ("waters".equals(modelType.toLowerCase())) modelTypeEnum = ModelType.WATERS;
+        if ("sye".equals(modelType.toLowerCase())) modelTypeEnum = ModelType.SYE;
+        
+        RunMetadata metaData = new RunMetadata(
+                modelTypeEnum,
+                modelId,
+                modelerName,
+                modelVersion,
+                runIdent,
+                runDate,
+                scenario,
+                comments,
+                email,
+                wfsUrl,
+                layer,
+                commonAttr
+        );
+        
+        RunMetadata originalMetaData = new RunMetadata(
+                modelTypeEnum,
+                modelId,
+                originalModelerName,
+                originalModelVersion,
+                originalRunIdent,
+                originalRunDate,
+                originalScenario,
+                originalComments,
+                email, 
+                wfsUrl,
+                layer,
+                commonAttr
+        );
+        
+        
+        
         boolean success = true;
-        String responseText = null;
+        String responseText;
         if (success) {
             responseText = "{success: true, msg: 'The record has been updated'}";
         } else {

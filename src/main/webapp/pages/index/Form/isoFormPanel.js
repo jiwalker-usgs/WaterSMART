@@ -174,28 +174,14 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                             url: form.url,
                             scope : this,
                             params: {
-                                name : metadataForm.name,
-                                originalName : this.ownerCt.ownerCt.orginalModelerName,
-                                
                                 modelId : isoFormPanel.modelId,
-                                
-                                modelVersion : metadataForm.version,
+                                originalName : isoFormPanel.originalModelerName,
                                 originalModelVersion : form.originalModelVersion,
-                                
-                                runIdent : metadataForm.runIdent,
                                 originalRunIdent : form.originalRunIdentifier,
-                                
-                                creationDate : metadataForm.creationDate,
                                 originalCreationDate : form.originalRunDate.format('m/d/Y'),
-                                
-                                scenario : metadataForm.scenario,
                                 originalScenario : form.originalScenario,
-                                
-                                comments : metadataForm.comments,
                                 originalComments : form.originalAbstract,
-                                
                                 email : WATERSMART.USER_EMAIL,
-                                
                                 modeltype : isoFormPanel.modelName,
                                 wfsUrl : isoFormPanel.wfsUrl,
                                 layer : isoFormPanel.layer,
@@ -208,7 +194,12 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                                 this.ownerCt.ownerCt.ownerCt.close();
                             },
                             failure: function(form, action) {
-                                NOTIFY.warn({ msg : action.result.msg });
+                                if (action.failureType === 'client') {
+                                    NOTIFY.warn({ msg : 'Please ensure all input data is valid'})
+                                } else {
+                                    NOTIFY.warn({ msg : action.result.msg });
+                                }
+                                
                             }
                         });
                     }
