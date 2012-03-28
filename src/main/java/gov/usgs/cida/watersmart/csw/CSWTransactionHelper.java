@@ -64,6 +64,10 @@ public class CSWTransactionHelper {
         this.cswSession = new GeonetworkSession();
     }
     
+    public CSWTransactionHelper(RunMetadata runMeta) {
+        this(runMeta, null);
+    }
+    
     public void insert() throws IOException, UnsupportedEncodingException, URISyntaxException, ParserConfigurationException, SAXException {
         Document getRecordsDoc = getRecordsCall();
         NodeList nodes = getRecordsDoc.getElementsByTagNameNS(NAMESPACE_GMD, "MD_Metadata");
@@ -88,7 +92,7 @@ public class CSWTransactionHelper {
         // check that it updated alright
     }
     
-    public void update(RunMetadata oldInfo, RunMetadata newInfo) {
+    public void update(RunMetadata oldInfo) {
         //String updateXml = buildUpdateEnvelope(null, null);
     }
     

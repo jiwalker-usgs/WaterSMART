@@ -1,5 +1,6 @@
 package gov.usgs.cida.watersmart.util;
 
+import gov.usgs.cida.watersmart.csw.CSWTransactionHelper;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ModelType;
 import gov.usgs.cida.watersmart.parse.RunMetadata;
@@ -89,7 +90,9 @@ public class UpdateRun extends HttpServlet {
                 commonAttr
         );
         
+        CSWTransactionHelper helper = new CSWTransactionHelper(metaData);
         
+        helper.update(originalMetaData);
         
         boolean success = true;
         String responseText;
