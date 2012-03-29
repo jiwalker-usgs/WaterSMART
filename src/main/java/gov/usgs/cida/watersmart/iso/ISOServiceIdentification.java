@@ -24,8 +24,8 @@ public class ISOServiceIdentification {
     }
     
     public Node makeIdentificationInfo() {
-        Node identificationInfo = document.createElementNS(NAMESPACE_GMD, "identificationInfo");
-        Element serviceIdentification = document.createElementNS(NAMESPACE_SRV, "SV_ServiceIdentification");
+        Node identificationInfo = document.createElementNS(NAMESPACE_GMD, "gmd:identificationInfo");
+        Element serviceIdentification = document.createElementNS(NAMESPACE_SRV, "srv:SV_ServiceIdentification");
         serviceIdentification.setAttribute("id", "ncSOS");
         serviceIdentification.appendChild(makeCitation());
         serviceIdentification.appendChild(makeAbstract());
@@ -38,8 +38,8 @@ public class ISOServiceIdentification {
     }
     
     private Node makeCitation() {
-        Element citation = document.createElementNS(NAMESPACE_GMD, "citation");
-        Element ciCitation = document.createElementNS(NAMESPACE_GMD, "CI_Citation");
+        Element citation = document.createElementNS(NAMESPACE_GMD, "gmd:citation");
+        Element ciCitation = document.createElementNS(NAMESPACE_GMD, "gmd:CI_Citation");
         Node title = makeTitle();
         Node date = makeDate();
         Node edition = makeEdition();
@@ -56,41 +56,41 @@ public class ISOServiceIdentification {
     }
     
     private Node makeTitle() {
-        Element title = document.createElementNS(NAMESPACE_GMD, "title");
+        Element title = document.createElementNS(NAMESPACE_GMD, "gmd:title");
         Node charString = makeCharacterString(metadata.getScenario());
         title.appendChild(charString);
         return title;
     }
     
     private Node makeDate() {
-        Element date = document.createElementNS(NAMESPACE_GMD, "date");
-        Element CIdate = document.createElementNS(NAMESPACE_GMD, "CI_Date");
-        Element innerDate = document.createElementNS(NAMESPACE_GMD, "date");
-        Element dateTime = document.createElementNS(NAMESPACE_GCO, "DateTime");
+        Element date = document.createElementNS(NAMESPACE_GMD, "gmd:date");
+        Element CIdate = document.createElementNS(NAMESPACE_GMD, "gmd:CI_Date");
+        Element innerDate = document.createElementNS(NAMESPACE_GMD, "gmd:date");
+        Element dateTime = document.createElementNS(NAMESPACE_GCO, "gco:DateTime");
         Text text = document.createTextNode(metadata.getCreationDate());
         dateTime.appendChild(text);
         innerDate.appendChild(dateTime);
-        Element dateType = document.createElementNS(NAMESPACE_GMD, "dateType");
-        Element CIDateTypeCode = document.createElementNS(NAMESPACE_GMD, "CI_DateTypeCode");
+        Element dateType = document.createElementNS(NAMESPACE_GMD, "gmd:dateType");
+        Element CIDateTypeCode = document.createElementNS(NAMESPACE_GMD, "gmd:CI_DateTypeCode");
         CIDateTypeCode.setAttribute("codeListValue", "revision");
         CIDateTypeCode.setAttribute("codeList", "http://www.isotc211.org/2005/resources/codeList.xml#CI_DateTypeCode");
         dateType.appendChild(CIDateTypeCode);
         CIdate.appendChild(innerDate);
-        CIdate.appendChild(CIDateTypeCode);
+        CIdate.appendChild(dateType);
         date.appendChild(CIdate);
         return date;
     }
     
     private Node makeEdition() {
-        Element edition = document.createElementNS(NAMESPACE_GMD, "edition");
+        Element edition = document.createElementNS(NAMESPACE_GMD, "gmd:edition");
         Node charString = makeCharacterString(metadata.getEditionString());
         edition.appendChild(charString);
         return edition;
     }
     
     private Node makeCitedResponsibleParty() {
-        Element citedResponsibleParty = document.createElementNS(NAMESPACE_GMD, "citedResponsibleParty");
-        Element ciResponsibleParty = document.createElementNS(NAMESPACE_GMD, "CI_ResponsibleParty");
+        Element citedResponsibleParty = document.createElementNS(NAMESPACE_GMD, "gmd:citedResponsibleParty");
+        Element ciResponsibleParty = document.createElementNS(NAMESPACE_GMD, "gmd:CI_ResponsibleParty");
         Node individualName = makeIndividualName();
         Node contactInfo = makeContactInfo();
         Node role = makeRole();
@@ -102,15 +102,15 @@ public class ISOServiceIdentification {
     }
     
     private Node makeIndividualName() {
-        Element individualName = document.createElementNS(NAMESPACE_GMD, "individualName");
+        Element individualName = document.createElementNS(NAMESPACE_GMD, "gmd:individualName");
         Node charString = makeCharacterString(metadata.getName());
         individualName.appendChild(charString);
         return individualName;
     }
     
     private Node makeContactInfo() {
-        Element contactInfo = document.createElementNS(NAMESPACE_GMD, "contactInfo");
-        Element ciContact = document.createElementNS(NAMESPACE_GMD, "CI_Contact");
+        Element contactInfo = document.createElementNS(NAMESPACE_GMD, "gmd:contactInfo");
+        Element ciContact = document.createElementNS(NAMESPACE_GMD, "gmd:CI_Contact");
         // TODO phone number if available
         Node address = makeAddress();
         ciContact.appendChild(address);
@@ -119,8 +119,8 @@ public class ISOServiceIdentification {
     }
     
     private Node makeAddress() {
-        Element address = document.createElementNS(NAMESPACE_GMD, "address");
-        Element ciAddress = document.createElementNS(NAMESPACE_GMD, "CI_Address");
+        Element address = document.createElementNS(NAMESPACE_GMD, "gmd:address");
+        Element ciAddress = document.createElementNS(NAMESPACE_GMD, "gmd:CI_Address");
         Node email = makeEmail();
         // should do other address types
         ciAddress.appendChild(email);
@@ -129,15 +129,15 @@ public class ISOServiceIdentification {
     }
     
     private Node makeEmail() {
-        Element email = document.createElementNS(NAMESPACE_GMD, "electronicMailAddress");
+        Element email = document.createElementNS(NAMESPACE_GMD, "gmd:electronicMailAddress");
         Node charString = makeCharacterString(metadata.getEmail());
         email.appendChild(charString);
         return email;
     }
     
     private Node makeRole() {
-        Element role = document.createElementNS(NAMESPACE_GMD, "role");
-        Element ciRoleCode = document.createElementNS(NAMESPACE_GMD, "CI_RoleCode");
+        Element role = document.createElementNS(NAMESPACE_GMD, "gmd:role");
+        Element ciRoleCode = document.createElementNS(NAMESPACE_GMD, "gmd:CI_RoleCode");
         ciRoleCode.setAttribute("codeList", "http://www.isotc211.org/2005/resources/codeList.xml#CI_RoleCode");
         ciRoleCode.setAttribute("codeListValue", "processor");
         role.appendChild(ciRoleCode);
@@ -145,8 +145,8 @@ public class ISOServiceIdentification {
     }
     
     private Node makePresentationForm() {
-        Element presForm = document.createElementNS(NAMESPACE_GMD, "presentationForm");
-        Element ciPresFormCode = document.createElementNS(NAMESPACE_GMD, "CI_PresentationFormCode");
+        Element presForm = document.createElementNS(NAMESPACE_GMD, "gmd:presentationForm");
+        Element ciPresFormCode = document.createElementNS(NAMESPACE_GMD, "gmd:CI_PresentationFormCode");
         ciPresFormCode.setAttribute("codeList", "http://www.isotc211.org/2005/resources/codeList.xml#CI_PresentationFormCode");
         ciPresFormCode.setAttribute("codeListValue", "modelDigital");
         presForm.appendChild(ciPresFormCode);
@@ -154,15 +154,15 @@ public class ISOServiceIdentification {
     }
     
     private Node makeAbstract() {
-        Element abstrakt = document.createElementNS(NAMESPACE_GMD, "abstract");
+        Element abstrakt = document.createElementNS(NAMESPACE_GMD, "gmd:abstract");
         Node charString = makeCharacterString(metadata.getComments());
         abstrakt.appendChild(charString);
         return abstrakt;
     }
     
     private Node makeServiceType() {
-        Element serviceType = document.createElementNS(NAMESPACE_SRV, "serviceType");
-        Element localName = document.createElementNS(NAMESPACE_GCO, "LocalName");
+        Element serviceType = document.createElementNS(NAMESPACE_SRV, "srv:serviceType");
+        Element localName = document.createElementNS(NAMESPACE_GCO, "gco:LocalName");
         Text text = document.createTextNode("OGC:SOS");
         localName.appendChild(text);
         serviceType.appendChild(localName);
@@ -170,8 +170,8 @@ public class ISOServiceIdentification {
     }
     
     private Node makeCouplingType() {
-        Element couplingType = document.createElementNS(NAMESPACE_SRV, "couplingType");
-        Element svCouplingType = document.createElementNS(NAMESPACE_SRV, "SV_CouplingType");
+        Element couplingType = document.createElementNS(NAMESPACE_SRV, "srv:couplingType");
+        Element svCouplingType = document.createElementNS(NAMESPACE_SRV, "srv:SV_CouplingType");
         svCouplingType.setAttribute("codeList", "http://www.isotc211.org/2005/iso19119/resources/Codelist/gmxCodelists.xml#SV_CouplingType");
         svCouplingType.setAttribute("codeListValue", "mixed");
         couplingType.appendChild(svCouplingType);
@@ -179,20 +179,20 @@ public class ISOServiceIdentification {
     }
     
     private Node makeContainsOperations() {
-        Element containsOperations = document.createElementNS(NAMESPACE_SRV, "containsOperations");
-        Element svOperationMetadata = document.createElementNS(NAMESPACE_SRV, "SV_OperationMetadata");
-        Element operationName = document.createElementNS(NAMESPACE_SRV, "operationName");
+        Element containsOperations = document.createElementNS(NAMESPACE_SRV, "srv:containsOperations");
+        Element svOperationMetadata = document.createElementNS(NAMESPACE_SRV, "srv:SV_OperationMetadata");
+        Element operationName = document.createElementNS(NAMESPACE_SRV, "srv:operationName");
         Node charString = makeCharacterString("GetOperation");
         operationName.appendChild(charString);
         // skipping DCP
-        Element connectPoint = document.createElementNS(NAMESPACE_SRV, "connectPoint");
-        Element ciOnlineResource = document.createElementNS(NAMESPACE_GMD, "CI_OnlineResource");
-        Element linkage = document.createElementNS(NAMESPACE_GMD, "linkage");
-        Element url = document.createElementNS(NAMESPACE_GMD, "URL");
+        Element connectPoint = document.createElementNS(NAMESPACE_SRV, "srv:connectPoint");
+        Element ciOnlineResource = document.createElementNS(NAMESPACE_GMD, "gmd:CI_OnlineResource");
+        Element linkage = document.createElementNS(NAMESPACE_GMD, "gmd:linkage");
+        Element url = document.createElementNS(NAMESPACE_GMD, "gmd:URL");
         Text text = document.createTextNode(sosEndpoint);
         url.appendChild(text);
         linkage.appendChild(url);
-        Element name = document.createElementNS(NAMESPACE_GMD, "name");
+        Element name = document.createElementNS(NAMESPACE_GMD, "gmd:name");
         Node charString2 = makeCharacterString(metadata.getFileName());
         name.appendChild(charString2);
         ciOnlineResource.appendChild(linkage);
@@ -205,13 +205,13 @@ public class ISOServiceIdentification {
     }
     
     private Node makeOperatesOn() {
-        Element operatesOn = document.createElementNS(NAMESPACE_SRV, "operatesOn");
-        operatesOn.setAttributeNS(NAMESPACE_XLINK, "href", "#DataIdentification");
+        Element operatesOn = document.createElementNS(NAMESPACE_SRV, "srv:operatesOn");
+        operatesOn.setAttributeNS(NAMESPACE_XLINK, "xlink:href", "#DataIdentification");
         return operatesOn;
     }
     
     private Node makeCharacterString(String str) {
-        Element charString = document.createElementNS(NAMESPACE_GCO, "CharacterString");
+        Element charString = document.createElementNS(NAMESPACE_GCO, "gco:CharacterString");
         Text text = document.createTextNode(str);
         charString.appendChild(text);
         return charString;

@@ -1,15 +1,16 @@
 package gov.usgs.cida.watersmart.parse;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ModelType;
 import java.io.File;
-import java.text.ParseException;
-import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeFormatterBuilder;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,13 +47,30 @@ public class RunMetadata {
                                XPATH_SUBSTITUTION_MODEL_VERSION + "." + XPATH_SUBSTITUTION_RUN_IDENTIFIER + 
                                "']/../../../..";
     
-    private static final String[] dateInputFormats = {
-        "yyyy/MM/dd",
-        "MM/dd/yyyy",
-        "yyyy-MM-dd",
-        "MM-dd-yyyy",
-        "yyyy-MM-dd'T'HH:mm:ssZ"
-    };
+    private static final List<DateTimeFormatter> dateInputFormats = Lists.newArrayList();
+    static {
+        dateInputFormats.add(
+            new DateTimeFormatterBuilder()
+            .appendMonthOfYear(1)
+            .appendLiteral('/')
+            .appendDayOfMonth(1)
+            .appendLiteral('/')
+            .appendYear(4, 4)
+            .toFormatter());
+        
+        dateInputFormats.add(
+            new DateTimeFormatterBuilder()
+            .appendMonthOfYear(1)
+            .appendLiteral('-')
+            .appendDayOfMonth(1)
+            .appendLiteral('-')
+            .appendYear(4, 4)
+            .toFormatter());
+        
+        dateInputFormats.add(
+            ISODateTimeFormat.dateTimeParser());
+    }
+
     
     static {
         XPATH_MAP.put("name", "/gmd:citation/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:individualName/gco:CharacterString");
@@ -79,7 +97,7 @@ public class RunMetadata {
         commonAttribute = null;
     }
     
-    public RunMetadata(ModelType type, String modelId, String name, String modelVersion, String runIdent, String creationDate, String scenario, String comments, String email, String wfsUrl, String layerName, String commonAttribute) throws ParseException {
+    public RunMetadata(ModelType type, String modelId, String name, String modelVersion, String runIdent, String creationDate, String scenario, String comments, String email, String wfsUrl, String layerName, String commonAttribute) {
         this.type = type;
         this.modelId = modelId;
         this.name = name;
@@ -114,7 +132,7 @@ public class RunMetadata {
      * @param item file form field item
      * @return true if item is set, false if not found
      */
-    public boolean set(FileItem item) throws ParseException {
+    public boolean set(FileItem item) {
         String param = item.getFieldName().toLowerCase();
         if ("modeltype".equals(param)) {
             ModelType mt = ModelType.valueOf(item.getString());
@@ -210,14 +228,27 @@ public class RunMetadata {
         return creationDate.toString(ISODateTimeFormat.dateTimeNoMillis());
     }
 
-    public void setCreationDate(String creationDate) throws ParseException {
+    public void setCreationDate(String creationDate) {
         this.creationDate = parseDate(creationDate);
     }
 
-    private static DateTime parseDate(String date) throws ParseException {
-        Date parseDate = DateUtils.parseDate(date, dateInputFormats);
-        DateTime dt = new DateTime(parseDate);
-        return dt;
+    /**
+     * Uses predefined date parsers to create DateTime object
+     * @param date parsed Date
+     * @return parsed date or null if invalid input date
+     */
+    private static DateTime parseDate(String date) {
+        DateTime parsedDate = null;
+        for (DateTimeFormatter dtf : dateInputFormats) {
+            try {
+                parsedDate = dtf.parseDateTime(date);
+                break; // throws exception if parse fails
+            }
+            catch (IllegalArgumentException ex) {
+                // try again
+            }
+        }
+        return parsedDate;
     }
     
     public String getEmail() {
