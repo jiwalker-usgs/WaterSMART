@@ -3,16 +3,17 @@ package gov.usgs.cida.watersmart.csw;
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
 import gov.usgs.cida.watersmart.proxy.GeonetworkProxy;
 import gov.usgs.cida.watersmart.util.JNDISingleton;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import org.apache.http.ConnectionClosedException;
-import org.apache.http.HttpClientConnection;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.*;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -42,9 +43,9 @@ public class GeonetworkSession {
 
     // currently defaults to gdp2 geonetwork
     public final String GEONETWORK_ENDPOINT = props.getProperty("watersmart.geonetwork.addr");
-    public final String GEONETWORK_CSW = GEONETWORK_ENDPOINT + "/srv/en/csw";
-    public final String GEONETWORK_LOGIN = GEONETWORK_ENDPOINT + "/srv/en/xml.user.login";
-    public final String GEONETWORK_LOGOUT = GEONETWORK_ENDPOINT + "/srv/en/xml.user.logout";
+    public final String GEONETWORK_CSW = GEONETWORK_ENDPOINT + "/srv/eng/csw-publication";
+    public final String GEONETWORK_LOGIN = GEONETWORK_ENDPOINT + "/srv/eng/xml.user.login";
+    public final String GEONETWORK_LOGOUT = GEONETWORK_ENDPOINT + "/srv/eng/xml.user.logout";
     public final String GEONETWORK_USER = props.getProperty("watersmart.geonetwork.user");
     public final String GEONETWORK_PASS = props.getProperty("watersmart.geonetwork.pass");
     
@@ -83,7 +84,12 @@ public class GeonetworkSession {
                 "application/x-www-form-urlencoded",
                 "UTF-8");
         ((HttpEntityEnclosingRequest) request).setEntity(entity);
-        httpClient.execute(request, localContext);
+        HttpResponse resp = httpClient.execute(request, localContext);
+        // TODO check that login worked
+        InputStream is = resp.getEntity().getContent();
+        String loginResponse = IOUtils.toString(is);
+        LOG.debug(loginResponse);
+        IOUtils.closeQuietly(is);
         
         Calendar cal = new GregorianCalendar();
         cal.add(Calendar.HOUR_OF_DAY, 1);
@@ -101,7 +107,11 @@ public class GeonetworkSession {
         HttpContext localContext = new BasicHttpContext();
         localContext.setAttribute(ClientContext.COOKIE_STORE, cookieJar);
         HttpUriRequest request = new HttpGet(logout);
-        httpClient.execute(request, localContext);
+        HttpResponse resp = httpClient.execute(request, localContext);
+        InputStream is = resp.getEntity().getContent();
+        String loginResponse = IOUtils.toString(is);
+        LOG.debug(loginResponse);
+        IOUtils.closeQuietly(is);
         cookieJar.clear();
     }
     

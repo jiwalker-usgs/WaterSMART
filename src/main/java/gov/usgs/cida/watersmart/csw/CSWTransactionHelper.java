@@ -5,9 +5,7 @@ import gov.usgs.cida.config.DynamicReadOnlyProperties;
 import gov.usgs.cida.watersmart.iso.ISOServiceIdentification;
 import gov.usgs.cida.watersmart.parse.RunMetadata;
 import gov.usgs.cida.watersmart.util.JNDISingleton;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,6 +16,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.ClientContext;
@@ -45,9 +44,7 @@ public class CSWTransactionHelper {
     private final String TRANSACTION_HEADER = "<csw:Transaction service=\"CSW\" version=\"2.0.2\" xmlns:csw=\"http://www.opengis.net/cat/csw/2.0.2\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:dc=\"http://www.purl.org/dc/elements/1.1/\">";
     private final String TRANSACTION_FOOTER = "</csw:Transaction>";
     
-    private static final String XPATH_SUBSTITUTION_SCENARIO = "{scenario}";
-    private static final String XPATH_SUBSTITUTION_MODEL_VERSION = "{modelVersion}";
-    private static final String XPATH_SUBSTITUTION_RUN_IDENTIFIER = "{runIdentifier}";
+
     
     public static final String NAMESPACE_GMD = "http://www.isotc211.org/2005/gmd";
     public static final String NAMESPACE_SRV = "http://www.isotc211.org/2005/srv";
@@ -57,11 +54,7 @@ public class CSWTransactionHelper {
     private RunMetadata metadataBean;
     private String ncFile;
     private GeonetworkSession cswSession;
-    
-    private String updateXpathTemplate = "gmd:identificationInfo/srv:SV_ServiceIdentification[@id='ncSOS']/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString[text()='" +
-                               XPATH_SUBSTITUTION_SCENARIO + "']/../../gmd:edition/gco:CharacterString[text()='" + 
-                               XPATH_SUBSTITUTION_MODEL_VERSION + "." + XPATH_SUBSTITUTION_RUN_IDENTIFIER + 
-                               "']/../../../..";
+
     
     public CSWTransactionHelper(RunMetadata runMeta, String ncFile) {
         this.metadataBean = runMeta;
@@ -94,21 +87,17 @@ public class CSWTransactionHelper {
         
         String insertXml = buildUpdateEnvelope(nodeToString(recordNode), metadataBean.getModelId());
         LOG.debug(insertXml);
-        HttpResponse postResponse = performCSWPost(insertXml);
+        String postResponse = performCSWPost(insertXml);
         // check that it updated alright
     }
     
     public String update(RunMetadata oldInfo) throws IOException, URISyntaxException {
         Map<String, String> updateMap = this.metadataBean.getUpdateMap(oldInfo);
-        String updateXpath = updateXpathTemplate
-                .replace(XPATH_SUBSTITUTION_SCENARIO, oldInfo.getScenario())
-                .replace(XPATH_SUBSTITUTION_MODEL_VERSION, oldInfo.getModelVersion())
-                .replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, oldInfo.getRunIdent());
         
-        String updateXml = buildUpdateEnvelope(updateMap, metadataBean.getModelId(), updateXpath);
+        String updateXml = buildUpdateEnvelope(updateMap, metadataBean.getModelId());
         LOG.debug(updateXml);
-        HttpResponse postResponse = performCSWPost(updateXml);
-        return postResponse.getEntity().toString();
+        String postResponse = performCSWPost(updateXml);
+        return postResponse;
     }
     
     public void delete(RunMetadata info) {
@@ -121,16 +110,16 @@ public class CSWTransactionHelper {
         String cswGetRecordsSearch = buildSearchXML(identifier);
         System.out.println(cswGetRecordsSearch);
         
-        HttpResponse response = performCSWPost(cswGetRecordsSearch);
+        String response = performCSWPost(cswGetRecordsSearch);
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
-        Document doc = factory.newDocumentBuilder().parse(response.getEntity().getContent());
+        Document doc = factory.newDocumentBuilder().parse(new ByteArrayInputStream(response.getBytes()));
         
         return doc;
     }
     
-    private HttpResponse performCSWPost(String postData) throws IOException, UnsupportedEncodingException, URISyntaxException {
+    private String performCSWPost(String postData) throws IOException, UnsupportedEncodingException, URISyntaxException {
         cswSession.login();
         HttpPost post = new HttpPost(cswSession.GEONETWORK_CSW);
         post.setEntity(new StringEntity(postData, "application/xml", "UTF-8"));
@@ -150,7 +139,11 @@ public class CSWTransactionHelper {
         finally {
             httpClient.getConnectionManager().closeExpiredConnections();
             cswSession.logout();
-            return methodResponse;
+            InputStream is = methodResponse.getEntity().getContent();
+            String responseText = IOUtils.toString(is);
+            LOG.debug(responseText);
+            IOUtils.closeQuietly(is);
+            return responseText;
         }
     }
     
@@ -185,13 +178,13 @@ public class CSWTransactionHelper {
         return deleteXml.toString();
     }
     
-    private String buildUpdateEnvelope(Map<String, String> propValueMap, String identifier, String xPathPrefix) {
+    private String buildUpdateEnvelope(Map<String, String> propValueMap, String identifier) {
         StringBuilder recordXml = new StringBuilder();
         Iterator<String> recordIter = propValueMap.keySet().iterator();
         while (recordIter.hasNext()) {
             String recordName = recordIter.next();
             recordXml.append("<csw:RecordProperty>")
-                    .append("<csw:Name>").append(xPathPrefix).append(recordName).append("</csw:Name>")
+                    .append("<csw:Name>").append(recordName).append("</csw:Name>")
                     .append("<csw:Value>").append(propValueMap.get(recordName)).append("</csw:Value>")
                     .append("</csw:RecordProperty>");
         }

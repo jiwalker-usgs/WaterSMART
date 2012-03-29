@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -34,7 +36,7 @@ public class UpdateRun extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws ServletException, IOException, ParseException {
         LOG.debug("Received new update request");
         
         String modelerName = request.getParameter("name");
@@ -133,7 +135,12 @@ public class UpdateRun extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        }
+        catch (ParseException ex) {
+            throw new ServletException(ex.getMessage());
+        }
     }
 
     /**
@@ -148,7 +155,12 @@ public class UpdateRun extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        }
+        catch (ParseException ex) {
+            throw new ServletException(ex.getMessage());
+        }
     }
 
     /**
