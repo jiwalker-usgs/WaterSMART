@@ -105,6 +105,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                     if (isoFormPanel.create) {
                         uploadPanel.getForm().submit({
                             url: uploadPanel.url,
+                            scope : this,
                             params: {
                                 name : metadataForm.name,
                                 modelId : isoFormPanel.modelId,
@@ -122,44 +123,12 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                             waitMsg: 'Saving...',
                             success: function() {
                                 LOG.info('isoFormPanel.js::User upload succeeded.');
-                            
+                                LOG.info('isoFormPanel.js::Closing modal window');
+                                this.ownerCt.ownerCt.ownerCt.close();
+                                
                                 NOTIFY.info({
                                     msg:'Upload succeeded'
                                 })
-                            
-//                                var form = Ext.getCmp('metadata-form');
-//                                form.getForm().submit({
-//                                    url: form.url,
-//                                    params: {
-//                                        transaction: true,
-//                                        modeltype : ''
-//                                    },
-//                                    waitMsg: 'Saving...',
-//                                    success: function(x, action) {
-//                                        LOG.debug('');
-//                                    var form = Ext.getCmp('metadata-form');
-//                                    var xml = action.response.responseXML;
-//
-//                                    Ext.Ajax.request({
-//                                        url: 'updatecsw',
-//                                        method: 'POST',
-//                                        xmlData: xml,
-//                                        success: function(response) {
-//                                            var result = response.responseText;
-//                                            LOG.debug(result);
-//                                        },
-//                                        failure: function(panel, fail) {
-//                                            LOG.debug(fail);
-//                                        }
-//                                    });
-//                                    },
-//                                    failure: function(panel, fail) {
-//                                        LOG.info('')
-//                                        NOTIFY.error({
-//                                            msg : fail.result.message
-//                                        })
-//                                    }
-//                                });
                             },
                             failure: function(panel, fail) {
                                 LOG.info('isoFormPanel.js:: User upload failed.');
@@ -190,7 +159,9 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                             },
                             waitMsg: 'Saving...',
                             success: function(form, action) {
+                                LOG.info('isoFormPanel.js::User update succeeded.');
                                 NOTIFY.info({ msg : action.result.msg });
+                                LOG.info('isoFormPanel.js::Closing modal window');
                                 this.ownerCt.ownerCt.ownerCt.close();
                             },
                             failure: function(form, action) {
