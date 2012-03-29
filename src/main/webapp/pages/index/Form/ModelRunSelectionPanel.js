@@ -347,8 +347,9 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         })
     },
     reloadRuns : function() {
-        this.cswStore.load({
+        this.cswStore.reload({
             callback : function(store) {
+                this.updateModelStore();
                 var combobox = Ext.getCmp('model-combobox')
                 combobox.setValue(combobox.getValue());
             },
@@ -427,10 +428,13 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                 storeItem.get('identificationInfo')[0].citation.title.CharacterString.value,
                 storeItem])
         }, modelArray)
-        this.modelStore = new Ext.data.ArrayStore({
-            fields : ['title', 'rec'],
-            idIndex : 0
-        })
+        if (!this.modelStore) {
+            this.modelStore = new Ext.data.ArrayStore({
+                
+                fields : ['title', 'rec'],
+                idIndex : 0
+            })
+        }
         this.modelStore.loadData(modelArray);
     }
 });
