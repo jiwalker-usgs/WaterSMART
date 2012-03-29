@@ -400,6 +400,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                 format: 'image/png'
             },
             {
+                gutter : 5, // Should always be half the size of the point size
                 extractAttributes : true,
                 opacity : '0.5',
                 displayOutsideMaxExtent: true,
