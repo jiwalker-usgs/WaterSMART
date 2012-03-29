@@ -14,156 +14,9 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         this.cswStore = config.cswStore;
         this.mapPanel = config.mapPanel;
         
-        // TODO- For quicktips, we should add more fields to this store from the underlying 
-        // store like Date, date last revised, language, etc
-        var modelArray = [];
-        Ext.each(this.cswStore.getRange(), function(storeItem){
-            this.push([
-                storeItem.get('identificationInfo')[0].citation.title.CharacterString.value,
-                storeItem])
-        }, modelArray)
-        this.modelStore = new Ext.data.ArrayStore({
-            fields : ['title', 'rec'],
-            idIndex : 0
-        })
-        this.modelStore.loadData(modelArray);
+        this.updateModelStore();
         
-        this.runPanel = new Ext.Panel({
-            id : 'run-panel',
-            title : 'Runs',
-            region : 'center',
-            height : '100%',
-            disabled : true,
-            currentlySelectedRun : undefined,
-            tbar : [
-            {
-                xtype : 'button',
-                id : 'edit-selected-run-button',
-                text : 'Edit Selected Run',
-                disabled : true,
-                listeners : {
-                    click : function() {
-                        LOG.debug('ModelRunSelectionPanel.js::User clicked on "Edit Selected Run" button.')
-                        var selectedRun = this.runPanel.currentlySelectedRun;
-                        var comboValue = this.getTopToolbar().get('model-combobox').getValue();
-                        var modelStore = this.getTopToolbar().get('model-combobox').getStore().getById(comboValue);
-                        var modelId = modelStore.data.rec.data.fileIdentifier;
-                        var serviceIdentification = selectedRun.serviceIdentification;
-                        var wfsUrl = '';
-                        var layer = '';
-                        var commonAttr = this.commonAttr;
-                        var modelVersion = 0;
-                        var runIdentifier = 0;
-                        var abstrakt = '';
-                        var runDate;
-                        var scenario;
-                        
-                        modelVersion = serviceIdentification.citation.edition.CharacterString.value.split('.')[0];
-                        runIdentifier = serviceIdentification.citation.edition.CharacterString.value.split('.')[1];
-                        abstrakt = serviceIdentification['abstract'].CharacterString.value;
-                        runDate = Date.parseDate(serviceIdentification.citation.date[0].date[0].DateTime.value.split('T')[0], 'Y-m-d');
-                        scenario = serviceIdentification.citation.title.CharacterString.value;
-                        
-                        for (var i = 0;i < modelStore.data.rec.data.identificationInfo.length;i++) {
-                            var iiItem = modelStore.data.rec.data.identificationInfo[i];
-                            
-                            if (!wfsUrl && iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ows') {
-                                wfsUrl = iiItem.serviceIdentification.operationMetadata.linkage.URL;
-                                layer = iiItem.serviceIdentification.operationMetadata.name.CharacterString.value;
-                            }
-                        }
-                        
-                        var isoFormPanel = new WaterSMART.ISOFormPanel({
-                            title : selectedRun.title,
-                            modelId : modelId,
-                            'abstract' : abstrakt,
-                            commonAttr : commonAttr,
-                            create : false,
-                            layer : layer,
-                            modelerName : WATERSMART.USER_NAME,
-                            modelName : comboValue,
-                            modelVersion : modelVersion,
-                            runIdentifier : runIdentifier,
-                            wfsUrl : wfsUrl,
-                            runDate : runDate,
-                            scenario : scenario
-                        });
-                    
-                        var modalRunWindow = new Ext.Window({
-                            width: '30%',
-                            height : 'auto',
-                            modal : true,
-                            items : [ isoFormPanel ]
-                        })
-                    
-                        modalRunWindow.show();
-                    },
-                    scope : this
-                }
-            },
-            {
-                xtype : 'button',
-                id : 'create-run-button',
-                text : 'Create A Run',
-                listeners : {
-                    click : function() {
-                        
-                        LOG.debug('ModelRunSelectionPanel.js::User clicked on "Create A Run" button.')
-                        var comboValue = this.getTopToolbar().get('model-combobox').getValue();
-                        var modelStore = this.getTopToolbar().get('model-combobox').getStore().getById(comboValue);
-                        var modelId = modelStore.data.rec.data.fileIdentifier;
-                        var wfsUrl = '';
-                        var layer = '';
-                        var commonAttr = this.commonAttr;
-                        var modelVersion = 0;
-                        var runIdentifier = 0;
-                        
-                        for (var i = 0;i < modelStore.data.rec.data.identificationInfo.length;i++) {
-                            var iiItem = modelStore.data.rec.data.identificationInfo[i];
-                            
-                            if (iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
-                                modelVersion = iiItem.serviceIdentification.citation.edition.CharacterString.value.split('.')[0];
-                                
-                                var runVersion = iiItem.serviceIdentification.citation.edition.CharacterString.value.split('.')[1];
-                                if (parseInt(runVersion) > this.runVersion) this.runVersion = runVersion;
-                            } 
-                            
-                            if (!wfsUrl && iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ows') {
-                                wfsUrl = iiItem.serviceIdentification.operationMetadata.linkage.URL;
-                                layer = iiItem.serviceIdentification.operationMetadata.name.CharacterString.value;
-                            }
-                        }
-                        runIdentifier++;
-                        
-                        var isoFormPanel = new WaterSMART.ISOFormPanel({
-                            title : 'Create A New Run',
-                            modelId : modelId,
-                            commonAttr : commonAttr,
-                            create : true,
-                            layer : layer,
-                            modelerName : WATERSMART.USER_NAME,
-                            modelName : comboValue,
-                            modelVersion : modelVersion,
-                            runIdentifier : runIdentifier,
-                            scenario : '',
-                            wfsUrl : wfsUrl
-                        });
-                    
-                        var modalRunWindow = new Ext.Window({
-                            width: '30%',
-                            height : 'auto',
-                            modal : true,
-                            items : [ isoFormPanel ]
-                        })
-                    
-                        modalRunWindow.show();
-                    
-                    },
-                    scope : this
-                }
-            }
-            ]
-        })
+        this.runPanel = this.createRunPanel();
         
         config = Ext.apply({
             id: 'model-run-selection-panel',
@@ -187,6 +40,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                 displayField : 'title',
                 listeners : {
                     select : function(combo, record) {
+                        LOG.debug('ModelRunSelectionPanel.js::User selected a model');
                         var panelInfo = {};
                         var storeItem = record.get('rec');
                         
@@ -354,6 +208,154 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         })
         wpsCapsStore.load();
     },
+    createRunPanel : function() {
+        return new Ext.Panel({
+            id : 'run-panel',
+            title : 'Runs',
+            region : 'center',
+            height : '100%',
+            disabled : true,
+            currentlySelectedRun : undefined,
+            tbar : [
+            {
+                xtype : 'button',
+                id : 'edit-selected-run-button',
+                text : 'Edit Selected Run',
+                disabled : true,
+                listeners : {
+                    click : function() {
+                        LOG.debug('ModelRunSelectionPanel.js::User clicked on "Edit Selected Run" button.')
+                        var selectedRun = this.runPanel.currentlySelectedRun;
+                        var comboValue = this.getTopToolbar().get('model-combobox').getValue();
+                        var modelStore = this.getTopToolbar().get('model-combobox').getStore().getById(comboValue);
+                        var modelId = modelStore.data.rec.data.fileIdentifier;
+                        var serviceIdentification = selectedRun.serviceIdentification;
+                        var wfsUrl = '';
+                        var layer = '';
+                        var commonAttr = this.commonAttr;
+                        var modelVersion = 0;
+                        var runIdentifier = 0;
+                        var abstrakt = '';
+                        var runDate;
+                        var scenario;
+                        
+                        modelVersion = serviceIdentification.citation.edition.CharacterString.value.split('.')[0];
+                        runIdentifier = serviceIdentification.citation.edition.CharacterString.value.split('.')[1];
+                        abstrakt = serviceIdentification['abstract'].CharacterString.value;
+                        runDate = Date.parseDate(serviceIdentification.citation.date[0].date[0].DateTime.value.split('T')[0], 'Y-m-d');
+                        scenario = serviceIdentification.citation.title.CharacterString.value;
+                        
+                        for (var i = 0;i < modelStore.data.rec.data.identificationInfo.length;i++) {
+                            var iiItem = modelStore.data.rec.data.identificationInfo[i];
+                            
+                            if (!wfsUrl && iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ows') {
+                                wfsUrl = iiItem.serviceIdentification.operationMetadata.linkage.URL;
+                                layer = iiItem.serviceIdentification.operationMetadata.name.CharacterString.value;
+                            }
+                        }
+                        
+                        var isoFormPanel = new WaterSMART.ISOFormPanel({
+                            title : selectedRun.title,
+                            modelId : modelId,
+                            'abstract' : abstrakt,
+                            commonAttr : commonAttr,
+                            create : false,
+                            layer : layer,
+                            modelerName : WATERSMART.USER_NAME,
+                            modelName : comboValue,
+                            modelVersion : modelVersion,
+                            runIdentifier : runIdentifier,
+                            wfsUrl : wfsUrl,
+                            runDate : runDate,
+                            scenario : scenario
+                        });
+                    
+                        var modalRunWindow = new Ext.Window({
+                            width: '30%',
+                            height : 'auto',
+                            modal : true,
+                            items : [ isoFormPanel ]
+                        })
+                    
+                        modalRunWindow.show();
+                    },
+                    scope : this
+                }
+            },
+            {
+                xtype : 'button',
+                id : 'create-run-button',
+                text : 'Create A Run',
+                listeners : {
+                    click : function() {
+                        
+                        LOG.debug('ModelRunSelectionPanel.js::User clicked on "Create A Run" button.')
+                        var comboValue = this.getTopToolbar().get('model-combobox').getValue();
+                        var modelStore = this.getTopToolbar().get('model-combobox').getStore().getById(comboValue);
+                        var modelId = modelStore.data.rec.data.fileIdentifier;
+                        var wfsUrl = '';
+                        var layer = '';
+                        var commonAttr = this.commonAttr;
+                        var modelVersion = 0;
+                        var runIdentifier = 0;
+                        
+                        for (var i = 0;i < modelStore.data.rec.data.identificationInfo.length;i++) {
+                            var iiItem = modelStore.data.rec.data.identificationInfo[i];
+                            
+                            if (iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
+                                modelVersion = iiItem.serviceIdentification.citation.edition.CharacterString.value.split('.')[0];
+                                
+                                var runVersion = iiItem.serviceIdentification.citation.edition.CharacterString.value.split('.')[1];
+                                if (parseInt(runVersion) > this.runVersion) this.runVersion = runVersion;
+                            } 
+                            
+                            if (!wfsUrl && iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ows') {
+                                wfsUrl = iiItem.serviceIdentification.operationMetadata.linkage.URL;
+                                layer = iiItem.serviceIdentification.operationMetadata.name.CharacterString.value;
+                            }
+                        }
+                        runIdentifier++;
+                        
+                        var isoFormPanel = new WaterSMART.ISOFormPanel({
+                            title : 'Create A New Run',
+                            modelId : modelId,
+                            commonAttr : commonAttr,
+                            create : true,
+                            layer : layer,
+                            modelerName : WATERSMART.USER_NAME,
+                            modelName : comboValue,
+                            modelVersion : modelVersion,
+                            runIdentifier : runIdentifier,
+                            scenario : '',
+                            wfsUrl : wfsUrl
+                        });
+                    
+                        var modalRunWindow = new Ext.Window({
+                            width: '30%',
+                            height : 'auto',
+                            modal : true,
+                            items : [ isoFormPanel ]
+                        })
+                    
+                        modalRunWindow.show();
+                    
+                    },
+                    scope : this
+                }
+            }
+            ]
+        })
+    },
+    reloadRuns : function() {
+        this.cswStore.load({
+            callback : function(store) {
+                var combobox = Ext.getCmp('model-combobox')
+                combobox.setValue(combobox.getValue());
+            },
+            scope : this
+        });
+        
+    },
     modelSelected : function(config) {
         LOG.debug('ModelRunSelectionpanel.js::A model has been selected');
         var runPanels = config.runPanels;
@@ -415,5 +417,20 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         this.mapPanel.sosEndpoint = panel.panelInfo.operationURL;
         this.mapPanel.plotterVars = 'Discharge';
         this.mapPanel.addIdentifyToolingToMap();
+    },
+    updateModelStore : function() {
+        // TODO- For quicktips, we should add more fields to this store from the underlying 
+        // store like Date, date last revised, language, etc
+        var modelArray = [];
+        Ext.each(this.cswStore.getRange(), function(storeItem){
+            this.push([
+                storeItem.get('identificationInfo')[0].citation.title.CharacterString.value,
+                storeItem])
+        }, modelArray)
+        this.modelStore = new Ext.data.ArrayStore({
+            fields : ['title', 'rec'],
+            idIndex : 0
+        })
+        this.modelStore.loadData(modelArray);
     }
 });

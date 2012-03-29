@@ -123,6 +123,9 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                             waitMsg: 'Saving...',
                             success: function() {
                                 LOG.info('isoFormPanel.js::User upload succeeded.');
+                                
+                                Ext.getCmp('model-run-selection-panel').reloadRuns();
+                                
                                 LOG.info('isoFormPanel.js::Closing modal window');
                                 this.ownerCt.ownerCt.ownerCt.close();
                                 
@@ -160,15 +163,18 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                             waitMsg: 'Saving...',
                             success: function(form, action) {
                                 LOG.info('isoFormPanel.js::User update succeeded.');
-                                NOTIFY.info({ msg : action.result.msg });
+                                NOTIFY.info({msg : action.result.msg});
+                                
+                                Ext.getCmp('model-run-selection-panel').reloadRuns();
+                                
                                 LOG.info('isoFormPanel.js::Closing modal window');
                                 this.ownerCt.ownerCt.ownerCt.close();
                             },
                             failure: function(form, action) {
                                 if (action.failureType === 'client') {
-                                    NOTIFY.warn({ msg : 'Please ensure all input data is valid'})
+                                    NOTIFY.warn({msg : 'Please ensure all input data is valid'})
                                 } else {
-                                    NOTIFY.warn({ msg : action.result.msg });
+                                    NOTIFY.warn({msg : action.result.msg});
                                 }
                                 
                             }

@@ -43,79 +43,84 @@ Ext.onReady(function() {
                 }
             }
         },
-            listeners : {
-                load : function(store) {
-                    LOG.debug('onReady.js::CSW Record Store loaded ' + store.totalLength + ' record(s)');
-
-                    var commonAttr = CONFIG.COMMON_ATTR;
-
-                    var map = new WaterSMART.Map({
-                        commonAttr : commonAttr
-                    });
-        
-                    var modelRunSelPanel = new WaterSMART.ModelRunSelectionPanel({
-                        commonAttr : commonAttr,
-                        cswStore : store,
-                        mapPanel : map
-                    });
-        
-                    var forms = new Ext.Panel({
-                        region: 'east',
-                        border: false,
-                        layout: 'border',
-                        collapsible: true,
-                        width: '30%',
-                        autoShow: true,
-                        items: [ modelRunSelPanel ]
-                    });
-
-                    var bodyPanel = new Ext.Panel({
-                        region: 'center',
-                        border: false,
-                        layout : 'border',
-                        autoShow: true,
-                        items : [
-                        forms,
-                        map
-                        ]
-                    });
-	
-                    var headerPanel = new Ext.Panel({
-                        id: 'header-panel',
-                        region: 'north',
-                        height: 'auto',
-                        border : false,
-                        autoShow: true,
-                        contentEl: 'usgs-header-panel'
-                    });
-                    var footerPanel = new Ext.Panel({
-                        id: 'footer-panel',
-                        region: 'south',
-                        height: 'auto',
-                        border : false,
-                        autoShow: true,
-                        contentEl: 'usgs-footer-panel'
-                    });
-	
-                    VIEWPORT = new Ext.Viewport({
-                        renderTo : document.body,
-                        layout : 'border',
-                        items : [
-                        headerPanel,
-                        bodyPanel,
-                        footerPanel
-                        ]
-                    });
-                    LOADMASK.hide();
-                },
-                exception : function() {
-                    LOG.debug('');
-                }
-            }
+        listeners : {
+            load : this.cswStoreFirstLoad,
+            exception : function() {
+                NOTIFY.warn({ msg : 'An error has occured - Application may not work properly.'})
+            }, 
+            scope : this
+        }
         
     });
     parentCswStore.load();
 });
+
+function cswStoreFirstLoad(store) {
+    LOG.debug('onReady.js::CSW Record Store loaded ' + store.totalLength + ' record(s)');
+
+    var commonAttr = CONFIG.COMMON_ATTR;
+
+    var map = new WaterSMART.Map({
+        commonAttr : commonAttr
+    });
+        
+    var modelRunSelPanel = new WaterSMART.ModelRunSelectionPanel({
+        commonAttr : commonAttr,
+        cswStore : store,
+        mapPanel : map
+    });
+        
+    var forms = new Ext.Panel({
+        region: 'east',
+        border: false,
+        layout: 'border',
+        collapsible: true,
+        width: '30%',
+        autoShow: true,
+        items: [ modelRunSelPanel ]
+    });
+
+    var bodyPanel = new Ext.Panel({
+        region: 'center',
+        border: false,
+        layout : 'border',
+        autoShow: true,
+        items : [
+        forms,
+        map
+        ]
+    });
+	
+    var headerPanel = new Ext.Panel({
+        id: 'header-panel',
+        region: 'north',
+        height: 'auto',
+        border : false,
+        autoShow: true,
+        contentEl: 'usgs-header-panel'
+    });
+    var footerPanel = new Ext.Panel({
+        id: 'footer-panel',
+        region: 'south',
+        height: 'auto',
+        border : false,
+        autoShow: true,
+        contentEl: 'usgs-footer-panel'
+    });
+	
+    VIEWPORT = new Ext.Viewport({
+        renderTo : document.body,
+        layout : 'border',
+        items : [
+        headerPanel,
+        bodyPanel,
+        footerPanel
+        ]
+    });
+    LOADMASK.hide();
+    
+    store.un('load', this.cswStoreFirstLoad, this);
+}
 
 function initializeAjax() {
     
