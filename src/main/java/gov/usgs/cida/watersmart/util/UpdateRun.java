@@ -5,7 +5,9 @@ import gov.usgs.cida.watersmart.parse.CreateDSGFromZip;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ModelType;
 import gov.usgs.cida.watersmart.parse.RunMetadata;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.net.URISyntaxException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -90,16 +92,19 @@ public class UpdateRun extends HttpServlet {
                 commonAttr
         );
         
-        CSWTransactionHelper helper = new CSWTransactionHelper(metaData);
-        
-        helper.update(originalMetaData);
-        
-        boolean success = true;
         String responseText;
-        if (success) {
+        
+        CSWTransactionHelper helper = new CSWTransactionHelper(metaData);
+        try {
+            String results = helper.update(originalMetaData);
+            // parse xml, make sure stuff happened alright, if so don't say success
             responseText = "{success: true, msg: 'The record has been updated'}";
-        } else {
-            responseText = "{success: false, msg: 'The record update failed'}";
+        }
+        catch (IOException ioe) {
+            responseText = "{success: false, msg: '" + ioe.getMessage() + "'}";
+        }
+        catch (URISyntaxException ex) {
+            responseText = "{success: false, msg: '" + ex.getMessage() + "'}";
         }
 
         response.setContentType("application/json");

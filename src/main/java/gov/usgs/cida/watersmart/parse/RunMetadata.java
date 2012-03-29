@@ -1,7 +1,9 @@
 package gov.usgs.cida.watersmart.parse;
 
+import com.google.common.collect.Maps;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ModelType;
 import java.io.File;
+import java.util.Map;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -29,13 +31,17 @@ public class RunMetadata {
     private String layerName;
     private String commonAttribute;
     
-    public static final String XPATH_LOCATOR_NAME = "/gmd:citation/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:individualName/gco:CharacterString";
-    // Edition is modelVersion and runIdentifier, need to be changed at same time
-    public static final String XPATH_LOCATOR_EDITION = "/gmd:citation/gmd:CI_Citation/gmd:edition/gco:CharacterString";
-    public static final String XPATH_LOCATOR_DATE = "/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:DateTime";
-    public static final String XPATH_LOCATOR_SCENARIO = "/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString";
-    public static final String XPATH_LOCATOR_EMAIL = "/gmd:citation/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gco:CharacterString";
-    public static final String XPATH_LOCATOR_COMMENTS = "/gmd:abstract/gco:CharacterString";
+    public static final Map<String, String> XPATH_MAP = Maps.newHashMap();
+    
+    static {
+        XPATH_MAP.put("name", "/gmd:citation/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:individualName/gco:CharacterString");
+        // Edition is modelVersion and runIdentifier, need to be changed at same time
+        XPATH_MAP.put("edition", "/gmd:citation/gmd:CI_Citation/gmd:edition/gco:CharacterString");
+        XPATH_MAP.put("date", "/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:DateTime");
+        XPATH_MAP.put("scenario", "/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString");
+        XPATH_MAP.put("email", "/gmd:citation/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gco:CharacterString");
+        XPATH_MAP.put("comments", "/gmd:abstract/gco:CharacterString");
+    }
     
     public RunMetadata() {
         type = null;
@@ -279,5 +285,31 @@ public class RunMetadata {
     
     public String getEditionString() {
         return modelVersion + "." + runIdent;
+    }
+    
+    public String get(String var) {
+        if ("edition".equals(var)) {
+            return getEditionString();
+        } else if ("name".equals(var)) {
+            return getName();
+        } else if ("scenario".equals(var)) {
+            return getScenario();
+        } else if ("date".equals(var)) {
+            return getCreationDate();
+        } else if ("comments".equals(var)) {
+            return getComments();
+        } else if ("email".equals(var)) {
+            return getEmail();
+        } else {
+            throw new IllegalArgumentException("This is not a thing");
+        }
+    }
+    
+    public Map<String, String> getUpdateMap(RunMetadata oldMetadata) {
+        Map<String, String> propsMap = Maps.newHashMap();
+        for (String key : XPATH_MAP.keySet()) {
+            propsMap.put(XPATH_MAP.get(key), this.get(key));
+        }
+        return propsMap;
     }
 }

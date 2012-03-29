@@ -1,10 +1,12 @@
 package gov.usgs.cida.watersmart.csw;
 
+import com.google.common.collect.Maps;
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
 import gov.usgs.cida.watersmart.iso.ISOServiceIdentification;
 import gov.usgs.cida.watersmart.parse.RunMetadata;
 import gov.usgs.cida.watersmart.util.JNDISingleton;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -13,6 +15,9 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.ClientContext;
@@ -53,7 +58,7 @@ public class CSWTransactionHelper {
     private String ncFile;
     private GeonetworkSession cswSession;
     
-    private String updateXpathTemplate = "/gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification[@id='ncSOS']/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString[text()='" +
+    private String updateXpathTemplate = "gmd:identificationInfo/srv:SV_ServiceIdentification[@id='ncSOS']/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString[text()='" +
                                XPATH_SUBSTITUTION_SCENARIO + "']/../../gmd:edition/gco:CharacterString[text()='" + 
                                XPATH_SUBSTITUTION_MODEL_VERSION + "." + XPATH_SUBSTITUTION_RUN_IDENTIFIER + 
                                "']/../../../..";
@@ -68,7 +73,7 @@ public class CSWTransactionHelper {
         this(runMeta, null);
     }
     
-    public void insert() throws IOException, UnsupportedEncodingException, URISyntaxException, ParserConfigurationException, SAXException {
+    public void insert() throws IOException, UnsupportedEncodingException, URISyntaxException, ParserConfigurationException, SAXException, TransformerException {
         Document getRecordsDoc = getRecordsCall();
         NodeList nodes = getRecordsDoc.getElementsByTagNameNS(NAMESPACE_GMD, "MD_Metadata");
         
@@ -87,13 +92,23 @@ public class CSWTransactionHelper {
         
 
         
-        String insertXml = buildUpdateEnvelope(recordNode.toString(), metadataBean.getModelId());
-//        HttpResponse postResponse = performCSWPost(insertXml);
+        String insertXml = buildUpdateEnvelope(nodeToString(recordNode), metadataBean.getModelId());
+        LOG.debug(insertXml);
+        HttpResponse postResponse = performCSWPost(insertXml);
         // check that it updated alright
     }
     
-    public void update(RunMetadata oldInfo) {
-        //String updateXml = buildUpdateEnvelope(null, null);
+    public String update(RunMetadata oldInfo) throws IOException, URISyntaxException {
+        Map<String, String> updateMap = this.metadataBean.getUpdateMap(oldInfo);
+        String updateXpath = updateXpathTemplate
+                .replace(XPATH_SUBSTITUTION_SCENARIO, oldInfo.getScenario())
+                .replace(XPATH_SUBSTITUTION_MODEL_VERSION, oldInfo.getModelVersion())
+                .replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, oldInfo.getRunIdent());
+        
+        String updateXml = buildUpdateEnvelope(updateMap, metadataBean.getModelId(), updateXpath);
+        LOG.debug(updateXml);
+        HttpResponse postResponse = performCSWPost(updateXml);
+        return postResponse.getEntity().toString();
     }
     
     public void delete(RunMetadata info) {
@@ -170,13 +185,13 @@ public class CSWTransactionHelper {
         return deleteXml.toString();
     }
     
-    private String buildUpdateEnvelope(HashMap<String, String> propValueMap, String identifier) {
+    private String buildUpdateEnvelope(Map<String, String> propValueMap, String identifier, String xPathPrefix) {
         StringBuilder recordXml = new StringBuilder();
         Iterator<String> recordIter = propValueMap.keySet().iterator();
         while (recordIter.hasNext()) {
             String recordName = recordIter.next();
             recordXml.append("<csw:RecordProperty>")
-                    .append("<csw:Name>").append(recordName).append("</csw:Name>")
+                    .append("<csw:Name>").append(xPathPrefix).append(recordName).append("</csw:Name>")
                     .append("<csw:Value>").append(propValueMap.get(recordName)).append("</csw:Value>")
                     .append("</csw:RecordProperty>");
         }
@@ -232,4 +247,12 @@ public class CSWTransactionHelper {
         return idNode;
     }
     
+    private static String nodeToString(Node node) throws TransformerException {
+        StringWriter writer = new StringWriter();
+        Transformer t = TransformerFactory.newInstance().newTransformer();
+        t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        t.transform(new DOMSource(node), new StreamResult(writer));
+        return writer.toString();
+    }
+
 }
