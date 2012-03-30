@@ -230,6 +230,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         var modelStore = this.getTopToolbar().get('model-combobox').getStore().getById(comboValue);
                         var modelId = modelStore.data.rec.data.fileIdentifier;
                         var serviceIdentification = selectedRun.serviceIdentification;
+                        var modelerName = '';
                         var wfsUrl = '';
                         var layer = '';
                         var commonAttr = this.commonAttr;
@@ -239,6 +240,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         var runDate;
                         var scenario;
                         
+                        modelerName = serviceIdentification.citation.citedResponsibleParty[0].individualName.CharacterString.value;
                         modelVersion = serviceIdentification.citation.edition.CharacterString.value.split('.')[0];
                         runIdentifier = serviceIdentification.citation.edition.CharacterString.value.split('.')[1];
                         abstrakt = serviceIdentification['abstract'].CharacterString.value;
@@ -261,7 +263,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                             commonAttr : commonAttr,
                             create : false,
                             layer : layer,
-                            modelerName : WATERSMART.USER_NAME,
+                            modelerName : modelerName,
                             modelName : comboValue,
                             modelVersion : modelVersion,
                             runIdentifier : runIdentifier,
