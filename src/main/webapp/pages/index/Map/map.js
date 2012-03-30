@@ -251,6 +251,8 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
             if (isBaseLayer && !includeBaseLayers) return;
             if (!record.getLayer().metadata.persist) {
                 this.layers.remove(record)
+                if (isBaseLayer) this.currentMapConfig.layers.baseLayers.remove(record.data.layer);
+                else this.currentMapConfig.layers.layers.remove(record.data.layer);
             }
         }, this)
     }
