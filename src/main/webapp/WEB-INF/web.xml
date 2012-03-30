@@ -2,11 +2,9 @@
 <web-app id="WebApp_ID" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
     <description>WaterSMART Model intercomparison Portal</description>
     <display-name>WaterSMART {Owner: DB, Coder: JW}</display-name>
-    
     <welcome-file-list>
         <welcome-file>login.jsp</welcome-file>
     </welcome-file-list>
-    
     <!-- Security -->
     <security-constraint>
         <display-name>Security Constraint</display-name>
@@ -18,7 +16,6 @@
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
         </user-data-constraint>
     </security-constraint>
- 
     <filter>
         <filter-name>SessionFilter</filter-name>
         <filter-class>gov.usgs.cida.filter.SessionFilter</filter-class>
@@ -35,7 +32,6 @@
         <filter-name>SessionFilter</filter-name>
         <url-pattern>/index.jsp</url-pattern>
     </filter-mapping>
-    
     <!-- should keep services on different path, put paths here -->
     <filter>
         <filter-name>ServiceSessionFilter</filter-name>
@@ -50,41 +46,18 @@
         <url-pattern>/service/*</url-pattern>
     </filter-mapping>
     
-    <filter>
-        <filter-name>UrlRewriteFilter</filter-name>
-        <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
-        <init-param>
-            <param-name>logLevel</param-name>
-            <param-value>ERROR</param-value>
-        </init-param>
-        <init-param>
-            <param-name>confReloadCheckInterval</param-name>
-            <param-value>60</param-value>
-        </init-param>
-    </filter>
-    <filter-mapping>
-        <filter-name>UrlRewriteFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
-    </filter-mapping>
-    
-<!--    <servlet>
+    <servlet>
         <servlet-name>OWSProxy</servlet-name>
         <servlet-class>gov.usgs.service.OWSProxyServletX</servlet-class>
-        <init-param>
-            <param-name>getRequestURIKey</param-name>
-            <param-value>/proxy/*</param-value>
-        </init-param>
-    </servlet>-->
+    </servlet>
     <servlet>
         <servlet-name>ISORecord</servlet-name>
         <servlet-class>gov.usgs.cida.watersmart.iso.ISORecord</servlet-class>
     </servlet>
-<!--    <servlet-mapping>
+    <servlet-mapping>
         <servlet-name>OWSProxy</servlet-name>
-        <url-pattern>/proxy/*</url-pattern>
-    </servlet-mapping>-->
+        <url-pattern>/service/proxy</url-pattern>
+    </servlet-mapping>
     <servlet>
         <servlet-name>Export</servlet-name>
         <servlet-class>gov.usgs.cida.watersmart.util.Export</servlet-class>
@@ -116,5 +89,13 @@
     <servlet-mapping>
         <servlet-name>ISORecord</servlet-name>
         <url-pattern>/service/isorecord</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>UpdateRun</servlet-name>
+        <servlet-class>gov.usgs.cida.watersmart.util.UpdateRun</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UpdateRun</servlet-name>
+        <url-pattern>/update</url-pattern>
     </servlet-mapping>
 </web-app>

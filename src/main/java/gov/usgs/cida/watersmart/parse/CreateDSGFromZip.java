@@ -1,20 +1,19 @@
 package gov.usgs.cida.watersmart.parse;
 
 import com.google.common.collect.Maps;
-import gov.usgs.cida.watersmart.parse.file.SYEParser;
-import gov.usgs.cida.watersmart.parse.file.WATERSParser;
 import gov.usgs.cida.netcdf.dsg.Observation;
 import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Station;
 import gov.usgs.cida.netcdf.dsg.StationTimeSeriesNetCDFFile;
 import gov.usgs.cida.watersmart.parse.column.AFINCHParser;
+import gov.usgs.cida.watersmart.parse.file.SYEParser;
+import gov.usgs.cida.watersmart.parse.file.WATERSParser;
 import gov.usgs.cida.watersmart.util.JNDISingleton;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -41,7 +40,7 @@ public class CreateDSGFromZip {
         String filename = srcZip.getName().replace(".zip", ".nc");
         
         File ncFile = new File(sosPath + File.separator + runMeta.getTypeString() +
-                               File.separator +filename);
+                               File.separator + filename);
         ZipFile zip = new ZipFile(srcZip);
         Enumeration<? extends ZipEntry> entries = zip.entries();
         StationTimeSeriesNetCDFFile nc = null;

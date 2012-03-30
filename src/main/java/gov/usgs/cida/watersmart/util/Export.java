@@ -40,8 +40,7 @@ public class Export extends HttpServlet {
         
         InputStream in = null;
         BufferedOutputStream out = null;
-//        File tempFileOut = File.createTempFile("test", ".");
-//        FileOutputStream fos = new FileOutputStream(tempFileOut);
+
         try {
             response.setContentType("application/octet-stream");
             response.setContentLength(length);
@@ -54,11 +53,8 @@ public class Export extends HttpServlet {
             
             byte[] outputByte = new byte[4096];
             while (in.read(outputByte, 0, 4096) != -1) {
-//                fos.write(outputByte, 0, 4096);
                 out.write(outputByte, 0, 4096);
             }
-//            fos.flush();
-//            fos.close();
             out.flush();
             out.close();
         } finally {

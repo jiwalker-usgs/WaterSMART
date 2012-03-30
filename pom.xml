@@ -62,18 +62,7 @@
         <dependency>
             <groupId>gov.usgs.cida.gdp</groupId>
             <artifactId>gdp-proxy</artifactId>
-            <version>14</version>
-        </dependency>
-        <dependency>
-            <groupId>org.tuckey</groupId>
-            <artifactId>urlrewritefilter</artifactId>
-            <version>3.2.0-1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>    
-                </exclusion>
-            </exclusions>
+            <version>15-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -183,6 +172,12 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>11.0.2</version>
+        </dependency>
+        <!-- TODO switch to httpcomponents -->
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
         </dependency>
         
         <!-- Testing! -->

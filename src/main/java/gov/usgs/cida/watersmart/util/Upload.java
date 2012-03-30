@@ -77,14 +77,14 @@ public class Upload extends HttpServlet {
                     destinationFile = meta.getFile(tempDir);
                     saveFileFromRequest(fileIn, destinationFile);
                     String filename = CreateDSGFromZip.create(destinationFile, meta);
-                    CSWTransactionHelper helper = new CSWTransactionHelper(meta);
+                    CSWTransactionHelper helper = new CSWTransactionHelper(meta, filename);
                     helper.insert();
                 } else {
                     throw new Exception("Must provide all required parameters");
                 }
             } catch (Exception ex) {
                 // pass exception text along?
-                sendErrorResponse(response, "Unable to upload file");
+                sendErrorResponse(response, "Unable to upload file: " + ex.getMessage());
                 return;
             }
         } else {
@@ -99,8 +99,7 @@ public class Upload extends HttpServlet {
 //            }
         }
 
-        String responseText = null;
-        responseText = "{success: true, file: '" + destinationFile.getName() + "'}";
+        String responseText = "{success: true, file: '" + destinationFile.getName() + "'}";
         // can do post processing stuff here
         sendResponse(response, responseText);
     }

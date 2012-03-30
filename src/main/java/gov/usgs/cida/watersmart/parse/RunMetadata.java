@@ -1,11 +1,19 @@
 package gov.usgs.cida.watersmart.parse;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ModelType;
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeFormatterBuilder;
+import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tuckey.noclash.gzipfilter.org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -21,13 +29,58 @@ public class RunMetadata {
     private String name;
     private String modelVersion;
     private String runIdent;
-    private String creationDate;
+    private DateTime creationDate;
     private String scenario;
     private String comments;
     private String email;
     private String wfsUrl;
     private String layerName;
     private String commonAttribute;
+    
+    private static final Map<String, String> XPATH_MAP = Maps.newLinkedHashMap();
+    private static final String XPATH_SUBSTITUTION_SCENARIO = "{scenario}";
+    private static final String XPATH_SUBSTITUTION_MODEL_VERSION = "{modelVersion}";
+    private static final String XPATH_SUBSTITUTION_RUN_IDENTIFIER = "{runIdentifier}";
+        
+    private static final String UPDATE_XPATH_TEMPLATE = "gmd:identificationInfo/srv:SV_ServiceIdentification[@id='ncSOS']/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString[text()='" +
+                               XPATH_SUBSTITUTION_SCENARIO + "']/../../gmd:edition/gco:CharacterString[text()='" + 
+                               XPATH_SUBSTITUTION_MODEL_VERSION + "." + XPATH_SUBSTITUTION_RUN_IDENTIFIER + 
+                               "']/../../../..";
+    
+    private static final List<DateTimeFormatter> dateInputFormats = Lists.newArrayList();
+    static {
+        dateInputFormats.add(
+            new DateTimeFormatterBuilder()
+            .appendMonthOfYear(1)
+            .appendLiteral('/')
+            .appendDayOfMonth(1)
+            .appendLiteral('/')
+            .appendYear(4, 4)
+            .toFormatter());
+        
+        dateInputFormats.add(
+            new DateTimeFormatterBuilder()
+            .appendMonthOfYear(1)
+            .appendLiteral('-')
+            .appendDayOfMonth(1)
+            .appendLiteral('-')
+            .appendYear(4, 4)
+            .toFormatter());
+        
+        dateInputFormats.add(
+            ISODateTimeFormat.dateTimeParser());
+    }
+
+    
+    static {
+        XPATH_MAP.put("name", "/gmd:citation/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:individualName/gco:CharacterString");
+        XPATH_MAP.put("date", "/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:DateTime");
+        XPATH_MAP.put("email", "/gmd:citation/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gco:CharacterString");
+        XPATH_MAP.put("comments", "/gmd:abstract/gco:CharacterString");
+        XPATH_MAP.put("scenario", "/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString");
+        // Edition is modelVersion and runIdentifier, need to be changed at same time
+        XPATH_MAP.put("edition", "/gmd:citation/gmd:CI_Citation/gmd:edition/gco:CharacterString");
+    }
     
     public RunMetadata() {
         type = null;
@@ -44,13 +97,28 @@ public class RunMetadata {
         commonAttribute = null;
     }
     
+    public RunMetadata(ModelType type, String modelId, String name, String modelVersion, String runIdent, String creationDate, String scenario, String comments, String email, String wfsUrl, String layerName, String commonAttribute) {
+        this.type = type;
+        this.modelId = modelId;
+        this.name = name;
+        this.modelVersion = modelVersion;
+        this.runIdent = runIdent;
+        this.creationDate = parseDate(creationDate);
+        this.scenario = scenario;
+        this.comments = comments;
+        this.email = email;
+        this.wfsUrl = wfsUrl;
+        this.layerName = layerName;
+        this.commonAttribute = commonAttribute;
+    }
+    
     public boolean isFilledIn() {
         return (type != null &&
+                creationDate != null &&
                 StringUtils.isNotBlank(modelId) &&
                 StringUtils.isNotBlank(name) &&
                 StringUtils.isNotBlank(modelVersion) &&
                 StringUtils.isNotBlank(runIdent) &&
-                StringUtils.isNotBlank(creationDate) &&
                 StringUtils.isNotBlank(scenario) &&
                 StringUtils.isNotBlank(email) &&
                 StringUtils.isNotBlank(wfsUrl) &&
@@ -128,7 +196,7 @@ public class RunMetadata {
         if (StringUtils.isNotBlank(dirPath)) {
             File dir = new File(dirPath);
             if (dir.exists() && dir.canWrite()) {
-                String file = type.toString().toLowerCase() + "-" + scenario + "-" + modelVersion + "." + runIdent + UPLOAD_EXTENSION;
+                String file = getFileName() + UPLOAD_EXTENSION;
                 return new File(dirPath + File.separator + file);
             }
         }
@@ -136,6 +204,16 @@ public class RunMetadata {
         String err = "Must pass in a valid directory in which to create file";
         LOG.debug(err);
         throw new IllegalArgumentException(err);
+    }
+    
+    public String getFileName() {
+        StringBuilder str = new StringBuilder();
+        str.append(getTypeString())
+           .append("-")
+           .append(scenario)
+           .append("-")
+           .append(getEditionString());
+        return str.toString();
     }
 
     public String getComments() {
@@ -147,13 +225,32 @@ public class RunMetadata {
     }
 
     public String getCreationDate() {
-        return creationDate;
+        return creationDate.toString(ISODateTimeFormat.dateTimeNoMillis());
     }
 
     public void setCreationDate(String creationDate) {
-        this.creationDate = creationDate;
+        this.creationDate = parseDate(creationDate);
     }
 
+    /**
+     * Uses predefined date parsers to create DateTime object
+     * @param date parsed Date
+     * @return parsed date or null if invalid input date
+     */
+    private static DateTime parseDate(String date) {
+        DateTime parsedDate = null;
+        for (DateTimeFormatter dtf : dateInputFormats) {
+            try {
+                parsedDate = dtf.withZoneUTC().parseDateTime(date);
+                break; // throws exception if parse fails
+            }
+            catch (IllegalArgumentException ex) {
+                // try again
+            }
+        }
+        return parsedDate;
+    }
+    
     public String getEmail() {
         return email;
     }
@@ -242,5 +339,47 @@ public class RunMetadata {
      */
     public void setModelId(String modelId) {
         this.modelId = modelId;
+    }
+    
+    public String getEditionString() {
+        return modelVersion + "." + runIdent;
+    }
+    
+    public String get(String var) {
+        if ("edition".equals(var)) {
+            return getEditionString();
+        } else if ("name".equals(var)) {
+            return getName();
+        } else if ("scenario".equals(var)) {
+            return getScenario();
+        } else if ("date".equals(var)) {
+            return getCreationDate();
+        } else if ("comments".equals(var)) {
+            return getComments();
+        } else if ("email".equals(var)) {
+            return getEmail();
+        } else {
+            throw new IllegalArgumentException("This is not a thing");
+        }
+    }
+    
+    public Map<String, String> getUpdateMap(RunMetadata oldMetadata) {
+        String updateXpath = UPDATE_XPATH_TEMPLATE
+                .replace(XPATH_SUBSTITUTION_SCENARIO, oldMetadata.getScenario())
+                .replace(XPATH_SUBSTITUTION_MODEL_VERSION, oldMetadata.getModelVersion())
+                .replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, oldMetadata.getRunIdent());
+        
+        Map<String, String> propsMap = Maps.newLinkedHashMap();
+        for (String key : XPATH_MAP.keySet()) {
+            if ("edition".equals(key)) {
+                updateXpath = UPDATE_XPATH_TEMPLATE
+                .replace(XPATH_SUBSTITUTION_SCENARIO, getScenario()) // scenario has already been changed, maybe
+                .replace(XPATH_SUBSTITUTION_MODEL_VERSION, oldMetadata.getModelVersion())
+                .replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, oldMetadata.getRunIdent());
+            }
+            
+            propsMap.put(updateXpath + XPATH_MAP.get(key), this.get(key));
+        }
+        return propsMap;
     }
 }

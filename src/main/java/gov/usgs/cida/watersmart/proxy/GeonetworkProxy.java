@@ -1,33 +1,19 @@
 package gov.usgs.cida.watersmart.proxy;
 
-import gov.usgs.cida.config.DynamicReadOnlyProperties;
-import gov.usgs.cida.watersmart.util.JNDISingleton;
+import gov.usgs.cida.watersmart.csw.GeonetworkSession;
 import gov.usgs.service.OWSProxyServletX;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.logging.Level;
-import javax.naming.NamingException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
@@ -40,36 +26,19 @@ import org.slf4j.LoggerFactory;
 public class GeonetworkProxy extends OWSProxyServletX {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GeonetworkProxy.class);
+    private static GeonetworkSession geonetworkSession;
     
-    private static CookieStore cookieJar;
-    private static Date selfExpireCookieDate;
-    private static final DynamicReadOnlyProperties props = JNDISingleton.getInstance();
-
-    // currently defaults to gdp2 geonetwork
-    private static final String geonetworkAddr = props.getProperty("watersmart.geonetwork.addr");
-    private static final String GEONETWORK_CSW = geonetworkAddr + "/srv/en/csw";
-    private static final String GEONETWORK_LOGIN = geonetworkAddr + "/srv/en/xml.user.login";
-    private static final String GEONETWORK_LOGOUT = geonetworkAddr + "/srv/en/xml.user.logout";
-    private static final String GEONETWORK_USER = props.getProperty("watersmart.geonetwork.user");
-    private static final String GEONETWORK_PASS = props.getProperty("watersmart.geonetwork.pass");
-    
-
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        if (null == geonetworkAddr || null == GEONETWORK_USER || null == GEONETWORK_PASS) {
-            throw new RuntimeException("Geonetwork dependency not declared in JNDI context,"
-                    + " please set GEONETWORK_ADDR, GEONETWORK_USER, and GEONETWORK_PASS");
-        }
-        cookieJar = new BasicCookieStore();
-        selfExpireCookieDate = new Date();
+        geonetworkSession = new GeonetworkSession();
         LOGGER.debug("Geonetwork proxy initialized");
     }
 
     @Override
     public void destroy() {
         try {
-            logout();
+            geonetworkSession.logout();
         }
         catch (IOException ioe) {
             LOGGER.debug("Error logging out of geonetwork", ioe);
@@ -84,64 +53,8 @@ public class GeonetworkProxy extends OWSProxyServletX {
                 conMgr.shutdown();
             }
         }
-        cookieJar.clear();
-        cookieJar = null;
+        geonetworkSession.clearCookieJar();
         LOGGER.debug("Servlet destroy complete");
-    }
-
-    /**
-     * Calls the login for geonetwork, returns the cookie store
-     * @throws URISyntaxException
-     * @throws IOException 
-     */
-    private synchronized void login() throws URISyntaxException,
-                                                   IOException {
-        URI loginUri = new URI(GEONETWORK_LOGIN);
-        HttpContext localContext = new BasicHttpContext();
-        localContext.setAttribute(ClientContext.COOKIE_STORE, cookieJar);
-        HttpUriRequest request = new HttpPost(loginUri);
-        // username and password should be configured somewhere
-        LOGGER.warn("username and password are still not parameterized");
-        HttpEntity entity = new StringEntity(
-                "username=" + GEONETWORK_USER + "&password=" + GEONETWORK_PASS,
-                "application/x-www-form-urlencoded",
-                "UTF-8");
-        ((HttpEntityEnclosingRequest) request).setEntity(entity);
-        HttpClient httpClient = getHttpClient(null);
-        httpClient.execute(request, localContext);
-        
-        Calendar cal = new GregorianCalendar();
-        cal.add(Calendar.HOUR_OF_DAY, 1);
-        selfExpireCookieDate = cal.getTime();
-    }
-
-    /**
-     * Calls the logout url for geonetwork, kills the cookie store
-     * @throws URISyntaxException
-     * @throws IOException 
-     */
-    private synchronized void logout() throws URISyntaxException,
-                                                    IOException {
-        URI logout = new URI(GEONETWORK_LOGOUT);
-        HttpContext localContext = new BasicHttpContext();
-        localContext.setAttribute(ClientContext.COOKIE_STORE, cookieJar);
-        HttpUriRequest request = new HttpGet(logout);
-        HttpClient httpClient = getHttpClient(null);
-        httpClient.execute(request, localContext);
-        cookieJar.clear();
-    }
-    
-    private synchronized boolean isExistingCookie() throws URISyntaxException, IOException {
-        if (cookieJar != null) {
-            Date now = new Date();
-            if (now.after(selfExpireCookieDate)) {
-                cookieJar.clear();
-//                logout();
-                return false;
-            }
-            return !(cookieJar.getCookies().isEmpty());
-        }
-        return false;
     }
 
     /** 
@@ -157,8 +70,8 @@ public class GeonetworkProxy extends OWSProxyServletX {
             throws ServletException, IOException {
 
         try {
-            if(!isExistingCookie()) {
-                login();
+            if(!geonetworkSession.isExistingCookie()) {
+                geonetworkSession.login();
             }
             HttpUriRequest serverRequest = generateServerRequest(request);
             handleServerRequest(request, response, serverRequest);
@@ -180,7 +93,7 @@ public class GeonetworkProxy extends OWSProxyServletX {
         HttpClient serverClient = getHttpClient(clientRequest);
         try {
             HttpContext localContext = new BasicHttpContext();
-            localContext.setAttribute(ClientContext.COOKIE_STORE, cookieJar);
+            localContext.setAttribute(ClientContext.COOKIE_STORE, geonetworkSession.getCookieJar());
             HttpResponse methodReponse = serverClient.execute(serverRequest,
                                                               localContext);
             handleServerResponse(clientRequest, clientResponse, methodReponse);
@@ -197,6 +110,6 @@ public class GeonetworkProxy extends OWSProxyServletX {
     @Override
     protected String getServerRequestURIAsString(
             HttpServletRequest clientrequest) {
-        return GEONETWORK_CSW;
+        return geonetworkSession.GEONETWORK_CSW;
     }
 }
