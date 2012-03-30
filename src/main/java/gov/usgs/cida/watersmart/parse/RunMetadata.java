@@ -241,7 +241,7 @@ public class RunMetadata {
         DateTime parsedDate = null;
         for (DateTimeFormatter dtf : dateInputFormats) {
             try {
-                parsedDate = dtf.parseDateTime(date);
+                parsedDate = dtf.withZoneUTC().parseDateTime(date);
                 break; // throws exception if parse fails
             }
             catch (IllegalArgumentException ex) {
