@@ -113,6 +113,8 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                             runPanels : runPanelsClone,
                             panelInfo : panelInfo
                         })
+                        
+                        this.mapPanel.removeLayers(null, false);
                     },
                     scope : this
                 }
