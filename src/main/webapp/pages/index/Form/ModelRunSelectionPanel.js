@@ -350,8 +350,10 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         this.cswStore.reload({
             callback : function(store) {
                 this.updateModelStore();
-                var combobox = Ext.getCmp('model-combobox')
-                combobox.setValue(combobox.getValue());
+                var combobox = Ext.getCmp('model-combobox');
+                var currentRecord = combobox.findRecord('title', combobox.getRawValue());
+                combobox.setRawValue(combobox.getValue());
+                combobox.fireEvent('select', combobox, currentRecord);
             },
             scope : this
         });
