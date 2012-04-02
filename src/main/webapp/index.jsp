@@ -12,7 +12,7 @@
         <jsp:include page="template/USGSHead.jsp">
             <jsp:param name="shortName" value="WaterSMART" />
             <jsp:param name="title" value="WaterSMART Model Intercomparison Portal" />
-            <jsp:param name="description" value="WaterSMART Modle Intercomparison Portal" />
+            <jsp:param name="description" value="WaterSMART Model Intercomparison Portal" />
             <jsp:param name="author" value="Jordan Walker"/>
             <jsp:param name="publisher" value="USGS - U.S. Geological Survey, Water Resources; CIDA - Center for Integrated Data Analytics" />
             <jsp:param name="keywords" value="USGS, U.S. Geological Survey, water, earth science, hydrology, hydrologic, data, streamflow, stream, river, lake, flood, drought, quality, basin, watershed, environment, ground water, groundwater" />
