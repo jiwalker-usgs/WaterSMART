@@ -18,6 +18,12 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
         this.panelInfo.citedResponsibleParty = this.serviceIdentification.citation.citedResponsibleParty; // Array
         this.panelInfo.date = this.serviceIdentification.citation.date; // Array
         this.panelInfo.presentationForm = this.serviceIdentification.citation.presentationForm; // Array
+        this.panelInfo.isBestScenario = false;
+        
+        if (this.serviceIdentification.citation.otherCitationDetails && this.serviceIdentification.citation.otherCitationDetails.CharacterString.value.toLowerCase() === 'best') {
+            this.panelInfo.isBestScenario = true;
+            this.panelInfo.title += ' -- (Best Scenario)'
+        }
         
         var revisionDates = [];
         Ext.each(this.panelInfo.date, function(dateItem){

@@ -52,6 +52,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         panelInfo.runPanels = [];
                         panelInfo.metadataStandardName = storeItem.get('metadataStandardName');
                         panelInfo.metadataStandardVersion = storeItem.get('metadataStandardVersion');
+                        panelInfo.isBestScenario = false;
                         
                         Ext.each(storeItem.get('identificationInfo'), function(idItem) {
                 
@@ -241,6 +242,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         var abstrakt = '';
                         var runDate;
                         var scenario;
+                        var isBestScenario;
                         
                         modelerName = serviceIdentification.citation.citedResponsibleParty[0].individualName.CharacterString.value;
                         modelVersion = serviceIdentification.citation.edition.CharacterString.value.split('.')[0];
@@ -248,7 +250,8 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         abstrakt = serviceIdentification['abstract'].CharacterString.value;
                         runDate = Date.parseDate(serviceIdentification.citation.date[0].date[0].DateTime.value.split('T')[0], 'Y-m-d');
                         scenario = serviceIdentification.citation.title.CharacterString.value;
-                        
+                        isBestScenario = (serviceIdentification.citation.otherCitationDetails && serviceIdentification.citation.otherCitationDetails.CharacterString.value.toLowerCase() === 'best');
+                            
                         for (var i = 0;i < modelStore.data.rec.data.identificationInfo.length;i++) {
                             var iiItem = modelStore.data.rec.data.identificationInfo[i];
                             
@@ -271,7 +274,8 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                             runIdentifier : runIdentifier,
                             wfsUrl : wfsUrl,
                             runDate : runDate,
-                            scenario : scenario
+                            scenario : scenario,
+                            isBestScenario : isBestScenario
                         });
                     
                         var modalRunWindow = new Ext.Window({

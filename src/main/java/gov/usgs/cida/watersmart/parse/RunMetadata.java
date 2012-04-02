@@ -20,10 +20,9 @@ import org.slf4j.LoggerFactory;
  * @author Jordan Walker <jiwalker@usgs.gov>
  */
 public class RunMetadata {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(RunMetadata.class);
     private static final String UPLOAD_EXTENSION = ".zip";
-    
     private ModelType type;
     private String modelId;
     private String name;
@@ -36,42 +35,28 @@ public class RunMetadata {
     private String wfsUrl;
     private String layerName;
     private String commonAttribute;
-    
+    private boolean best;
     private static final Map<String, String> XPATH_MAP = Maps.newLinkedHashMap();
     private static final String XPATH_SUBSTITUTION_SCENARIO = "{scenario}";
     private static final String XPATH_SUBSTITUTION_MODEL_VERSION = "{modelVersion}";
     private static final String XPATH_SUBSTITUTION_RUN_IDENTIFIER = "{runIdentifier}";
-        
-    private static final String UPDATE_XPATH_TEMPLATE = "gmd:identificationInfo/srv:SV_ServiceIdentification[@id='ncSOS']/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString[text()='" +
-                               XPATH_SUBSTITUTION_SCENARIO + "']/../../gmd:edition/gco:CharacterString[text()='" + 
-                               XPATH_SUBSTITUTION_MODEL_VERSION + "." + XPATH_SUBSTITUTION_RUN_IDENTIFIER + 
-                               "']/../../../..";
-    
+    private static final String UPDATE_XPATH_TEMPLATE = "gmd:identificationInfo/srv:SV_ServiceIdentification[@id='ncSOS']/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString[text()='"
+            + XPATH_SUBSTITUTION_SCENARIO + "']/../../gmd:edition/gco:CharacterString[text()='"
+            + XPATH_SUBSTITUTION_MODEL_VERSION + "." + XPATH_SUBSTITUTION_RUN_IDENTIFIER
+            + "']/../../../..";
     private static final List<DateTimeFormatter> dateInputFormats = Lists.newArrayList();
+
     static {
         dateInputFormats.add(
-            new DateTimeFormatterBuilder()
-            .appendMonthOfYear(1)
-            .appendLiteral('/')
-            .appendDayOfMonth(1)
-            .appendLiteral('/')
-            .appendYear(4, 4)
-            .toFormatter());
-        
+                new DateTimeFormatterBuilder().appendMonthOfYear(1).appendLiteral('/').appendDayOfMonth(1).appendLiteral('/').appendYear(4, 4).toFormatter());
+
         dateInputFormats.add(
-            new DateTimeFormatterBuilder()
-            .appendMonthOfYear(1)
-            .appendLiteral('-')
-            .appendDayOfMonth(1)
-            .appendLiteral('-')
-            .appendYear(4, 4)
-            .toFormatter());
-        
+                new DateTimeFormatterBuilder().appendMonthOfYear(1).appendLiteral('-').appendDayOfMonth(1).appendLiteral('-').appendYear(4, 4).toFormatter());
+
         dateInputFormats.add(
-            ISODateTimeFormat.dateTimeParser());
+                ISODateTimeFormat.dateTimeParser());
     }
 
-    
     static {
         XPATH_MAP.put("name", "/gmd:citation/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:individualName/gco:CharacterString");
         XPATH_MAP.put("date", "/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:DateTime");
@@ -81,7 +66,7 @@ public class RunMetadata {
         // Edition is modelVersion and runIdentifier, need to be changed at same time
         XPATH_MAP.put("edition", "/gmd:citation/gmd:CI_Citation/gmd:edition/gco:CharacterString");
     }
-    
+
     public RunMetadata() {
         type = null;
         modelId = null;
@@ -95,9 +80,15 @@ public class RunMetadata {
         wfsUrl = null;
         layerName = null;
         commonAttribute = null;
+        best = false;
     }
+
     
     public RunMetadata(ModelType type, String modelId, String name, String modelVersion, String runIdent, String creationDate, String scenario, String comments, String email, String wfsUrl, String layerName, String commonAttribute) {
+        this(type, modelId, name, modelVersion, runIdent, creationDate, scenario, comments, email, wfsUrl, layerName, commonAttribute, false);
+    }
+    
+    public RunMetadata(ModelType type, String modelId, String name, String modelVersion, String runIdent, String creationDate, String scenario, String comments, String email, String wfsUrl, String layerName, String commonAttribute, boolean best) {
         this.type = type;
         this.modelId = modelId;
         this.name = name;
@@ -110,25 +101,27 @@ public class RunMetadata {
         this.wfsUrl = wfsUrl;
         this.layerName = layerName;
         this.commonAttribute = commonAttribute;
+        this.best = best;
     }
-    
+
     public boolean isFilledIn() {
-        return (type != null &&
-                creationDate != null &&
-                StringUtils.isNotBlank(modelId) &&
-                StringUtils.isNotBlank(name) &&
-                StringUtils.isNotBlank(modelVersion) &&
-                StringUtils.isNotBlank(runIdent) &&
-                StringUtils.isNotBlank(scenario) &&
-                StringUtils.isNotBlank(email) &&
-                StringUtils.isNotBlank(wfsUrl) &&
-                StringUtils.isNotBlank(layerName) &&
-                StringUtils.isNotBlank(commonAttribute) &&
-                comments != null);
+        return (type != null
+                && creationDate != null
+                && StringUtils.isNotBlank(modelId)
+                && StringUtils.isNotBlank(name)
+                && StringUtils.isNotBlank(modelVersion)
+                && StringUtils.isNotBlank(runIdent)
+                && StringUtils.isNotBlank(scenario)
+                && StringUtils.isNotBlank(email)
+                && StringUtils.isNotBlank(wfsUrl)
+                && StringUtils.isNotBlank(layerName)
+                && StringUtils.isNotBlank(commonAttribute)
+                && comments != null);
     }
-    
+
     /**
      * Tries to set value corresponding to the item
+     *
      * @param item file form field item
      * @return true if item is set, false if not found
      */
@@ -143,7 +136,7 @@ public class RunMetadata {
             setModelId(item.getString());
             return true;
         }
-        if("name".equals(param)) {
+        if ("name".equals(param)) {
             setName(item.getString());
             return true;
         }
@@ -185,14 +178,14 @@ public class RunMetadata {
         }
         return false;
     }
-    
+
     public File getFile(String dirPath) throws UnsupportedOperationException {
         if (!isFilledIn()) {
             String err = "Call to getFile before all fields are set";
             LOG.debug(err);
             throw new UnsupportedOperationException(err);
         }
-        
+
         if (StringUtils.isNotBlank(dirPath)) {
             File dir = new File(dirPath);
             if (dir.exists() && dir.canWrite()) {
@@ -205,14 +198,10 @@ public class RunMetadata {
         LOG.debug(err);
         throw new IllegalArgumentException(err);
     }
-    
+
     public String getFileName() {
         StringBuilder str = new StringBuilder();
-        str.append(getTypeString())
-           .append("-")
-           .append(scenario)
-           .append("-")
-           .append(getEditionString());
+        str.append(getTypeString()).append("-").append(scenario).append("-").append(getEditionString());
         return str.toString();
     }
 
@@ -234,6 +223,7 @@ public class RunMetadata {
 
     /**
      * Uses predefined date parsers to create DateTime object
+     *
      * @param date parsed Date
      * @return parsed date or null if invalid input date
      */
@@ -243,14 +233,13 @@ public class RunMetadata {
             try {
                 parsedDate = dtf.withZoneUTC().parseDateTime(date);
                 break; // throws exception if parse fails
-            }
-            catch (IllegalArgumentException ex) {
+            } catch (IllegalArgumentException ex) {
                 // try again
             }
         }
         return parsedDate;
     }
-    
+
     public String getEmail() {
         return email;
     }
@@ -294,7 +283,7 @@ public class RunMetadata {
     public ModelType getType() {
         return type;
     }
-    
+
     public String getTypeString() {
         return getType().toString().toLowerCase();
     }
@@ -302,7 +291,7 @@ public class RunMetadata {
     public void setType(ModelType type) {
         this.type = type;
     }
-    
+
     public String getCommonAttribute() {
         return commonAttribute;
     }
@@ -340,11 +329,19 @@ public class RunMetadata {
     public void setModelId(String modelId) {
         this.modelId = modelId;
     }
-    
+
+    public boolean isBest() {
+        return best;
+    }
+
+    public void setBest(boolean best) {
+        this.best = best;
+    }
+
     public String getEditionString() {
         return modelVersion + "." + runIdent;
     }
-    
+
     public String get(String var) {
         if ("edition".equals(var)) {
             return getEditionString();
@@ -362,22 +359,17 @@ public class RunMetadata {
             throw new IllegalArgumentException("This is not a thing");
         }
     }
-    
+
     public Map<String, String> getUpdateMap(RunMetadata oldMetadata) {
-        String updateXpath = UPDATE_XPATH_TEMPLATE
-                .replace(XPATH_SUBSTITUTION_SCENARIO, oldMetadata.getScenario())
-                .replace(XPATH_SUBSTITUTION_MODEL_VERSION, oldMetadata.getModelVersion())
-                .replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, oldMetadata.getRunIdent());
-        
+        String updateXpath = UPDATE_XPATH_TEMPLATE.replace(XPATH_SUBSTITUTION_SCENARIO, oldMetadata.getScenario()).replace(XPATH_SUBSTITUTION_MODEL_VERSION, oldMetadata.getModelVersion()).replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, oldMetadata.getRunIdent());
+
         Map<String, String> propsMap = Maps.newLinkedHashMap();
         for (String key : XPATH_MAP.keySet()) {
             if ("edition".equals(key)) {
-                updateXpath = UPDATE_XPATH_TEMPLATE
-                .replace(XPATH_SUBSTITUTION_SCENARIO, getScenario()) // scenario has already been changed, maybe
-                .replace(XPATH_SUBSTITUTION_MODEL_VERSION, oldMetadata.getModelVersion())
-                .replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, oldMetadata.getRunIdent());
+                updateXpath = UPDATE_XPATH_TEMPLATE.replace(XPATH_SUBSTITUTION_SCENARIO, getScenario()) // scenario has already been changed, maybe
+                        .replace(XPATH_SUBSTITUTION_MODEL_VERSION, oldMetadata.getModelVersion()).replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, oldMetadata.getRunIdent());
             }
-            
+
             propsMap.put(updateXpath + XPATH_MAP.get(key), this.get(key));
         }
         return propsMap;

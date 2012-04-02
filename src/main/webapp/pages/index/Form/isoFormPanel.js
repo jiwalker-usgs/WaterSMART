@@ -4,6 +4,12 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
     commonAttr : undefined,
     create : undefined,
     htmlTransform : undefined,
+    isBestScenario : undefined,
+    isBestScenarioCheckbox : new Ext.form.Checkbox({
+        fieldLabel: 'Mark As Best',
+        xtype : 'checkbox',
+        name : 'markAsBest'
+    }),
     layer : undefined,
     modelId : undefined,
     modelName : undefined,
@@ -39,6 +45,8 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
         this.scenario = this.originalScenario = config.scenario;
         this.wfsUrl = config.wfsUrl || '';
         this.create = config.create;
+        this.isBestScenario = config.isBestScenario || false;
+        
         this['abstract'] = this.originalAbstract = config['abstract'] || '';
         
         config = Ext.apply({
@@ -118,7 +126,8 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                                 modeltype : isoFormPanel.modelName,
                                 wfsUrl : isoFormPanel.wfsUrl,
                                 layer : isoFormPanel.layer,
-                                commonAttr : isoFormPanel.commonAttr
+                                commonAttr : isoFormPanel.commonAttr,
+                                markAsBest : isoFormPanel.markAsBest
                             },
                             waitMsg: 'Saving...',
                             success: function() {
@@ -163,7 +172,9 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                             waitMsg: 'Saving...',
                             success: function(form, action) {
                                 LOG.info('isoFormPanel.js::User update succeeded.');
-                                NOTIFY.info({msg : action.result.msg});
+                                NOTIFY.info({
+                                    msg : action.result.msg
+                                    });
                                 
                                 Ext.getCmp('model-run-selection-panel').reloadRuns();
                                 
@@ -172,9 +183,13 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                             },
                             failure: function(form, action) {
                                 if (action.failureType === 'client') {
-                                    NOTIFY.warn({msg : 'Please ensure all input data is valid'})
+                                    NOTIFY.warn({
+                                        msg : 'Please ensure all input data is valid'
+                                    })
                                 } else {
-                                    NOTIFY.warn({msg : action.result.msg});
+                                    NOTIFY.warn({
+                                        msg : action.result.msg
+                                        });
                                 }
                                 
                             }
@@ -187,9 +202,14 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
         
         if (this.create) {
             this.add(new WaterSMART.FileUploadPanel())
-            this.doLayout();
+            
         }
         
+        if (!this.isBestScenario) {
+            this.add(this.isBestScenarioCheckbox);
+        }
+        
+        this.doLayout();        
         
     }
 });
