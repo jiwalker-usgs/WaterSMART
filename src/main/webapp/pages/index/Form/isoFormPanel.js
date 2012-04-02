@@ -175,11 +175,13 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                                 NOTIFY.info({
                                     msg : action.result.msg
                                     });
+                                var task = new Ext.util.DelayedTask(function(){
+                                    Ext.getCmp('model-run-selection-panel').reloadRuns();
                                 
-                                Ext.getCmp('model-run-selection-panel').reloadRuns();
+                                    LOG.info('isoFormPanel.js::Closing modal window');
+                                    this.ownerCt.ownerCt.ownerCt.close();
+                                }, this).delay(500);
                                 
-                                LOG.info('isoFormPanel.js::Closing modal window');
-                                this.ownerCt.ownerCt.ownerCt.close();
                             },
                             failure: function(form, action) {
                                 if (action.failureType === 'client') {

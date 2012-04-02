@@ -40,10 +40,12 @@ public class RunMetadata {
     private static final String XPATH_SUBSTITUTION_SCENARIO = "{scenario}";
     private static final String XPATH_SUBSTITUTION_MODEL_VERSION = "{modelVersion}";
     private static final String XPATH_SUBSTITUTION_RUN_IDENTIFIER = "{runIdentifier}";
-    private static final String UPDATE_XPATH_TEMPLATE = "gmd:identificationInfo/srv:SV_ServiceIdentification[@id='ncSOS']/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString[text()='"
-            + XPATH_SUBSTITUTION_SCENARIO + "']/../../gmd:edition/gco:CharacterString[text()='"
+    private static final String UPDATE_XPATH_SCENARIO_TEMPLATE = "gmd:identificationInfo/srv:SV_ServiceIdentification[@id='ncSOS']/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString[text()='"
+            + XPATH_SUBSTITUTION_SCENARIO + "']";
+    private static final String UPDATE_XPATH_EDITION_TEMPLATE = "/../../gmd:edition/gco:CharacterString[text()='"
             + XPATH_SUBSTITUTION_MODEL_VERSION + "." + XPATH_SUBSTITUTION_RUN_IDENTIFIER
-            + "']/../../../..";
+            + "']";
+    private static final String UPDATE_XPATH_TEMPLATE = UPDATE_XPATH_SCENARIO_TEMPLATE + UPDATE_XPATH_EDITION_TEMPLATE + "/../../../..";
     private static final List<DateTimeFormatter> dateInputFormats = Lists.newArrayList();
 
     static {
@@ -63,6 +65,7 @@ public class RunMetadata {
         XPATH_MAP.put("email", "/gmd:citation/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gco:CharacterString");
         XPATH_MAP.put("comments", "/gmd:abstract/gco:CharacterString");
         XPATH_MAP.put("scenario", "/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString");
+        XPATH_MAP.put("best", "/gmd:citation/gmd:CI_Citation/gmd:otherCitationDetails/gco:CharacterString");
         // Edition is modelVersion and runIdentifier, need to be changed at same time
         XPATH_MAP.put("edition", "/gmd:citation/gmd:CI_Citation/gmd:edition/gco:CharacterString");
     }
@@ -355,19 +358,35 @@ public class RunMetadata {
             return getComments();
         } else if ("email".equals(var)) {
             return getEmail();
+        } else if ("best".equals(var)) {
+            return "BEST";
         } else {
             throw new IllegalArgumentException("This is not a thing");
         }
     }
 
     public Map<String, String> getUpdateMap(RunMetadata oldMetadata) {
-        String updateXpath = UPDATE_XPATH_TEMPLATE.replace(XPATH_SUBSTITUTION_SCENARIO, oldMetadata.getScenario()).replace(XPATH_SUBSTITUTION_MODEL_VERSION, oldMetadata.getModelVersion()).replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, oldMetadata.getRunIdent());
+        String updateXpath;
 
         Map<String, String> propsMap = Maps.newLinkedHashMap();
         for (String key : XPATH_MAP.keySet()) {
             if ("edition".equals(key)) {
-                updateXpath = UPDATE_XPATH_TEMPLATE.replace(XPATH_SUBSTITUTION_SCENARIO, getScenario()) // scenario has already been changed, maybe
-                        .replace(XPATH_SUBSTITUTION_MODEL_VERSION, oldMetadata.getModelVersion()).replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, oldMetadata.getRunIdent());
+                updateXpath = UPDATE_XPATH_TEMPLATE.replace(XPATH_SUBSTITUTION_SCENARIO, getScenario()) // scenario has already been changed
+                        .replace(XPATH_SUBSTITUTION_MODEL_VERSION, oldMetadata.getModelVersion())
+                        .replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, oldMetadata.getRunIdent());
+            }
+            else if ("best".equals(key)) {
+                String removeBestsXpath = UPDATE_XPATH_SCENARIO_TEMPLATE.replace(XPATH_SUBSTITUTION_SCENARIO, getScenario()) // clear best for target scenario
+                              + "/../../../.." + XPATH_MAP.get(key);
+                propsMap.put(removeBestsXpath, "");
+                updateXpath = UPDATE_XPATH_TEMPLATE.replace(XPATH_SUBSTITUTION_SCENARIO, getScenario()) // scenario has already been changed
+                        .replace(XPATH_SUBSTITUTION_MODEL_VERSION, oldMetadata.getModelVersion())
+                        .replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, oldMetadata.getRunIdent());
+            }
+            else {
+                updateXpath = UPDATE_XPATH_TEMPLATE.replace(XPATH_SUBSTITUTION_SCENARIO, oldMetadata.getScenario())
+                        .replace(XPATH_SUBSTITUTION_MODEL_VERSION, oldMetadata.getModelVersion())
+                        .replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, oldMetadata.getRunIdent());
             }
 
             propsMap.put(updateXpath + XPATH_MAP.get(key), this.get(key));

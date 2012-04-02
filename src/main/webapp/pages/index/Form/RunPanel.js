@@ -22,7 +22,7 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
         
         if (this.serviceIdentification.citation.otherCitationDetails && this.serviceIdentification.citation.otherCitationDetails.CharacterString.value.toLowerCase() === 'best') {
             this.panelInfo.isBestScenario = true;
-            this.panelInfo.title += ' -- (Best Scenario)'
+            this.panelInfo.title += ' -- (Best Available)'
         }
         
         var revisionDates = [];

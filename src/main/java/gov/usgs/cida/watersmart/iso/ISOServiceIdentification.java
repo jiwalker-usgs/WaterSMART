@@ -45,12 +45,14 @@ public class ISOServiceIdentification {
         Node edition = makeEdition();
         Node crp = makeCitedResponsibleParty();
         Node presForm = makePresentationForm();
+        Node otherDetails = makeOtherCitationDetails();
         // Do other sections
         ciCitation.appendChild(title);
         ciCitation.appendChild(date);
         ciCitation.appendChild(edition);
         ciCitation.appendChild(crp);
         ciCitation.appendChild(presForm);
+        ciCitation.appendChild(otherDetails);
         citation.appendChild(ciCitation);
         return citation;
     }
@@ -151,6 +153,13 @@ public class ISOServiceIdentification {
         ciPresFormCode.setAttribute("codeListValue", "modelDigital");
         presForm.appendChild(ciPresFormCode);
         return presForm;
+    }
+    
+    private Node makeOtherCitationDetails() {
+        Element otherDetails = document.createElementNS(NAMESPACE_GMD, "gmd:otherCitationDetails");
+        Node charString = makeCharacterString(""); // may want to default BEST, but need logic for that
+        otherDetails.appendChild(charString);
+        return otherDetails;
     }
     
     private Node makeAbstract() {
