@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context antiJARLocking="true" path="/watersmart">
+<Context antiJARLocking="true" path="/watersmart" allowLinking="true">
     <!-- watersmart environment using this like documentation for what settings are available -->
     <Environment name="watersmart.frontend.log4js.pattern.layout" type="java.lang.String" value="%rms - %-5p - %m%n" />
     <Environment name="watersmart.frontend.log4js.threshold" type="java.lang.String" value="debug" />
