@@ -42,10 +42,24 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
         
         this.defaultMapConfig.layers.baseLayers = [
         new OpenLayers.Layer.XYZ(
+            "World Light Gray Base",
+            "http://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/${z}/${y}/${x}",
+            Ext.apply(EPSG900913Options, {
+                numZoomLevels : 14
+            })
+            ),
+        new OpenLayers.Layer.XYZ(
+            "World Terrain Base",
+            "http://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/${z}/${y}/${x}",
+            Ext.apply(EPSG900913Options, {
+                numZoomLevels : 14
+            })
+            ),
+        new OpenLayers.Layer.XYZ(
             "USA Topo Map",
             "http://services.arcgisonline.com/ArcGIS/rest/services/USA_Topo_Maps/MapServer/tile/${z}/${y}/${x}",
             Ext.apply(EPSG900913Options, {
-                numZoomLevels : 18
+                numZoomLevels : 16
             })
             )
         ];
