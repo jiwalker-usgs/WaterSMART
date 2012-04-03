@@ -5,11 +5,6 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
     create : undefined,
     htmlTransform : undefined,
     isBestScenario : undefined,
-    isBestScenarioCheckbox : new Ext.form.Checkbox({
-        fieldLabel: 'Mark As Best',
-        xtype : 'checkbox',
-        name : 'markAsBest'
-    }),
     layer : undefined,
     modelId : undefined,
     modelName : undefined,
@@ -51,7 +46,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
         
         config = Ext.apply({
             id: 'metadata-form',
-            bodyPadding: 5,
+            padding: 5,
             region: 'center',
             width: '100%',
             url: 'update',
@@ -174,7 +169,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                                 LOG.info('isoFormPanel.js::User update succeeded.');
                                 NOTIFY.info({
                                     msg : action.result.msg
-                                    });
+                                });
                                 var task = new Ext.util.DelayedTask(function(){
                                     Ext.getCmp('model-run-selection-panel').reloadRuns();
                                 
@@ -191,7 +186,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                                 } else {
                                     NOTIFY.warn({
                                         msg : action.result.msg
-                                        });
+                                    });
                                 }
                                 
                             }
@@ -204,14 +199,15 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
         
         if (this.create) {
             this.add(new WaterSMART.FileUploadPanel())
-            
         }
         
         if (!this.isBestScenario) {
-            this.add(this.isBestScenarioCheckbox);
+            this.add(new Ext.form.Checkbox({
+                fieldLabel: 'Mark As Best',
+                xtype : 'checkbox',
+                name : 'markAsBest'
+            }));
         }
-        
-        this.doLayout();        
         
     }
 });
