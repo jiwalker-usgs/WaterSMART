@@ -32,7 +32,7 @@ public class StartupListener implements ServletContextListener {
     }
 
     private File initializeFileRepository(ServletContextEvent sce) throws IOException, InterruptedException {
-        String repositoryPath = props.getProperty("watersmart.file.location") + File.separatorChar + "files";
+        String repositoryPath = props.getProperty("watersmart.file.location") + props.getProperty("watersmart.file.location.wps.repository");
         File repositoryPathFile = new File(repositoryPath);
 
         String webPath = sce.getServletContext().getRealPath("/");
@@ -41,7 +41,7 @@ public class StartupListener implements ServletContextListener {
             FileUtils.forceMkdir(repositoryPathFile);
         }
 
-        Process process = Runtime.getRuntime().exec(new String[]{"ln", "-s", repositoryPath, webPath + File.separatorChar + "files"});
+        Process process = Runtime.getRuntime().exec(new String[]{"ln", "-s", repositoryPath, webPath + props.getProperty("watersmart.file.location.wps.repository")});
         process.waitFor();
         process.destroy();
 
