@@ -122,7 +122,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                                 wfsUrl : isoFormPanel.wfsUrl,
                                 layer : isoFormPanel.layer,
                                 commonAttr : isoFormPanel.commonAttr,
-                                markAsBest : isoFormPanel.markAsBest
+                                markAsBest : isoFormPanel.isBestScenario
                             },
                             waitMsg: 'Saving...',
                             success: function() {

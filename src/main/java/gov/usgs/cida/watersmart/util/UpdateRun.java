@@ -53,7 +53,7 @@ public class UpdateRun extends HttpServlet {
         String wfsUrl = request.getParameter("wfsUrl");
         String layer = request.getParameter("layer");
         String commonAttr = request.getParameter("commonAttr");
-        Boolean updateAsBest = Boolean.parseBoolean(request.getParameter("markAsBest"));
+        Boolean updateAsBest = "on".equalsIgnoreCase(request.getParameter("markAsBest")) ? Boolean.TRUE : Boolean.FALSE;
         
         ModelType modelTypeEnum = null;
         if ("prms".equals(modelType.toLowerCase())) modelTypeEnum = ModelType.PRMS;
