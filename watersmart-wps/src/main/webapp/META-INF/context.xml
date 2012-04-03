@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context antiJARLocking="true" path="/watersmart-wps">
+    <!-- watersmart environment using this like documentation for what settings are available -->
+    <Environment name="watersmart.email.host" type="java.lang.String" value="gsvaresh01.er.usgs.gov" />
+    <Environment name="watersmart.email.port" type="java.lang.String" value="25" />
+    <Environment name="watersmart.email.check.interval.millis" type="java.lang.String" value="60000" />
+    <Environment name="watersmart.email.from" type="java.lang.String" value="watersmart-noreply@usgs.gov" />
+    <Environment name="watersmart.email.tracker" type="java.lang.String" value="jiwalker@usgs.gov" />
+</Context>

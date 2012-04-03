@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>gov.usgs.cida.watersmart</groupId>
+        <artifactId>watersmart</artifactId>
+        <version>004-SNAPSHOT</version>
+    </parent>
+    
+    <artifactId>watersmart-wps</artifactId>
+    <packaging>war</packaging>
+    <name>WaterSMART WPS</name>
+    <build>
+        <finalName>watersmart-wps</finalName>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>gov.usgs.cida</groupId>
+            <artifactId>dynamicProperties</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>gov.usgs.cida.gdp</groupId>
+            <artifactId>gdp-52n-wps-patches</artifactId>
+        </dependency>  
+        <!-- version numbers set in parent pom -->
+        <dependency>
+            <groupId>gov.usgs.cida.jmx</groupId>
+            <artifactId>jmx-log4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.n52.wps</groupId>
+            <artifactId>52n-wps-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.n52.wps</groupId>
+            <artifactId>52n-wps-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.n52.wps</groupId>
+            <artifactId>52n-wps-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.n52.wps</groupId>
+            <artifactId>52n-wps-transactional</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.n52.wps</groupId>
+            <artifactId>52n-wps-r</artifactId>
+        </dependency>
+        <!-- LOGGING START-->
+        <!-- needed for patch 52n code -->
+        <dependency>
+            <artifactId>log4j</artifactId>
+            <groupId>log4j</groupId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <artifactId>slf4j-api</artifactId>
+            <groupId>org.slf4j</groupId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+<!--         install commons logging to slf4j bridge -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- hide commons-logging (force through slf4j using bridge) -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- LOGGING END-->
+    </dependencies>
+</project>
