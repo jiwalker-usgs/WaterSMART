@@ -1,7 +1,7 @@
 package gov.usgs.cida.watersmart.csw;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
-import gov.usgs.cida.watersmart.util.JNDISingleton;
+import gov.usgs.cida.watersmart.common.JNDISingleton;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;

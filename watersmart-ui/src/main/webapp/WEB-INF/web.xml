@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app id="WebApp_ID" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
-    
     <description>WaterSMART Model intercomparison Portal</description>
-    
     <display-name>WaterSMART {Owner: DB, Coder: JW}</display-name>
-    
     <welcome-file-list>
         <welcome-file>login.jsp</welcome-file>
     </welcome-file-list>
-    
-    <listener>
-        <listener-class>gov.usgs.cida.watersmart.util.StartupListener</listener-class>
-    </listener>
     
     <!-- Security -->
     <security-constraint>
@@ -40,7 +33,6 @@
         <filter-name>SessionFilter</filter-name>
         <url-pattern>/index.jsp</url-pattern>
     </filter-mapping>
-    
     <!-- should keep services on different path, put paths here -->
     <filter>
         <filter-name>ServiceSessionFilter</filter-name>
@@ -58,8 +50,6 @@
         <filter-name>ServiceSessionFilter</filter-name>
         <url-pattern>/files/*</url-pattern>
     </filter-mapping>
-    
-    
     <servlet>
         <servlet-name>OWSProxy</servlet-name>
         <servlet-class>gov.usgs.service.OWSProxyServletX</servlet-class>

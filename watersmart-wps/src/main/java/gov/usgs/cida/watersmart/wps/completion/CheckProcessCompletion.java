@@ -1,6 +1,7 @@
 package gov.usgs.cida.watersmart.wps.completion;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
+import gov.usgs.cida.watersmart.common.JNDISingleton;
 import gov.usgs.cida.watersmart.communication.EmailHandler;
 import gov.usgs.cida.watersmart.communication.EmailMessage;
 import gov.usgs.cida.watersmart.communication.HTTPUtils;
@@ -33,16 +34,7 @@ import org.xml.sax.SAXException;
  */
 public class CheckProcessCompletion {
 	static org.slf4j.Logger log = LoggerFactory.getLogger(CheckProcessCompletion.class);
-    static final DynamicReadOnlyProperties props = new DynamicReadOnlyProperties();
-    
-    static {
-        try {
-            props.addJNDIContexts(new String[0]);
-        }
-        catch (NamingException ex) {
-            /// I don't care
-        }
-    }
+    static final DynamicReadOnlyProperties props = JNDISingleton.getInstance();
     
     private static final long serialVersionUID = 1L;
 	private static CheckProcessCompletion singleton = null;
@@ -141,6 +133,7 @@ class EmailCheckTask extends TimerTask {
 		}
 		else if (procStat.isSuccess()) {
 			log.debug("Process (started " + taskStarted + ") complete, sending email");
+            copy(document);
 			sendCompleteEmail(procStat.getOutputReference(), emailMsg(document));
 			this.cancel();
 		}
@@ -216,5 +209,9 @@ class EmailCheckTask extends TimerTask {
 
     private String emailMsg(Document document) {
         return "Test email";
+    }
+
+    private void copy(Document document) {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

@@ -2,3 +2,5 @@
 /src/main/webapp/js/geoext/
 /watersmart-ui/target/
 /watersmart-wps/target/
+/watersmart-common/target/
+/watersmart-parse/target/

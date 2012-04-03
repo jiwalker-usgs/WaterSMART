@@ -1,9 +1,9 @@
 package gov.usgs.cida.watersmart.csw;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
+import gov.usgs.cida.watersmart.common.JNDISingleton;
+import gov.usgs.cida.watersmart.common.RunMetadata;
 import gov.usgs.cida.watersmart.iso.ISOServiceIdentification;
-import gov.usgs.cida.watersmart.parse.RunMetadata;
-import gov.usgs.cida.watersmart.util.JNDISingleton;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.util.Iterator;

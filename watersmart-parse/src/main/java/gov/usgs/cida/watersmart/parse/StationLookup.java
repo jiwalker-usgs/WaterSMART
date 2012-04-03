@@ -3,6 +3,7 @@ package gov.usgs.cida.watersmart.parse;
 import com.ctc.wstx.stax.WstxInputFactory;
 import com.google.common.collect.Maps;
 import gov.usgs.cida.netcdf.dsg.Station;
+import gov.usgs.cida.watersmart.common.RunMetadata;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;

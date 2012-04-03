@@ -2,7 +2,7 @@ package gov.usgs.cida.watersmart.ldap;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
 import gov.usgs.cida.watersmart.parse.DSGParser;
-import gov.usgs.cida.watersmart.util.JNDISingleton;
+import gov.usgs.cida.watersmart.common.JNDISingleton;
 import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;

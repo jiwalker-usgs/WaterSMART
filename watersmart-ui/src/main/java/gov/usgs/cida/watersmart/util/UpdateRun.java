@@ -1,8 +1,8 @@
 package gov.usgs.cida.watersmart.util;
 
+import gov.usgs.cida.watersmart.common.ModelType;
+import gov.usgs.cida.watersmart.common.RunMetadata;
 import gov.usgs.cida.watersmart.csw.CSWTransactionHelper;
-import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ModelType;
-import gov.usgs.cida.watersmart.parse.RunMetadata;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.URISyntaxException;

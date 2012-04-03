@@ -3,7 +3,7 @@ package gov.usgs.cida.filter;
 import gov.usgs.cida.watersmart.ldap.LDAPConnect;
 import gov.usgs.cida.watersmart.ldap.LoginMessage;
 import gov.usgs.cida.watersmart.ldap.User;
-import gov.usgs.cida.watersmart.util.JNDISingleton;
+import gov.usgs.cida.watersmart.common.JNDISingleton;
 import java.io.IOException;
 import javax.servlet.*;
 import javax.servlet.http.HttpServlet;

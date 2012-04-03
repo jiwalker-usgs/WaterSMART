@@ -6,4 +6,6 @@
     <Environment name="watersmart.email.check.interval.millis" type="java.lang.String" value="60000" />
     <Environment name="watersmart.email.from" type="java.lang.String" value="watersmart-noreply@usgs.gov" />
     <Environment name="watersmart.email.tracker" type="java.lang.String" value="jiwalker@usgs.gov" />
+    <Environment name="watersmart.file.location" type="java.lang.String" value="/tmp/watersmart" />
+    <Environment name="watersmart.file.location.wps.repository" type="java.lang.String" value="/files" />
 </Context>

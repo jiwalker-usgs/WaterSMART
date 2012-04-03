@@ -1,8 +1,7 @@
-package gov.usgs.cida.watersmart.parse;
+package gov.usgs.cida.watersmart.common;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ModelType;
 import java.io.File;
 import java.util.List;
 import java.util.Map;

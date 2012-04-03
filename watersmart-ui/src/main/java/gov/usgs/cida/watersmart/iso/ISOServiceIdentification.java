@@ -1,7 +1,7 @@
 package gov.usgs.cida.watersmart.iso;
 
+import gov.usgs.cida.watersmart.common.RunMetadata;
 import static gov.usgs.cida.watersmart.csw.CSWTransactionHelper.*;
-import gov.usgs.cida.watersmart.parse.RunMetadata;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

@@ -12,6 +12,9 @@
         <description>Allows dynamic Log4J log level changes via JMX</description>
         <listener-class>gov.usgs.cida.jmx.log4j.JMXLog4JLoggerServletContextListener</listener-class>
     </listener>
+    <listener>
+        <listener-class>gov.usgs.cida.watersmart.util.StartupListener</listener-class>
+    </listener>
     <filter>
         <filter-name>ResponseURLFilter</filter-name>
         <filter-class>gov.usgs.cida.n52.wps.servlet.ResponseURLFilter</filter-class>

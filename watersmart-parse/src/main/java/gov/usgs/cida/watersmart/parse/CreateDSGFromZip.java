@@ -5,10 +5,11 @@ import gov.usgs.cida.netcdf.dsg.Observation;
 import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Station;
 import gov.usgs.cida.netcdf.dsg.StationTimeSeriesNetCDFFile;
+import gov.usgs.cida.watersmart.common.JNDISingleton;
+import gov.usgs.cida.watersmart.common.RunMetadata;
 import gov.usgs.cida.watersmart.parse.column.AFINCHParser;
 import gov.usgs.cida.watersmart.parse.file.SYEParser;
 import gov.usgs.cida.watersmart.parse.file.WATERSParser;
-import gov.usgs.cida.watersmart.util.JNDISingleton;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,12 +28,7 @@ import org.apache.commons.lang.NotImplementedException;
  */
 public class CreateDSGFromZip {
     
-    public enum ModelType {
-        SYE,
-        WATERS,
-        PRMS,
-        AFINCH;
-    }
+
     
     public static String create(File srcZip, RunMetadata runMeta) throws IOException, XMLStreamException {
         // Need to put the resulting NetCDF file somewhere that ncSOS knows about

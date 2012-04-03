@@ -1,6 +1,7 @@
 package gov.usgs.cida.watersmart.communication;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
+import gov.usgs.cida.watersmart.common.JNDISingleton;
 import java.util.Properties;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -9,21 +10,11 @@ import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.naming.NamingException;
 import org.slf4j.LoggerFactory;
 
 public class EmailHandler {
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(EmailHandler.class);
-    private static final DynamicReadOnlyProperties props = new DynamicReadOnlyProperties();
-    
-    static {
-        try {
-            props.addJNDIContexts(new String[0]);
-        }
-        catch (NamingException ex) {
-            /// I don't care
-        }
-    }
+    private static final DynamicReadOnlyProperties props = JNDISingleton.getInstance();
 
 	public static void sendMessage(EmailMessage message) throws AddressException, MessagingException {
 		Properties properties = System.getProperties();
