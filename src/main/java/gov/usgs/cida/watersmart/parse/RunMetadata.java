@@ -36,6 +36,7 @@ public class RunMetadata {
     private String layerName;
     private String commonAttribute;
     private boolean best;
+    
     private static final Map<String, String> XPATH_MAP = Maps.newLinkedHashMap();
     private static final String XPATH_SUBSTITUTION_SCENARIO = "{scenario}";
     private static final String XPATH_SUBSTITUTION_MODEL_VERSION = "{modelVersion}";
@@ -376,6 +377,9 @@ public class RunMetadata {
                         .replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, oldMetadata.getRunIdent());
             }
             else if ("best".equals(key)) {
+                if (!isBest()) {
+                    continue;
+                }
                 String removeBestsXpath = UPDATE_XPATH_SCENARIO_TEMPLATE.replace(XPATH_SUBSTITUTION_SCENARIO, getScenario()) // clear best for target scenario
                               + "/../../../.." + XPATH_MAP.get(key);
                 propsMap.put(removeBestsXpath, "");
