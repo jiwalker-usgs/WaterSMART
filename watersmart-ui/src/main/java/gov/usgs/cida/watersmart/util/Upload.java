@@ -52,6 +52,7 @@ public class Upload extends HttpServlet {
         }
 
         File destinationFile = null;
+        String wpsresponse = null;
 
         // Handle form-based upload (from IE)
         if (ServletFileUpload.isMultipartContent(request)) {
@@ -78,8 +79,10 @@ public class Upload extends HttpServlet {
                     destinationFile = meta.getFile(tempDir);
                     saveFileFromRequest(fileIn, destinationFile);
                     // async
-
+                    // POST to DoEverythingAlgorithm
                     // end async
+                    WPSImpl impl = new WPSImpl();
+                    wpsresponse = impl.executeProcess(destinationFile, meta);
                 } else {
                     throw new Exception("Must provide all required parameters");
                 }
@@ -100,7 +103,7 @@ public class Upload extends HttpServlet {
 //            }
         }
 
-        String responseText = "{success: true, file: '" + destinationFile.getName() + "'}";
+        String responseText = "{success: true, message: '" + wpsresponse + "'}";
         // can do post processing stuff here
         sendResponse(response, responseText);
     }

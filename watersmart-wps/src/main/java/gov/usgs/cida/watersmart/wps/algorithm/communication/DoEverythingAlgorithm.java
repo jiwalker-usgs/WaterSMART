@@ -36,14 +36,14 @@ public class DoEverythingAlgorithm extends AbstractAnnotatedAlgorithm {
         this.zipLocation = new File(zipLocation);
     }
     
-    @ComplexDataInput(
-            identifier="run-metadata",
-            title="Metadata corresponding to model run",
-            abstrakt="User specified model run metadata to be included in resulting NetCDF file and ISO metadata",
-            binding=RunMetadataBinding.class)
-    public void setUploadMeta(RunMetadata uploadMeta) {
-        this.uploadMeta = uploadMeta;
-    }
+//    @ComplexDataInput(
+//            identifier="run-metadata",
+//            title="Metadata corresponding to model run",
+//            abstrakt="User specified model run metadata to be included in resulting NetCDF file and ISO metadata",
+//            binding=RunMetadataBinding.class)
+//    public void setUploadMeta(RunMetadata uploadMeta) {
+//        this.uploadMeta = uploadMeta;
+//    }
     
     @LiteralDataInput(
             identifier="email",

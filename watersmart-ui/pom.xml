@@ -15,7 +15,8 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>watersmart-common</artifactId>
-            <version>${project.version}</version>
+            <version>004-SNAPSHOT</version>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -59,10 +60,6 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient-cache</artifactId>
         </dependency>
         <dependency>
             <artifactId>commons-logging</artifactId>

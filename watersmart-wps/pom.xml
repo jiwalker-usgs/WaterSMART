@@ -10,9 +10,7 @@
     <artifactId>watersmart-wps</artifactId>
     <packaging>war</packaging>
     <name>WaterSMART WPS</name>
-    <build>
-        <finalName>watersmart-wps</finalName>
-    </build>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -74,6 +72,12 @@
             <artifactId>52n-wps-webadmin</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.n52.wps</groupId>
+            <artifactId>52n-wps-webapp</artifactId>
+            <version>${n52.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
         </dependency>
@@ -108,4 +112,24 @@
         </dependency>
         <!-- LOGGING END-->
     </dependencies>
+    
+        <build>
+        <finalName>watersmart-wps</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <goals>
+                    <configuration>
+                    <overlays>
+                        <overlay>
+                            <groupId>org.n52.wps</groupId>
+                            <artifactId>52n-wps-webapp</artifactId>
+                        </overlay>
+                    </overlays>
+                </configuration>
+                </goals>
+            </plugin>
+        </plugins>
+    </build>
 </project>

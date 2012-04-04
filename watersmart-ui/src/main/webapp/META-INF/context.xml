@@ -18,4 +18,10 @@
     <Environment name="watersmart.geonetwork.addr" type="java.lang.String" value="http://130.11.165.241:8081/geonetwork"/>
     <Environment name="watersmart.geonetwork.user" type="java.lang.String" value="watersmart" />
     <Environment name="watersmart.geonetwork.pass" type="java.lang.String" value="not_the_password" />
+    <Environment name="watersmart.external.mapping.url" type="java.lang.String" value="http://130.11.161.215:8081/watersmart" />
+    <Environment name="watersmart.email.host" type="java.lang.String" value="gsvaresh01.er.usgs.gov" />
+    <Environment name="watersmart.email.port" type="java.lang.String" value="25" />
+    <Environment name="watersmart.email.check.interval.millis" type="java.lang.String" value="60000" />
+    <Environment name="watersmart.email.from" type="java.lang.String" value="watersmart-noreply@usgs.gov" />
+    <Environment name="watersmart.email.tracker" type="java.lang.String" value="jiwalker@usgs.gov" />
 </Context>

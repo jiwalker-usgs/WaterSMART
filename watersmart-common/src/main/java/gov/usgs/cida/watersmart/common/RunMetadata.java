@@ -106,6 +106,14 @@ public class RunMetadata {
         this.commonAttribute = commonAttribute;
         this.best = best;
     }
+    
+    public static RunMetadata getInstance(Map<String, String> metadataMap) {
+        RunMetadata meta = new RunMetadata();
+        for (String key : metadataMap.keySet()) {
+            meta.set(key, metadataMap.get(key));
+        }
+        return meta;
+    }
 
     public boolean isFilledIn() {
         return (type != null
@@ -130,53 +138,58 @@ public class RunMetadata {
      */
     public boolean set(FileItem item) {
         String param = item.getFieldName().toLowerCase();
+        String value = item.getString();
+        return set(param, value);
+    }
+
+    public boolean set(String param, String value) {
         if ("modeltype".equals(param)) {
-            ModelType mt = ModelType.valueOf(item.getString());
+            ModelType mt = ModelType.valueOf(value);
             setType(mt);
             return true;
         }
         if ("modelid".equals(param)) {
-            setModelId(item.getString());
+            setModelId(value);
             return true;
         }
         if ("name".equals(param)) {
-            setName(item.getString());
+            setName(value);
             return true;
         }
         if ("modelversion".equals(param)) {
-            setModelVersion(item.getString());
+            setModelVersion(value);
             return true;
         }
         if ("runident".equals(param)) {
-            setRunIdent(item.getString());
+            setRunIdent(value);
             return true;
         }
         if ("creationdate".equals(param)) {
-            setCreationDate(item.getString());
+            setCreationDate(value);
             return true;
         }
         if ("scenario".equals(param)) {
-            setScenario(item.getString());
+            setScenario(value);
             return true;
         }
         if ("comments".equals(param)) {
-            setComments(item.getString());
+            setComments(value);
             return true;
         }
         if ("email".equals(param)) {
-            setEmail(item.getString());
+            setEmail(value);
             return true;
         }
         if ("wfsurl".equals(param)) {
-            setWfsUrl(item.getString());
+            setWfsUrl(value);
             return true;
         }
         if ("layer".equals(param)) {
-            setLayerName(item.getString());
+            setLayerName(value);
             return true;
         }
         if ("commonattr".equals(param)) {
-            setCommonAttribute(item.getString());
+            setCommonAttribute(value);
             return true;
         }
         return false;
@@ -365,6 +378,24 @@ public class RunMetadata {
         }
     }
 
+    public Map<String, String> toKeyValueMap() {
+        Map<String, String> keyValMap = Maps.newLinkedHashMap();
+        keyValMap.put("type", getTypeString());
+        keyValMap.put("modelId", getModelId());
+        keyValMap.put("name", getName());
+        keyValMap.put("modelVersion", getModelVersion());
+        keyValMap.put("runIdent", getRunIdent());
+        keyValMap.put("date", getCreationDate());
+        keyValMap.put("scenario", getScenario());
+        keyValMap.put("comments", getComments());
+        keyValMap.put("email", getEmail());
+        keyValMap.put("wfsUrl", getWfsUrl());
+        keyValMap.put("layerName", getLayerName());
+        keyValMap.put("commonAttr", getCommonAttribute());
+        keyValMap.put("best", isBest() ? "true" : "false");
+        return keyValMap;
+    }
+    
     public Map<String, String> getUpdateMap(RunMetadata oldMetadata) {
         String updateXpath;
 

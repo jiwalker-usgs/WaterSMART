@@ -132,10 +132,10 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                                 
                                 LOG.info('isoFormPanel.js::Closing modal window');
                                 this.ownerCt.ownerCt.ownerCt.close();
-                                
                                 NOTIFY.info({
-                                    msg:'Upload succeeded'
-                                })
+                                        msg : 'Your run is being processed. When completed, you will receive an e-mail at ' + WATERSMART.USER_EMAIL + '. You can continue working or close this application.',
+                                        hideDelay : 15000
+                                    });
                             },
                             failure: function(panel, fail) {
                                 LOG.info('isoFormPanel.js:: User upload failed.');
@@ -176,7 +176,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                                     LOG.info('isoFormPanel.js::Closing modal window');
                                     this.ownerCt.ownerCt.ownerCt.close();
                                     NOTIFY.info({
-                                        msg : 'Your run is being processed. When completed, you will receive an e-mail at ' + WATERSMART.USER_EMAIL + '. You can continue working or close this application.',
+                                        msg : 'Metadata update successful.',
                                         hideDelay : 15000
                                     })
                                 }, this).delay(500);
