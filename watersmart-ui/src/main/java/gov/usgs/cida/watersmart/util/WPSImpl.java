@@ -157,12 +157,12 @@ class WPSTask extends Thread {
         EmailHandler.sendMessage(message);
     }
     
-        public void sendFailedEmail(Exception ex) {
+    public void sendFailedEmail(Exception ex) {
         String subject = "WaterSMART processing failed";
         StringBuilder content = new StringBuilder();
         content.append("The user uploaded a file, but processing failed, here is the stack trace:\n\n"); 
         for (StackTraceElement el : ex.getStackTrace()) {
-            content.append(el.toString());
+            content.append(el.toString()).append("\n");
         }
         List<String> bcc = new ArrayList<String>();
         String from = props.getProperty("watersmart.email.from");

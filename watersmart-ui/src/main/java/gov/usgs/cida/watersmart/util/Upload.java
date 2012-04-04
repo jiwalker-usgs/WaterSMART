@@ -78,9 +78,6 @@ public class Upload extends HttpServlet {
                 if (meta.isFilledIn() && fileIn != null) {
                     destinationFile = meta.getFile(tempDir);
                     saveFileFromRequest(fileIn, destinationFile);
-                    // async
-                    // POST to DoEverythingAlgorithm
-                    // end async
                     WPSImpl impl = new WPSImpl();
                     wpsresponse = impl.executeProcess(destinationFile, meta);
                 } else {

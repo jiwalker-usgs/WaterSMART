@@ -19,6 +19,20 @@ import org.slf4j.LoggerFactory;
  * @author Jordan Walker <jiwalker@usgs.gov>
  */
 public class RunMetadata {
+    protected static final String MODEL_ID = "modelid";
+    protected static final String BEST = "markasbest";
+    protected static final String COMMENTS = "comments";
+    protected static final String COMMON_ATTR = "commonattr";
+    protected static final String DATE = "creationdate";
+    protected static final String EDITION = "edition";
+    protected static final String EMAIL = "email";
+    protected static final String LAYER_NAME = "layer";
+    protected static final String MODEL_VERSION = "modelversion";
+    protected static final String NAME = "name";
+    protected static final String RUN_IDENT = "runident";
+    protected static final String SCENARIO = "scenario";
+    protected static final String TYPE = "modeltype";
+    protected static final String WFS_URL = "wfsurl";
 
     private static final Logger LOG = LoggerFactory.getLogger(RunMetadata.class);
     private static final String UPLOAD_EXTENSION = ".zip";
@@ -60,14 +74,14 @@ public class RunMetadata {
     }
 
     static {
-        XPATH_MAP.put("name", "/gmd:citation/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:individualName/gco:CharacterString");
-        XPATH_MAP.put("date", "/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:DateTime");
-        XPATH_MAP.put("email", "/gmd:citation/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gco:CharacterString");
-        XPATH_MAP.put("comments", "/gmd:abstract/gco:CharacterString");
-        XPATH_MAP.put("scenario", "/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString");
-        XPATH_MAP.put("best", "/gmd:citation/gmd:CI_Citation/gmd:otherCitationDetails/gco:CharacterString");
+        XPATH_MAP.put(NAME, "/gmd:citation/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:individualName/gco:CharacterString");
+        XPATH_MAP.put(DATE, "/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:DateTime");
+        XPATH_MAP.put(EMAIL, "/gmd:citation/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gco:CharacterString");
+        XPATH_MAP.put(COMMENTS, "/gmd:abstract/gco:CharacterString");
+        XPATH_MAP.put(SCENARIO, "/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString");
+        XPATH_MAP.put(BEST, "/gmd:citation/gmd:CI_Citation/gmd:otherCitationDetails/gco:CharacterString");
         // Edition is modelVersion and runIdentifier, need to be changed at same time
-        XPATH_MAP.put("edition", "/gmd:citation/gmd:CI_Citation/gmd:edition/gco:CharacterString");
+        XPATH_MAP.put(EDITION, "/gmd:citation/gmd:CI_Citation/gmd:edition/gco:CharacterString");
     }
 
     public RunMetadata() {
@@ -143,52 +157,52 @@ public class RunMetadata {
     }
 
     public boolean set(String param, String value) {
-        if ("modeltype".equals(param)) {
-            ModelType mt = ModelType.valueOf(value);
+        if (TYPE.equals(param)) {
+            ModelType mt = ModelType.valueOf(value.toUpperCase());
             setType(mt);
             return true;
         }
-        if ("modelid".equals(param)) {
+        if (MODEL_ID.equals(param)) {
             setModelId(value);
             return true;
         }
-        if ("name".equals(param)) {
+        if (NAME.equals(param)) {
             setName(value);
             return true;
         }
-        if ("modelversion".equals(param)) {
+        if (MODEL_VERSION.equals(param)) {
             setModelVersion(value);
             return true;
         }
-        if ("runident".equals(param)) {
+        if (RUN_IDENT.equals(param)) {
             setRunIdent(value);
             return true;
         }
-        if ("creationdate".equals(param)) {
+        if (DATE.equals(param)) {
             setCreationDate(value);
             return true;
         }
-        if ("scenario".equals(param)) {
+        if (SCENARIO.equals(param)) {
             setScenario(value);
             return true;
         }
-        if ("comments".equals(param)) {
+        if (COMMENTS.equals(param)) {
             setComments(value);
             return true;
         }
-        if ("email".equals(param)) {
+        if (EMAIL.equals(param)) {
             setEmail(value);
             return true;
         }
-        if ("wfsurl".equals(param)) {
+        if (WFS_URL.equals(param)) {
             setWfsUrl(value);
             return true;
         }
-        if ("layer".equals(param)) {
+        if (LAYER_NAME.equals(param)) {
             setLayerName(value);
             return true;
         }
-        if ("commonattr".equals(param)) {
+        if (COMMON_ATTR.equals(param)) {
             setCommonAttribute(value);
             return true;
         }
@@ -359,19 +373,19 @@ public class RunMetadata {
     }
 
     public String get(String var) {
-        if ("edition".equals(var)) {
+        if (EDITION.equals(var)) {
             return getEditionString();
-        } else if ("name".equals(var)) {
+        } else if (NAME.equals(var)) {
             return getName();
-        } else if ("scenario".equals(var)) {
+        } else if (SCENARIO.equals(var)) {
             return getScenario();
-        } else if ("date".equals(var)) {
+        } else if (DATE.equals(var)) {
             return getCreationDate();
-        } else if ("comments".equals(var)) {
+        } else if (COMMENTS.equals(var)) {
             return getComments();
-        } else if ("email".equals(var)) {
+        } else if (EMAIL.equals(var)) {
             return getEmail();
-        } else if ("best".equals(var)) {
+        } else if (BEST.equals(var)) {
             return "BEST";
         } else {
             throw new IllegalArgumentException("This is not a thing");
@@ -380,19 +394,19 @@ public class RunMetadata {
 
     public Map<String, String> toKeyValueMap() {
         Map<String, String> keyValMap = Maps.newLinkedHashMap();
-        keyValMap.put("type", getTypeString());
-        keyValMap.put("modelId", getModelId());
-        keyValMap.put("name", getName());
-        keyValMap.put("modelVersion", getModelVersion());
-        keyValMap.put("runIdent", getRunIdent());
-        keyValMap.put("date", getCreationDate());
-        keyValMap.put("scenario", getScenario());
-        keyValMap.put("comments", getComments());
-        keyValMap.put("email", getEmail());
-        keyValMap.put("wfsUrl", getWfsUrl());
-        keyValMap.put("layerName", getLayerName());
-        keyValMap.put("commonAttr", getCommonAttribute());
-        keyValMap.put("best", isBest() ? "true" : "false");
+        keyValMap.put(TYPE, getTypeString());
+        keyValMap.put(MODEL_ID, getModelId());
+        keyValMap.put(NAME, getName());
+        keyValMap.put(MODEL_VERSION, getModelVersion());
+        keyValMap.put(RUN_IDENT, getRunIdent());
+        keyValMap.put(DATE, getCreationDate());
+        keyValMap.put(SCENARIO, getScenario());
+        keyValMap.put(COMMENTS, getComments());
+        keyValMap.put(EMAIL, getEmail());
+        keyValMap.put(WFS_URL, getWfsUrl());
+        keyValMap.put(LAYER_NAME, getLayerName());
+        keyValMap.put(COMMON_ATTR, getCommonAttribute());
+        keyValMap.put(BEST, isBest() ? "true" : "false");
         return keyValMap;
     }
     
@@ -401,12 +415,12 @@ public class RunMetadata {
 
         Map<String, String> propsMap = Maps.newLinkedHashMap();
         for (String key : XPATH_MAP.keySet()) {
-            if ("edition".equals(key)) {
+            if (EDITION.equals(key)) {
                 updateXpath = UPDATE_XPATH_TEMPLATE.replace(XPATH_SUBSTITUTION_SCENARIO, getScenario()) // scenario has already been changed
                         .replace(XPATH_SUBSTITUTION_MODEL_VERSION, oldMetadata.getModelVersion())
                         .replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, oldMetadata.getRunIdent());
             }
-            else if ("best".equals(key)) {
+            else if (BEST.equals(key)) {
                 if (!isBest()) {
                     continue;
                 }
