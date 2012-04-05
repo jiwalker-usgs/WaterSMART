@@ -128,7 +128,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         WaterSMART.ModelRunSelectionPanel.superclass.constructor.call(this, config);
     
         var wpsCapsStore = new CIDA.WPSCapabilitiesStore({
-            url : CONFIG.WPS_URL + '/WebProcessingService?Service=WPS&Request=GetCapabilities',
+            url : CONFIG.WPS_URL + '?Service=WPS&Request=GetCapabilities',
             listeners : {
                 load : function(store) {
                     var processArray = [];
@@ -146,12 +146,14 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                     this.processStore.loadData(processArray);
                     
                     this.getTopToolbar().addField({
-                        xtype: 'tbseparator'
+                        xtype: 'tbseparator',
+                        hidden : true
                     })
                     
                     this.getTopToolbar().addField({
                         xtype: 'tbtext',
-                        text: 'Processes:'
+                        text: 'Processes:',
+                        hidden : true
                     })
                     
                     this.getTopToolbar().addField({
@@ -166,6 +168,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         emptyText : 'Select A Process',
                         displayField : 'title',
                         disabled : true,
+                        hidden : true,
                         listeners : {
                             select : function(combo, record) {
                                 LOG.debug('ModelRunSelectionPanel.js:: User selected a WPS process: ' + record.id);
@@ -397,7 +400,6 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         
         this.runPanel.currentlySelectedRun = panel;
         this.runPanel.getTopToolbar().get('edit-selected-run-button').setDisabled(false);
-        this.getTopToolbar().get('wps-process-combo').setDisabled(false)
 
         // Close any current plotter windows
         if (Ext.getCmp('plotter-window')) Ext.getCmp('plotter-window').hide();

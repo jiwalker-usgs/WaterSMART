@@ -9,7 +9,7 @@
     </parent>
     <groupId>gov.usgs.cida.watersmart</groupId>
     <artifactId>watersmart-common</artifactId>
-    <name>watersmart-common</name>
+    <name>WaterSMART Common</name>
     <dependencies>
         <dependency>
             <groupId>gov.usgs.cida</groupId>
