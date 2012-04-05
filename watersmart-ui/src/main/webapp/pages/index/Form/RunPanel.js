@@ -19,6 +19,7 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
         this.panelInfo.date = this.serviceIdentification.citation.date; // Array
         this.panelInfo.presentationForm = this.serviceIdentification.citation.presentationForm; // Array
         this.panelInfo.isBestScenario = false;
+        this.panelInfo.coupledResource = this.serviceIdentification.coupledResource;
         
         if (this.serviceIdentification.citation.otherCitationDetails && this.serviceIdentification.citation.otherCitationDetails.CharacterString.value.toLowerCase() === 'best') {
             this.panelInfo.isBestScenario = true;
@@ -44,7 +45,7 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
                 role : crpItem.role.codeListValue
             })
         }, responsibleParties)
-
+        
         var html = '<div class="run-row"><span class="run-label">Calibration/Validation Scenario:</span> <span class="run-value">' + this.serviceIdentification.citation.title.CharacterString.value + '</span></div>';
         html += '<div class="run-row"><span class="run-label">Model Version and Run:</span> <span class="run-value">' + this.panelInfo.edition + '</span></div>';
         html += '<div class="run-row"><span class="run-label">Modeler Name:</span> <span class="run-value">' + responsibleParties[0].name + '</span></div>';
@@ -54,6 +55,11 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
         }
         
         html += '<div class="run-row"><span class="run-label">Other Information:</span> <span class="run-value">' + this.panelInfo['abstract'] + '</span></div>';
+        
+        if (this.panelInfo.coupledResource && this.panelInfo.coupledResource.svCoupledResource && this.panelInfo.coupledResource.svCoupledResource.identifier[0].CharacterString.value) {
+            html += '<div class="run-row"><span class="run-label">Run Algorithm:</span> <span class="run-algorithm">' + this.panelInfo.coupledResource.svCoupledResource.operationName.CharacterString.value + '</span></div>';
+            html += '<div class="run-row"><span class="run-label">Output Link:</span> <span class="run-value"><a href="'+this.panelInfo.coupledResource.svCoupledResource.identifier[0].CharacterString.value+'" target="_blank">' + this.panelInfo.coupledResource.svCoupledResource.identifier[0].CharacterString.value + '</a></span></div>';
+        }
         
         config = Ext.apply({
             title : this.panelInfo.title,
