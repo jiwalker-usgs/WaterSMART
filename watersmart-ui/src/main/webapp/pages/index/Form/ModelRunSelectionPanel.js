@@ -128,7 +128,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         WaterSMART.ModelRunSelectionPanel.superclass.constructor.call(this, config);
     
         var wpsCapsStore = new CIDA.WPSCapabilitiesStore({
-            url : CONFIG.WPS_URL + '/WebProcessingService?Service=WPS&Request=GetCapabilities',
+            url : CONFIG.WPS_URL + '?Service=WPS&Request=GetCapabilities',
             listeners : {
                 load : function(store) {
                     var processArray = [];
