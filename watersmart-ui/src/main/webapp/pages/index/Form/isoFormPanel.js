@@ -121,8 +121,8 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                                 modeltype : isoFormPanel.modelName,
                                 wfsUrl : isoFormPanel.wfsUrl,
                                 layer : isoFormPanel.layer,
-                                commonAttr : isoFormPanel.commonAttr,
-                                markAsBest : isoFormPanel.isBestScenario
+                                commonAttr : isoFormPanel.commonAttr
+//                                markAsBest : isoFormPanel.isBestScenario
                             },
                             waitMsg: 'Saving...',
                             success: function() {
@@ -203,9 +203,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
         
         if (this.create) {
             this.add(new WaterSMART.FileUploadPanel())
-        }
-        
-        if (!this.isBestScenario) {
+        } else if (!this.isBestScenario) {
             this.add(new Ext.form.Checkbox({
                 fieldLabel: 'Mark As Best',
                 xtype : 'checkbox',
