@@ -198,16 +198,17 @@ class WPSTask extends Thread {
             String contextPath = props.getProperty("watersmart.external.mapping.url");
             boolean completed = false;
             
-            Document document = null;
-            while (!completed) {
-                Thread.sleep(5000);
-                is = HTTPUtils.sendPacket(new URL(wpsCheckPoint), "GET");
-                document = CheckProcessCompletion.parseDocument(is);
-                completed = checkWPSProcess(document);
-            }
+            // leave this commented out until process exists
+//            Document document = null;
+//            while (!completed) {
+//                Thread.sleep(5000);
+//                is = HTTPUtils.sendPacket(new URL(wpsCheckPoint), "GET");
+//                document = CheckProcessCompletion.parseDocument(is);
+//                completed = checkWPSProcess(document);
+//            }
 
-            // copy results to persistant location
-            String xml = CSWTransactionHelper.nodeToString(document);
+            // copy results to persistant location // switch to completed document above
+            String xml = CSWTransactionHelper.nodeToString(wpsResponseDoc);
             File destinationFile = new File(
                     props.getProperty("watersmart.file.location") 
                     + props.getProperty("watersmart.file.location.wps.repository") 
@@ -216,7 +217,7 @@ class WPSTask extends Thread {
                     + ".xml");
             FileUtils.write(destinationFile, xml, "UTF-8");
             String destinationFileName = destinationFile.getName();
-            String webAccessibleFile = contextPath + props.getProperty("watersmart.file.location.wps.repository") + destinationFileName;
+            String webAccessibleFile = contextPath + props.getProperty("watersmart.file.location.wps.repository") + "/" + destinationFileName;
             
             // move csw to module?
             CSWTransactionHelper helper = new CSWTransactionHelper(metaObj, sosEndpoint, WPSImpl.algorithmName, webAccessibleFile);
