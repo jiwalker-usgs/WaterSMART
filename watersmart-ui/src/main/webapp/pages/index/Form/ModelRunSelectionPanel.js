@@ -354,6 +354,16 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                     },
                     scope : this
                 }
+            }, {
+                xtype: 'button',
+                id: 'reload-button-id',
+                text: 'Reload',
+                listeners: {
+                    scope: this,
+                    click: function() {
+                        this.reloadRuns();
+                    }
+                }
             }
             ]
         })
