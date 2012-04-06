@@ -80,10 +80,28 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                 allowBlank: false
             },{
                 fieldLabel: 'Calibration/ Validation Scenario',
+                xtype: 'combo',
+                mode: 'local',
+                store: ['PRMSbase',
+                        'Dense1',
+                        'Dense2',
+                        'Dense3',
+                        'Sparse1',
+                        'Sparse2',
+                        'Sparse3',
+                        'ACF_CG1',
+                        'ACF_CG2',
+                        'ACF_CG3',
+                        'Special'],
+                hiddenName: 'scenario',
                 name: 'scenario',
-                allowBlank: false,
+                setEditable: false,
+                forceSelection: true,
+                triggerAction: 'all',
+                emptyText: 'Select a scenario...',
+                selectOnFocus: true,
                 value : this.create ? '' : this.scenario,
-                anchor: '95%'
+                anchor: '65%'
             },{
                 fieldLabel: 'Comments',
                 xtype : 'textarea',
@@ -175,10 +193,6 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                                 
                                     LOG.info('isoFormPanel.js::Closing modal window');
                                     this.ownerCt.ownerCt.ownerCt.close();
-                                    NOTIFY.info({
-                                        msg : 'Metadata update successful.',
-                                        hideDelay : 15000
-                                    })
                                 }, this).delay(500);
                                 
                             },
