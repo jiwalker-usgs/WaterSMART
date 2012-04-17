@@ -1,6 +1,7 @@
 Ext.ns("WaterSMART");
 
 WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
+    'abstract' : undefined,
     commonAttr : undefined,
     create : undefined,
     htmlTransform : undefined,
@@ -15,7 +16,6 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
     scenario : undefined,
     wfsUrl : undefined,
     xmlTransform : undefined,
-    'abstract' : undefined,
     
     originalAbstract : undefined,
     originalModelerName : undefined,
@@ -46,16 +46,25 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
         
         config = Ext.apply({
             id: 'metadata-form',
+            
+            // TODO : This is an IE issue - IE crashes if this object is an Ext.form.FormPanel. Changing it out to 
+            // having an xtype of 'form' with a layout of 'form' makes it look ok, but the API of the object [annoyingly] changes
+            // so that the submit no longer works. The submit functionality needs to change to work with the new API. Because
+            // we currently don't mandate IE compatibility, I left it as-is
+            
+//            xtype : 'form',
+//            layout : 'form',
             padding: 5,
             region: 'center',
             width: '100%',
             url: 'update',
-            defaultType: 'textfield',
+            labelWidth : 100,
             items: [{
                 fieldLabel: 'Modeler Name',
                 name: 'name',
                 value : this.modelerName,
-                allowBlank: false
+                allowBlank: false,
+                xtype : 'textfield'
             },{
                 xtype : 'displayfield',
                 fieldLabel: 'Model Name',
@@ -66,12 +75,14 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                 fieldLabel: 'Model Version',
                 name: 'version',
                 value : this.modelVersion,
-                allowBlank: false
+                allowBlank: false,
+                xtype : 'textfield'
             },{
                 fieldLabel: 'Run Identifier',
                 name: 'runIdent',
                 value : this.runIdentifier,
-                allowBlank: false
+                allowBlank: false,
+                xtype : 'textfield'
             },{
                 xtype : 'datefield',
                 fieldLabel: 'Run Date',
@@ -83,7 +94,8 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                 name: 'scenario',
                 allowBlank: false,
                 value : this.create ? '' : this.scenario,
-                anchor: '95%'
+                anchor: '95%',
+                xtype : 'textfield'
             },{
                 fieldLabel: 'Comments',
                 xtype : 'textarea',
@@ -122,7 +134,6 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                                 wfsUrl : isoFormPanel.wfsUrl,
                                 layer : isoFormPanel.layer,
                                 commonAttr : isoFormPanel.commonAttr
-//                                markAsBest : isoFormPanel.isBestScenario
                             },
                             waitMsg: 'Saving...',
                             success: function() {
