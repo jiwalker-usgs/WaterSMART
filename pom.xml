@@ -183,7 +183,7 @@
             <dependency>
                 <groupId>gov.usgs.cida.netcdf</groupId>
                 <artifactId>netcdf-dsg</artifactId>
-                <version>1.1-SNAPSHOT</version>
+                <version>1.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ws.commons</groupId>
@@ -199,6 +199,21 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>11.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>gov.usgs.cida.gdp</groupId>
+                <artifactId>gdp-proxy</artifactId>
+                <version>15-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.servlet.jsp</groupId>
+                <artifactId>jsp-api</artifactId>
+                <version>2.2</version>
             </dependency>
         <!-- TODO switch to httpcomponents -->
             <dependency>

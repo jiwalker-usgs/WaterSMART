@@ -173,7 +173,7 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
                 rightGap : 5,
                 showRangeSelector: true,
                 yAxisLabelWidth: 75,
-                ylabel: 'Discharge',
+                ylabel: 'MEAN',
                 axes: {
                     x: {
                         valueFormatter: function(ms) {

@@ -439,7 +439,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         this.mapPanel.processMapConfigObject(this.mapPanel.currentMapConfig);
         
         this.mapPanel.sosEndpoint = panel.panelInfo.operationURL;
-        this.mapPanel.plotterVars = 'Discharge';
+        this.mapPanel.plotterVars = 'MEAN';
         this.mapPanel.addIdentifyToolingToMap();
     },
     updateModelStore : function() {
