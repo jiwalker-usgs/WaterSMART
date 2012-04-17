@@ -176,7 +176,7 @@ class WPSTask extends Thread {
         try {
             filename = CreateDSGFromZip.create(zipLocation, metaObj);
 
-            String repo = props.getProperty("watersmart.sos.repo");
+            String repo = props.getProperty("watersmart.sos.model.repo");
             String sosEndpoint = repo + metaObj.getTypeString() + "/" + filename;
             String wpsRequest = WPSImpl.createWaterSMARTStatsAlgorithmRequest(sosEndpoint);
             String wpsResponse = postToWPS(props.getProperty("watersmart.wps.url"), wpsRequest);
