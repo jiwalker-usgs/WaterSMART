@@ -134,7 +134,7 @@
         <dependency>
             <groupId>gov.usgs.cida.jslibs</groupId>
             <artifactId>geoext-sos-ux</artifactId>
-            <version>1.1-5</version>
+            <version>1.1-6-SNAPSHOT</version>
             <type>war</type>
         </dependency>
         <dependency>

@@ -83,7 +83,7 @@
         </jsp:include>
 
         <jsp:include page="js/openlayers/openlayers.jsp">
-            <jsp:param name="isDevelopment" value="<%= development %>" />
+            <jsp:param name="debug-qualifier" value="<%= development %>" />
         </jsp:include>
         <script type="text/javascript" src="js/watersmart/XMLHttpRequest.js"></script>
 
@@ -116,6 +116,7 @@
         <script type="text/javascript" src="pages/index/Form/ModelRunSelectionPanel.js"></script>
         <script type="text/javascript" src="pages/index/Plotter/PlotterPanel.js"></script>
         <script type="text/javascript" src="pages/index/Map/map.js"></script>
+        <script type="text/javascript" src="pages/index/Plotter/SOSController.js"></script>
         <script type="text/javascript" src="pages/index/onReady.js"></script>
         
     </head>

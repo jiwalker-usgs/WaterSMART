@@ -14,7 +14,7 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
     graph : undefined,
     ownerWindow : undefined,
     url : undefined,
-    vars : undefined,
+    vars : [],
     yLabels : [],
     constructor : function(config) {
         config = config || {};
@@ -65,8 +65,9 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
         })
     },
     loadSOSStore : function(options) {
-        var url = CONFIG.PROXY + options.url + "?service=SOS&request=GetObservation&version=1.0.0&offering=" + encodeURI(options.offering) + "&observedProperty=" + options.vars;
-        this.yLabels = options.vars.split(',');
+        var observedProperties = options.vars.join(",");
+        var url = CONFIG.PROXY + options.url + "?service=SOS&request=GetObservation&version=1.0.0&offering=" + encodeURI(options.offering) + "&observedProperty=" + observedProperties;
+        this.yLabels = options.vars;
         this.sosStore = new CIDA.SOSGetObservationStore({
             url : url, // gmlid is url for now, eventually, use SOS endpoint + gmlid or whatever param
             autoLoad : true,

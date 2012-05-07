@@ -123,8 +123,5 @@ WaterSMART.ModelPanel = Ext.extend(Ext.Panel, {
             
         }, config);
         WaterSMART.ModelPanel.superclass.constructor.call(this, config);
-        
-        
-        
     }
 });

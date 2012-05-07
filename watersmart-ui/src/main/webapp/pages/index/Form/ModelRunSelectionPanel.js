@@ -1,6 +1,7 @@
 Ext.ns("WaterSMART");
 
 WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
+    controller : undefined,
     commonAttr : undefined,
     cswStore : undefined,
     mapPanel : undefined,
@@ -10,6 +11,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
     constructor : function(config) {
         if (!config) config = {};
         
+        this.controller = config.sosController;
         this.commonAttr = config.commonAttr;
         this.cswStore = config.cswStore;
         this.mapPanel = config.mapPanel;
@@ -398,6 +400,8 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
     runSelected : function(panel) {
         LOG.debug('ModelRunSelectionpanel.js:: A run has been selected with the SOS endpoint of: ' + panel.panelInfo.operationURL);
         
+        this.controller.loadCapstore(panel.panelInfo.operationURL);
+        
         this.runPanel.currentlySelectedRun = panel;
         this.runPanel.getTopToolbar().get('edit-selected-run-button').setDisabled(false);
 
@@ -439,7 +443,6 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         this.mapPanel.processMapConfigObject(this.mapPanel.currentMapConfig);
         
         this.mapPanel.sosEndpoint = panel.panelInfo.operationURL;
-        this.mapPanel.plotterVars = 'MEAN';
         this.mapPanel.addIdentifyToolingToMap();
     },
     updateModelStore : function() {
