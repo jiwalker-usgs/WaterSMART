@@ -162,56 +162,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
             eventListeners : {
                 getfeatureinfo : function(event) {
                     if (event.features && event.features[0]){
-                        var tries = 0;
-                        var checkLoading = function() {
-                            if (this.sosController.loading && tries < 10) {
-                                var task = new Ext.util.DelayedTask(function(){                                
-                                    LOG.info('waiting for SOS GetCaps to respond');
-                                    tries++;
-                                    checkLoading();
-                                }, this).delay(1000);
-                            }
-                            else if (tries >= 10) {
-                                NOTIFY.error({msg : "SOS took too long to respond"});
-                            }
-                            else {
-                                if(!this.popup) {
-                                    this.popup = new GeoExt.Popup({
-                                        id: 'plotter-window',
-                                        title: event.features[0].attributes.station_nm,
-                                        anchored: false,
-                                        width: 900,
-                                        height: 300,
-                                        map: this.map,
-                                        collapsible: true,
-                                        closeAction: 'hide',
-                                        resizable : true,
-                                        listeners : {
-                                            'resize' : function(popup, width, height) {
-                                                popup.plotterPanel.resizePlotter(width, height);
-                                            },
-                                            'hide' : function(popup) {
-                                                popup.removeAll(false);
-                                            },
-                                            'show' : function(popup) {
-                                                if (popup.anc != null) popup.unanchorPopup();
-                                            }
-                                        }
-                                    });
-
-                                } else {
-                                    this.popup.setTitle(event.features[0].attributes.station_nm);
-                                }
-                                var offering = event.features[0].attributes[this.commonAttr];
-                                new WaterSMART.Plotter({
-                                    url : this.sosEndpoint,
-                                    vars : this.sosController.capabilities.offeringList[offering].observedProperties,
-                                    offering : offering,
-                                    ownerWindow : this.popup
-                                })
-                            }
-                        };
-                        checkLoading();
+                        this.checkLoading(event, 0);
                     }
                 },
                 scope: this
@@ -228,6 +179,53 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
             this.map.addLayers(layers);
         } else {
             this.map.addLayers([layers]);
+        }
+    },
+    checkLoading : function(event, tries) {
+        if (this.sosController.loading && tries < 10) {
+            var task = new Ext.util.DelayedTask(function(){                                
+                LOG.info('waiting for SOS GetCaps to respond');
+                this.checkLoading(event, ++tries);
+            }, this).delay(1000);
+        }
+        else if (tries >= 10) {
+            NOTIFY.error({msg : "SOS took too long to respond"});
+        }
+        else {
+            if(!this.popup) {
+                this.popup = new GeoExt.Popup({
+                    id: 'plotter-window',
+                    title: event.features[0].attributes.station_nm,
+                    anchored: false,
+                    width: 900,
+                    height: 300,
+                    map: this.map,
+                    collapsible: true,
+                    closeAction: 'hide',
+                    resizable : true,
+                    listeners : {
+                        'resize' : function(popup, width, height) {
+                            popup.plotterPanel.resizePlotter(width, height);
+                        },
+                        'hide' : function(popup) {
+                            popup.removeAll(false);
+                        },
+                        'show' : function(popup) {
+                            if (popup.anc != null) popup.unanchorPopup();
+                        }
+                    }
+                });
+
+            } else {
+                this.popup.setTitle(event.features[0].attributes.station_nm);
+            }
+            var offering = event.features[0].attributes[this.commonAttr];
+            new WaterSMART.Plotter({
+                url : this.sosEndpoint,
+                vars : this.sosController.getOffering(offering).observedProperties,
+                offering : offering,
+                ownerWindow : this.popup
+            })
         }
     },
     processMapConfigObject : function(mco) {
