@@ -12,11 +12,12 @@
         <module>watersmart-wps</module>
         <module>watersmart-parse</module>
         <module>watersmart-common</module>
+        <module>watersmart-wps-r</module>
     </modules>
     
     <properties>
         <cida.maven.url>http://cida-wiwsc-maven.er.usgs.gov:8080/maven</cida.maven.url>
-        <n52.version>2.0-RC8-SNAPSHOT</n52.version>
+        <n52.version>3.0</n52.version>
     </properties>
     
     <url>http://cida.usgs.gov</url>
@@ -72,6 +73,11 @@
             <id>cida-snapshots</id>
             <name>CIDA Nexus Snapshots</name>
             <url>${cida.maven.url}/content/groups/public-snapshots/</url>
+        </repository>
+        <repository>
+            <id>n52-releases</id>
+            <name>52-north Releases</name>
+            <url>http://52north.org/maven/repo/releases/</url>
         </repository>
     </repositories>
 
