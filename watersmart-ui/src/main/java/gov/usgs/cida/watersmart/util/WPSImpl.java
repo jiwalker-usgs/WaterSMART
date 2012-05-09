@@ -5,13 +5,17 @@ import gov.usgs.cida.watersmart.common.JNDISingleton;
 import gov.usgs.cida.watersmart.common.RunMetadata;
 import gov.usgs.cida.watersmart.communication.EmailHandler;
 import gov.usgs.cida.watersmart.communication.EmailMessage;
+import gov.usgs.cida.watersmart.communication.HTTPUtils;
 import gov.usgs.cida.watersmart.csw.CSWTransactionHelper;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip;
+import gov.usgs.cida.watersmart.parse.StationLookup;
+import gov.usgs.cida.watersmart.wps.completion.CheckProcessCompletion;
 import gov.usgs.cida.watersmart.wps.completion.ProcessStatus;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +42,7 @@ import org.w3c.dom.Document;
  */
 class WPSImpl implements WPSInterface {
 
-    static final String algorithmName = "gov.usgs.cida.watersmart.wps.algorithm.SomeAlgorithmYetToBeNamed";
+    static final String algorithmName = "org.n52.wps.server.r.stats_csv_nahat_test_wps";
     
     @Override
     public String executeProcess(File zipLocation, RunMetadata metadata) {
@@ -59,7 +63,8 @@ class WPSImpl implements WPSInterface {
     
     static String createWaterSMARTStatsAlgorithmRequest(String sosEndpoint) {
 
-       return new String(
+        // TODO need to get station list and properties from file just created
+        return new String(
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<wps:Execute service=\"WPS\" version=\"1.0.0\" " +
                     "xmlns:wps=\"http://www.opengis.net/wps/1.0.0\" " +
@@ -71,18 +76,34 @@ class WPSImpl implements WPSInterface {
                 "<ows:Identifier>"+algorithmName+"</ows:Identifier>" +
                 "<wps:DataInputs>" +
                     "<wps:Input>" +
-                        "<ows:Identifier>sos-endpoint</ows:Identifier>" +
+                        "<ows:Identifier>sos_url</ows:Identifier>" +
                         "<wps:Data>" +
                             "<wps:LiteralData>" +
                                 StringEscapeUtils.escapeXml(sosEndpoint) +
                             "</wps:LiteralData>" +
                         "</wps:Data>" +
                     "</wps:Input>" +
+                    "<wps:Input>" +
+                        "<ows:Identifier>sites</ows:Identifier>" +
+                        "<wps:Data>" +
+                            "<wps:LiteralData>" +
+                                "\\\"02177000\\\",\\\"02178400\\\",\\\"02184500\\\",\\\"02186000\\\"" +
+                            "</wps:LiteralData>" +
+                        "</wps:Data>" +
+                    "</wps:Input>" +
+                    "<wps:Input>" +
+                        "<ows:Identifier>property</ows:Identifier>" +
+                        "<wps:Data>" +
+                            "<wps:LiteralData>" +
+                                StringEscapeUtils.escapeXml("MEAN") +
+                            "</wps:LiteralData>" +
+                        "</wps:Data>" +
+                    "</wps:Input>" +
                 "</wps:DataInputs>" +
                 "<wps:ResponseForm>" +
-                    "<wps:ResponseDocument>" +
-                        "<wps:Output>" +
-                            "<ows:Identifier>result</ows:Identifier>" +
+                    "<wps:ResponseDocument storeExecuteResponse=\"true\" status=\"true\">" +
+                        "<wps:Output asReference=\"true\">" +
+                            "<ows:Identifier>output</ows:Identifier>" +
                         "</wps:Output>" +
                     "</wps:ResponseDocument>" +
                 "</wps:ResponseForm>" +
@@ -180,25 +201,32 @@ class WPSTask extends Thread {
             String sosEndpoint = repo + metaObj.getTypeString() + "/" + filename;
             String wpsRequest = WPSImpl.createWaterSMARTStatsAlgorithmRequest(sosEndpoint);
             String wpsResponse = postToWPS(props.getProperty("watersmart.wps.url"), wpsRequest);
+            log.debug(wpsResponse);
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             Document wpsResponseDoc = factory.newDocumentBuilder().parse(new ByteArrayInputStream(wpsResponse.getBytes()));
             ProcessStatus procStat = new ProcessStatus(wpsResponseDoc);
             String wpsCheckPoint = procStat.getStatusLocation();
+            log.debug(wpsCheckPoint);
             String contextPath = props.getProperty("watersmart.external.mapping.url");
             boolean completed = false;
             
             // leave this commented out until process exists
-//            Document document = null;
-//            while (!completed) {
-//                Thread.sleep(5000);
-//                is = HTTPUtils.sendPacket(new URL(wpsCheckPoint), "GET");
-//                document = CheckProcessCompletion.parseDocument(is);
-//                completed = checkWPSProcess(document);
-//            }
-
+            Document document = null;
+            while (!completed) {
+                Thread.sleep(5000);
+                log.debug("checking");
+                is = HTTPUtils.sendPacket(new URL(wpsCheckPoint), "GET");
+                document = CheckProcessCompletion.parseDocument(is);
+                completed = checkWPSProcess(document);
+            }
+            
+            ProcessStatus resultStatus = new ProcessStatus(document);
+            String outputReference = resultStatus.getOutputReference();
+            Document resultDocument = factory.newDocumentBuilder().parse(outputReference);
             // copy results to persistant location // switch to completed document above
-            String xml = CSWTransactionHelper.nodeToString(wpsResponseDoc);
+            String xml = CSWTransactionHelper.nodeToString(resultDocument);
+            log.debug(xml);
             File destinationFile = new File(
                     props.getProperty("watersmart.file.location") 
                     + props.getProperty("watersmart.file.location.wps.repository") 
