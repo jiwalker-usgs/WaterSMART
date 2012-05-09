@@ -10,23 +10,14 @@ WaterSMART.SOSController = Ext.extend(Ext.util.Observable, {
             'capstoreLoaded'
         );
     },
-    loadCapstore : function (url) {
+    getCaps : function (url) {
         this.loading = true;
         var sos = new OpenLayers.SOSClient({
             url: url,
             controller: this
         });
-        
-//        var sosCapsStore = new CIDA.SOSGetCapabilitiesStore({
-//            url : url + '?Service=SOS&Request=GetCapabilities&Version=1.0.0',
-//            listeners : {
-//                load : this.capstoreLoaded,
-//                scope : this
-//            }
-//        });
-//        sosCapsStore.load();
     },
-    capstoreLoaded : function (args) {
+    capsLoaded : function (args) {
         this.loading = false;
         LOG.debug("SOS GetCapabilites store loaded");
     },
@@ -56,7 +47,7 @@ OpenLayers.SOSClient = OpenLayers.Class({
     },
     getFois: function() {
         var result = [];
-        this.offeringCount = 0; 
+        this.offeringCount = 0;
         for (var name in this.SOSCapabilities.contents.offeringList) {
             var offering = this.SOSCapabilities.contents.offeringList[name];
             this.offeringCount++;
@@ -73,7 +64,7 @@ OpenLayers.SOSClient = OpenLayers.Class({
         // cache capabilities for future use
         this.SOSCapabilities = this.capsformat.read(response.responseXML || response.responseText);
         this.controller.sosGetCaps = this.SOSCapabilities;
-        this.controller.capstoreLoaded();
+        this.controller.capsLoaded();
     },
     getTitleForObservedProperty: function(property) {
         for (var name in this.SOSCapabilities.contents.offeringList) {

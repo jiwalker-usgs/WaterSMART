@@ -400,7 +400,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
     runSelected : function(panel) {
         LOG.debug('ModelRunSelectionpanel.js:: A run has been selected with the SOS endpoint of: ' + panel.panelInfo.operationURL);
         
-        this.controller.loadCapstore(panel.panelInfo.operationURL);
+        this.controller.getCaps(panel.panelInfo.operationURL);
         
         this.runPanel.currentlySelectedRun = panel;
         this.runPanel.getTopToolbar().get('edit-selected-run-button').setDisabled(false);
