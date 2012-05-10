@@ -197,6 +197,7 @@ class WPSTask extends Thread {
         RunMetadata metaObj = RunMetadata.getInstance(metadata);
         String filename;
         InputStream is = null;
+        InputStream resultIs = null;
         try {
             filename = CreateDSGFromZip.create(zipLocation, metaObj);
 
@@ -226,17 +227,18 @@ class WPSTask extends Thread {
             
             ProcessStatus resultStatus = new ProcessStatus(document);
             String outputReference = resultStatus.getOutputReference();
-            Document resultDocument = factory.newDocumentBuilder().parse(outputReference);
+            resultIs = HTTPUtils.sendPacket(new URL(outputReference), "GET");
+            String resultStr = IOUtils.toString(resultIs, "UTF-8");
             // copy results to persistant location // switch to completed document above
-            String xml = CSWTransactionHelper.nodeToString(resultDocument);
-            log.debug(xml);
+            
+            log.debug(resultStr);
             File destinationFile = new File(
                     props.getProperty("watersmart.file.location") 
                     + props.getProperty("watersmart.file.location.wps.repository") 
                     + File.separatorChar 
                     + UUID.randomUUID() 
                     + ".xml");
-            FileUtils.write(destinationFile, xml, "UTF-8");
+            FileUtils.write(destinationFile, resultStr, "UTF-8");
             String destinationFileName = destinationFile.getName();
             String webAccessibleFile = contextPath + props.getProperty("watersmart.file.location.wps.repository") + "/" + destinationFileName;
             
@@ -252,6 +254,7 @@ class WPSTask extends Thread {
         }
         finally {
             IOUtils.closeQuietly(is);
+            IOUtils.closeQuietly(resultIs);
         }
     }
 }
