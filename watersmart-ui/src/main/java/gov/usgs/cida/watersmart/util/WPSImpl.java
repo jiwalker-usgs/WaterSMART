@@ -145,10 +145,10 @@ class WPSTask extends Thread {
         if (procStat.isSuccess()) {
             return true;
         }
-        else if (procStat.isStarted()) {
-            // keep it going
-        }
-        else {
+//        else if (procStat.isStarted()) {
+//            // keep it going
+//        }
+        else if (procStat.isFailed()){
             throw new IOException("Process failed");
         }
         return false;
