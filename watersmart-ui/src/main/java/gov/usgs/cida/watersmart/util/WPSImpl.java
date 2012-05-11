@@ -233,11 +233,11 @@ class WPSTask extends Thread {
             
             log.debug(resultStr);
             File destinationFile = new File(
-                    props.getProperty("watersmart.file.location") 
-                    + props.getProperty("watersmart.file.location.wps.repository") 
-                    + File.separatorChar 
-                    + UUID.randomUUID() 
-                    + ".xml");
+                    props.getProperty("watersmart.file.location")
+                    + props.getProperty("watersmart.file.location.wps.repository")
+                    + File.separatorChar
+                    + UUID.randomUUID()
+                    + ".txt");
             FileUtils.write(destinationFile, resultStr, "UTF-8");
             String destinationFileName = destinationFile.getName();
             String webAccessibleFile = contextPath + props.getProperty("watersmart.file.location.wps.repository") + "/" + destinationFileName;
