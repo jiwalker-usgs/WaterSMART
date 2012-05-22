@@ -8,44 +8,29 @@
 # wps.in: interval, string, Observed interval, the SOS observed interval to request;
 # wps.in: latest, string, Observed latest, the SOS observed latest to request;
 
-# sos_url="http://nwisvaws02.er.usgs.gov/ogc-swie/wml2/dv/sos?request=GetObservation&featureID="
-# sites='"02177000","02178400"'
-# offering="Mean"
-# property="Discharge"
-# startdate="1970-01-01"
-# enddate="1971-09-30"
-# interval=''
-# latest=''
-
 library(XML)
 library(zoo)
 library(chron)
 library(doBy)
 #library(dataRetrieval)
-ParameterCd<-'Discharge'
-StatCd<-'Mean'
-StartDate<-'1970-01-01'
-EndDate<-'1971-09-30'
-Interval<-''
-Latest<-''
 
-getXMLDV2Data <- function(siteNumber,ParameterCd,StatCd,StartDate,EndDate,Interval,Latest){
+getXMLDV2Data <- function(sos_url,sites,property,offering,startdate,enddate,interval,latest){
   
-  baseURL <- "http://nwisvaws02.er.usgs.gov/ogc-swie/wml2/dv/sos?request=GetObservation&featureID="
+  baseURL <- sos_url
   
-  url <- paste(baseURL,siteNumber, "&observedProperty=",ParameterCd, "&offering=", StatCd, sep = "")
+  url <- paste(baseURL,sites, "&observedProperty=",property, "&offering=", offering, sep = "")
   
-  if (nzchar(StartDate)) {
-    url <- paste(url,"&beginPosition=",StartDate,sep="")
+  if (nzchar(startdate)) {
+    url <- paste(url,"&beginPosition=",startdate,sep="")
   } else url <- paste(url,"&beginPosition=","1851-01-01",sep="")
   
-  if (nzchar(EndDate)) {
-    url <- paste(url,"&endPosition=",EndDate,sep="")
+  if (nzchar(enddate)) {
+    url <- paste(url,"&endPosition=",enddate,sep="")
   }
-  if (nzchar(Interval)) {
-    url <- paste(url,"&Interval=",Interval,sep="")
+  if (nzchar(interval)) {
+    url <- paste(url,"&Interval=",interval,sep="")
   }
-  if (nzchar(Latest)) {
+  if (nzchar(latest)) {
     url <- paste(url,"&Latest",sep="")
   }
   
@@ -680,9 +665,8 @@ ra3v<-vector(length=a2)
 ra4v<-vector(length=a2)
 
 for (i in 1:length(a)){
-  site<-a[i]
-  url<-paste(sos_url,'?request=GetObservation&service=SOS&version=1.0.0&offering=',site,'&observedProperty=',property,sep='',collapse=NULL)
-  x<-SWE_CSV_IHA(url)
+  sites<-a[i]
+  x <- getXMLDV2Data(sos_url,sites,property,offering,startdate,enddate,interval,latest)
   colnames(x)<-c("date","discharge")
   x2<-(x$date)
   x<-data.frame(strptime(x2, "%Y-%m-%d"),x$discharge)
@@ -784,4 +768,4 @@ colnames(statsout)<-c('site_no','min_date','ma1_mean_disc','ma2_median_disc','ma
 output="output_obs.txt"
 write.table(statsout,file="output_obs.txt",col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
 
-# wps.out: output_obs, text, output_file, A file containing the mean daily flow median daily flow and skewness of daily flow;
+# wps.out: output, text, output_file, A file containing the mean daily flow median daily flow and skewness of daily flow;
