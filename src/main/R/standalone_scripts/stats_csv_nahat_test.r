@@ -336,6 +336,7 @@ ma40v[i]<-unname(ma40(qfiletempf))
     meanminmonflows<-mean(minmonbyyr$minmo)
     ml13<-(sdminmonflows*100)/meanminmonflows
   }
+  ml13v[i]<-ml13(qfiletempf)
   # Compute the minimum annual flow for each year. ML14 is the mean of the 
   # ratios of minimum annual flows to the median flow for each year 
   # (dimensionless – temporal).
@@ -859,7 +860,7 @@ ma40v[i]<-unname(ma40(qfiletempf))
 }
 
 # Make allstats matrix a dataframe with gages added
-statsout<-data.frame(t(a),y,ma1v,ma2v,ma3v,ma5v,ma12v,ma13v,ma14v,ma15v,ma16v,ma17v,ma18v,ma19v,ma20v,ma21v,ma22v,ma23v,
+statsout<-data.frame(t(a),yv,ma1v,ma2v,ma3v,ma5v,ma12v,ma13v,ma14v,ma15v,ma16v,ma17v,ma18v,ma19v,ma20v,ma21v,ma22v,ma23v,
 ma24v,ma25v,ma26v,ma27v,ma28v,ma29v,ma30v,ma31v,ma32v,ma33v,ma34v,ma35v,ma37v,ma39v,ma40v,ml13v,ml14v,mh14v,mh16v,
 mh26v,ml17v,ml18v,fl1v,fl2v,fh1v,fh2v,fh3v,fh4v,dl1v,dl2v,dl4v,dl5v,dl6v,dl9v,dl10v,dl18v,dh5v,dh10v,tl1v,tl2v,th1v,th2v,ra1v,ra3v,ra4v)
 
