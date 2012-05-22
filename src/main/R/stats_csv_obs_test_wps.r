@@ -1,7 +1,12 @@
-# wps.des: id=test_stats, title = test stats, abstract = Finds the mean daily flow median daily flow and skewness of daily flow in the input dataset;
+# wps.des: id=test_obs_stats, title = test obs stats, abstract = Finds the mean daily flow median daily flow and skewness of daily flow in the input dataset;
 # wps.in: sos_url, string, SOS Endpoint, A fully formed SOS GetObservations request that will return a SWE common CSV block holding date and flow;
 # wps.in: sites, string, list of sites, A list of sites;
-# wps.in: property, string, Observed Property, The SOS observed property to request;
+# wps.in: offering, string, Observed Offering, The SOS observed offering to request;
+# wps.in: property, string, Observed Property, the SOS observed property to request;
+# wps.in: startdate, string, Observed startdate, the SOS observed startdate to request;
+# wps.in: enddate, string, Observed enddate, the SOS observed enddate to request;
+# wps.in: interval, string, Observed interval, the SOS observed interval to request;
+# wps.in: latest, string, Observed latest, the SOS observed latest to request;
 
 # sos_url="http://nwisvaws02.er.usgs.gov/ogc-swie/wml2/dv/sos?request=GetObservation&featureID="
 # sites='"02177000","02178400"'
@@ -779,4 +784,4 @@ colnames(statsout)<-c('site_no','min_date','ma1_mean_disc','ma2_median_disc','ma
 output="output_obs.txt"
 write.table(statsout,file="output_obs.txt",col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
 
-# wps.out: output, text, output_file, A file containing the mean daily flow median daily flow and skewness of daily flow;
+# wps.out: output_obs, text, output_file, A file containing the mean daily flow median daily flow and skewness of daily flow;
