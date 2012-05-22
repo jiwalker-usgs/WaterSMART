@@ -3,10 +3,6 @@
 # wps.in: sites, string, list of sites, A list of sites;
 # wps.in: property, string, Observed Property, The SOS observed property to request;
 
-# sos_url="http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/afinch/afinch-Scenario-0.1.nc"
-# sites='"02177000","02178400","02184500","02186000"'
-# property="MEAN"
-
 library(XML)
 library(zoo)
 library(chron)
