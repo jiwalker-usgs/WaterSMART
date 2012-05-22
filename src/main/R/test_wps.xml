@@ -11,7 +11,7 @@
 		<wps:Input>
 			<ows:Identifier>sites</ows:Identifier>
 			<wps:Data>
-				<wps:LiteralData>\"02177000\",\"02178400\",\"02184500\",\"02186000\"</wps:LiteralData>
+				<wps:LiteralData>\"02177000\",\"02178400\"</wps:LiteralData>
 			</wps:Data>
 		</wps:Input>
 		<wps:Input>
