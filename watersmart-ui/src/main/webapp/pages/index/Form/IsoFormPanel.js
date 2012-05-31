@@ -16,7 +16,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
     wfsUrl : undefined,
     xmlTransform : undefined,
     'abstract' : undefined,
-    
+
     originalAbstract : undefined,
     originalModelerName : undefined,
     originalModelName : undefined,
@@ -24,11 +24,11 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
     originalRunIdentifier : undefined,
     originalRunDate : undefined,
     originalScenario : undefined,
-    
+
     constructor : function(config) {
-        
+
         if (!config) config = {};
-        
+
         this.commonAttr = config.commonAttr;
         this.layer = config.layer || '';
         this.modelId = config.modelId || '';
@@ -41,9 +41,9 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
         this.wfsUrl = config.wfsUrl || '';
         this.create = config.create;
         this.isBestScenario = config.isBestScenario || false;
-        
+
         this['abstract'] = this.originalAbstract = config['abstract'] || '';
-        
+
         config = Ext.apply({
             id: 'metadata-form',
             padding: 5,
