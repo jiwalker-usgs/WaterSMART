@@ -110,19 +110,20 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
 
                             var scenarioPanelsClone = [];
                             Ext.iterate(panelInfo.scenarioPanels, function (key, scenario) {
-                                var runPanelsClone = [];
-                                Ext.each(scenario.runPanels, function (panel) {
+                                var scenarioPanelClone = scenario.cloneConfig();
+                                Ext.each(scenario.items.items, function (panel) {
                                     panel.panelInfo.owsEndpoint = this.panelInfo.owsEndpoint;
                                     panel.panelInfo.owsResourceName = this.panelInfo.owsResourceName;
                                     panel.panelInfo.fileIdentifier = this.panelInfo.fileIdentifier;
                                     panel.panelInfo.metadataStandardName = this.panelInfo.metadataStandardName;
                                     panel.panelInfo.metadataStandardVersion = this.panelInfo.metadataStandardVersion;
-                                    this.runPanelsClone.push(panel.cloneConfig());
+                                    this.scenarioPanelClone.add(panel.cloneConfig());
                                 }, {
                                     panelInfo : panelInfo,
-                                    runPanelsClone : runPanelsClone
+                                    scenarioPanelClone : scenarioPanelClone
                                 });
-                                this.scenarioPanelsClone.push(runPanelsClone);
+                                
+                                this.scenarioPanelsClone.push(scenarioPanelClone);
                             }, {
                                 panelInfo : panelInfo,
                                 scenarioPanelsClone : scenarioPanelsClone
