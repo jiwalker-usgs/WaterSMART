@@ -331,14 +331,23 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                         var commonAttr = this.commonAttr;
                         var modelVersion = 0;
                         var runIdentifier = 0;
+                        var scenarioVersions = {};
                         
                         for (var i = 0;i < modelStore.data.rec.data.identificationInfo.length;i++) {
                             var iiItem = modelStore.data.rec.data.identificationInfo[i];
                             
+                            
                             if (iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
-                                modelVersion = iiItem.serviceIdentification.citation.edition.CharacterString.value.split('.')[0];
+                                var scenario = iiItem.serviceIdentification.citation.title.CharacterString.value;
+                                var edition = iiItem.serviceIdentification.citation.edition.CharacterString.value;
+                                if (!scenarioVersions[scenario]) {
+                                    scenarioVersions[scenario] = [];
+                                }
+                                scenarioVersions[scenario].push(edition);
                                 
-                                var runVersion = iiItem.serviceIdentification.citation.edition.CharacterString.value.split('.')[1];
+                                modelVersion = edition.split('.')[0];
+                                
+                                var runVersion = edition.split('.')[1];
                                 if (parseInt(runVersion) > this.runVersion) this.runVersion = runVersion;
                             } 
                             
@@ -359,6 +368,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                             modelName : comboValue,
                             modelVersion : modelVersion,
                             runIdentifier : runIdentifier,
+                            existingVersions : scenarioVersions,
                             scenario : '',
                             wfsUrl : wfsUrl
                         });
