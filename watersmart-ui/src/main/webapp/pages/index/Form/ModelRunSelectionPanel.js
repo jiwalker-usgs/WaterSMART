@@ -122,7 +122,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                                     panelInfo : panelInfo,
                                     scenarioPanelClone : scenarioPanelClone
                                 });
-                                
+
                                 this.scenarioPanelsClone.push(scenarioPanelClone);
                             }, {
                                 panelInfo : panelInfo,
@@ -267,6 +267,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                             var runDate;
                             var scenario;
                             var isBestScenario;
+                            var scenarioVersions = {};
 
                             modelerName = serviceIdentification.citation.citedResponsibleParty[0].individualName.CharacterString.value;
                             modelVersion = serviceIdentification.citation.edition.CharacterString.value.split('.')[0];
@@ -278,7 +279,14 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
 
                             for (var i = 0; i < modelStore.data.rec.data.identificationInfo.length; i++) {
                                 var iiItem = modelStore.data.rec.data.identificationInfo[i];
-
+                                if (iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
+                                    var edition = iiItem.serviceIdentification.citation.edition.CharacterString.value;
+                                    var iiScenario = iiItem.serviceIdentification.citation.title.CharacterString.value;
+                                    if (!scenarioVersions[iiScenario]) {
+                                        scenarioVersions[iiScenario] = [];
+                                    }
+                                    scenarioVersions[iiScenario].push(edition);
+                                }
                                 if (!wfsUrl && iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ows') {
                                     wfsUrl = iiItem.serviceIdentification.operationMetadata.linkage.URL;
                                     layer = iiItem.serviceIdentification.operationMetadata.name.CharacterString.value;
@@ -296,6 +304,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                                 modelName : comboValue,
                                 modelVersion : modelVersion,
                                 runIdentifier : runIdentifier,
+                                existingVersions : scenarioVersions,
                                 wfsUrl : wfsUrl,
                                 runDate : runDate,
                                 scenario : scenario,
@@ -344,12 +353,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                                     scenarioVersions[scenario] = [];
                                 }
                                 scenarioVersions[scenario].push(edition);
-                                
-                                modelVersion = edition.split('.')[0];
-                                
-                                var runVersion = edition.split('.')[1];
-                                if (parseInt(runVersion) > this.runVersion) this.runVersion = runVersion;
-                            } 
+                            }
                             
                             if (!wfsUrl && iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ows') {
                                 wfsUrl = iiItem.serviceIdentification.operationMetadata.linkage.URL;
@@ -437,8 +441,12 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         // Close any current plotter windows
         if (Ext.getCmp('plotter-window')) Ext.getCmp('plotter-window').hide();
 
-        Ext.each(this.scenarioPanel.items.getRange(), function(runPanel) {
-            runPanel.body.removeClass('run-panel-selected');
+        Ext.each(this.scenarioPanel.items.getRange(), function(accordPanel) {
+            Ext.each(accordPanel.items.getRange(), function (runPanel) {
+                if (runPanel.body) {
+                    runPanel.body.removeClass('run-panel-selected');
+                }
+            });
         })
         this.scenarioPanel.currentlySelectedRun.body.addClass('run-panel-selected');
         

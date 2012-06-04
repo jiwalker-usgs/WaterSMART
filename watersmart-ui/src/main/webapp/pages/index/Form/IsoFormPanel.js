@@ -82,17 +82,17 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                 }, {
                     fieldLabel: 'Model Version',
                     name: 'version',
+                    ref: 'versionField',
                     value : this.modelVersion,
-                    allowBlank: false
+                    allowBlank: false,
+                    validator: this.validateForm
                 }, {
                     fieldLabel: 'Run Identifier',
                     name: 'runIdent',
+                    ref: 'runIdentField',
                     value : this.runIdentifier,
                     allowBlank: false,
-                    validator: function (validateValue) {
-                        LOG.debug(validateValue);
-                        // do validator
-                    }
+                    validator: this.validateForm
                 }, {
                     xtype : 'datefield',
                     fieldLabel: 'Run Date',
@@ -106,6 +106,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                     store: WaterSMART.ScenarioOptions,
                     hiddenName: 'scenario',
                     name: 'scenario',
+                    ref: 'scenarioField',
                     setEditable: false,
                     forceSelection: true,
                     triggerAction: 'all',
@@ -127,14 +128,18 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                                     maxRunIdent = version.split(".")[1];
                                 }
                             });
-                            this.modelVersion = maxModelVer;
-                            this.runIdentifier = ++maxRunIdent;
-                            this.getForm().setValues(
-                                {
-                                    'version' : this.modelVersion,
-                                    'runIdent' : this.runIdentifier
-                                }
-                            );
+                            if (this.create) {
+                                this.runIdentifier = ++maxRunIdent;
+                                this.modelVersion = maxModelVer;
+                                this.getForm().setValues(
+                                    {
+                                        'runIdent' : this.runIdentifier,
+                                        'version' : this.modelVersion
+                                    }
+                                );
+                            }
+                            this.versionField.validate();
+                            this.runIdentField.validate();
                         },
                         scope : this
                     }
@@ -262,6 +267,19 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
             }));
         }
 
+    },
+    validateForm : function () {
+        var parentPanel = Ext.ComponentMgr.get('metadata-form');
+        var scenario = parentPanel.scenarioField.getValue();
+        var newVersion = parentPanel.versionField.getValue() + "." + parentPanel.runIdentField.getValue();
+        var origVersion = parentPanel.originalModelVersion + "." + parentPanel.originalRunIdentifier;
+        if ((origVersion !== newVersion || parentPanel.originalScenario !== scenario) &&
+                scenario !== "" &&
+                parentPanel.existingVersions[scenario] &&
+                parentPanel.existingVersions[scenario].indexOf(newVersion) >= 0) {
+            return "Cannot set version to one already in existance";
+        }
+        return true;
     }
 });
 
