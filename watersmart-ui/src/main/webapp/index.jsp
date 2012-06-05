@@ -41,6 +41,7 @@
             CONFIG.DEVELOPMENT = <%= development %>;
             CONFIG.CSW_PARENT_IDENTIFIER = '<%= props.getProperty("watersmart.csw.identifier.parent", "497cf2db-56d6-4cad-9a56-a14b63fb232a") %>';
             CONFIG.COMMON_ATTR = '<%= props.getProperty("watersmart.stations.primaryAttribute", "site_no") %>';
+            CONFIG.OBSERVED_SOS = '<%= props.getProperty("watersmart.sos.observed") %>';
             CONFIG.PROXY = 'service/proxy?';
 
             WATERSMART.USER = '<%= (user == null) ? "" : user.uid %>';

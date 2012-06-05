@@ -11,6 +11,7 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
     legendWidth : undefined,
     offering : undefined,
     sosStore : undefined,
+    observedStore : undefined,
     graph : undefined,
     ownerWindow : undefined,
     url : undefined,
@@ -62,18 +63,59 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
             url : this.url,
             vars : this.vars,
             offering : this.offering
-        })
+        });
+        
+        this.loadObserved({
+            url : CONFIG.OBSERVED_SOS,
+            offering : this.offering
+        });
     },
     loadSOSStore : function(options) {
         var observedProperties = options.vars.join(",");
         var url = CONFIG.PROXY + options.url + "?service=SOS&request=GetObservation&version=1.0.0&offering=" + encodeURI(options.offering) + "&observedProperty=" + observedProperties;
         this.yLabels = options.vars;
         this.sosStore = new CIDA.SOSGetObservationStore({
-            url : url, // gmlid is url for now, eventually, use SOS endpoint + gmlid or whatever param
+            url : url,
             autoLoad : true,
             proxy : new Ext.data.HttpProxy({
-                url: url, 
-                disableCaching: false, 
+                url: url,
+                disableCaching: false,
+                method: "GET"
+            }),
+            baseParams : {},
+            listeners : {
+                load : function(store) {
+                    this.globalArrayUpdate(store);
+                    if (this.sosStore.data.items.length) {
+                        this.ownerWindow.add(this);
+                        this.ownerWindow.show();
+                    } else {
+                        this.ownerWindow.hide();
+                    }
+                },
+                exception : function() {
+                    LOG.debug('Plotter: SOS store has encountered an exception.');
+                    // I only want to display this message once per request,
+                    if (!this.errorDisplayed) {
+                        this.errorDisplayed = true;
+                        NOTIFY.warn({msg: 'Unable to contact SOS service'});
+                    }
+                },
+                scope: this
+            }
+        });
+    },
+    loadObserved : function(options) {
+        var observedProperties = "Discharge";
+        var url = CONFIG.PROXY + options.url + "?service=SOS&request=GetObservation&version=1.0.0&offering=MEAN&observedProperty="
+            + observedProperties + "&featureId=" + options.offering + "&beginPosition=2000-01-01";
+        this.yLabels.push("Observed");
+        this.observedStore = new CIDA.SOSGetObservationStore({
+            url : url,
+            autoLoad : true,
+            proxy : new Ext.data.HttpProxy({
+                url: url,
+                disableCaching: false,
                 method: "GET"
             }),
             baseParams : {},
