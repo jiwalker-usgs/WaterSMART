@@ -2,12 +2,13 @@ Ext.ns("WaterSMART");
 
 WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
     serviceIdentification : undefined,
-    panelInfo : {},
+    panelInfo : undefined,
     constructor : function(config) {
         LOG.trace('RunPanel.js::constructor()');
         if (!config) config = {};
         
         this.serviceIdentification = config.serviceIdentification;
+        this.panelInfo = {};
         
         this.panelInfo.title = this.serviceIdentification.citation.title.CharacterString.value;
         this.panelInfo.edition = this.serviceIdentification.citation.edition.CharacterString.value;

@@ -112,12 +112,13 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                             Ext.iterate(panelInfo.scenarioPanels, function (key, scenario) {
                                 var scenarioPanelClone = scenario.cloneConfig();
                                 Ext.each(scenario.items.items, function (panel) {
-                                    panel.panelInfo.owsEndpoint = this.panelInfo.owsEndpoint;
-                                    panel.panelInfo.owsResourceName = this.panelInfo.owsResourceName;
-                                    panel.panelInfo.fileIdentifier = this.panelInfo.fileIdentifier;
-                                    panel.panelInfo.metadataStandardName = this.panelInfo.metadataStandardName;
-                                    panel.panelInfo.metadataStandardVersion = this.panelInfo.metadataStandardVersion;
-                                    this.scenarioPanelClone.add(panel.cloneConfig());
+                                    var clonePanel = panel.cloneConfig();
+                                    clonePanel.panelInfo.owsEndpoint = this.panelInfo.owsEndpoint;
+                                    clonePanel.panelInfo.owsResourceName = this.panelInfo.owsResourceName;
+                                    clonePanel.panelInfo.fileIdentifier = this.panelInfo.fileIdentifier;
+                                    clonePanel.panelInfo.metadataStandardName = this.panelInfo.metadataStandardName;
+                                    clonePanel.panelInfo.metadataStandardVersion = this.panelInfo.metadataStandardVersion;
+                                    this.scenarioPanelClone.add(clonePanel);
                                 }, {
                                     panelInfo : panelInfo,
                                     scenarioPanelClone : scenarioPanelClone
@@ -449,6 +450,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
             });
         })
         this.scenarioPanel.currentlySelectedRun.body.addClass('run-panel-selected');
+        this.mapPanel.sosEndpoint = panel.panelInfo.operationURL;
         
         // TODO- We will need to change this when (if?) we get more than one sites layer on the map at any given time
         if (this.mapPanel.currentMapConfig.layers.layers.length 
@@ -479,7 +481,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         this.mapPanel.currentMapConfig.layers.layers = newSitesLayerArray;
         this.mapPanel.processMapConfigObject(this.mapPanel.currentMapConfig);
         
-        this.mapPanel.sosEndpoint = panel.panelInfo.operationURL;
+
         this.mapPanel.addIdentifyToolingToMap();
     },
     updateModelStore : function() {
