@@ -4,6 +4,7 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
     contentPanel : undefined,
     legendDiv : undefined,
     legendPanel : undefined,
+    combinedSosData : {},
     plotterData : [],
     plotterTitle : undefined,
     plotterDiv : undefined,
@@ -12,12 +13,13 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
     offering : undefined,
     sosStore : undefined,
     observedStore : undefined,
+    loadingStatus : undefined,
     graph : undefined,
     ownerWindow : undefined,
     url : undefined,
     vars : [],
     yLabels : [],
-    constructor : function(config) {
+    constructor : function (config) {
         config = config || {};
         this.plotterDiv = config.plotterDiv || 'dygraph-content';
         this.legendDiv = config.legendDiv || 'dygraph-legend';
@@ -28,7 +30,7 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
         this.ownerWindow = config.ownerWindow;
         this.url = config.url;
         this.vars = config.vars;
-        
+
         this.contentPanel = new Ext.Panel({
             contentEl : this.plotterDiv,
             id : 'contentPanel',
@@ -47,7 +49,7 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
             width : this.legendWidth,
             autoShow : true
         });
-        
+
         config = Ext.apply({
             items : [this.contentPanel, this.legendPanel],
             ref : 'plotterPanel',
@@ -56,21 +58,27 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
             bufferResize : true,
             split: true
         }, config);
-        
+
         WaterSMART.Plotter.superclass.constructor.call(this, config);
-        
-        this.loadSOSStore({
-            url : this.url,
-            vars : this.vars,
-            offering : this.offering
-        });
-        
+
+        this.loadingStatus = {
+            modeled : "starting",
+            observed : "starting"
+        };
+
+//        this.loadSOSStore({
+//            url : this.url,
+//            vars : this.vars,
+//            offering : this.offering
+//        });
+        this.loadingStatus.modeled = "complete";
+
         this.loadObserved({
             url : CONFIG.OBSERVED_SOS,
             offering : this.offering
         });
     },
-    loadSOSStore : function(options) {
+    loadSOSStore : function (options) {
         var observedProperties = options.vars.join(",");
         var url = CONFIG.PROXY + options.url + "?service=SOS&request=GetObservation&version=1.0.0&offering=" + encodeURI(options.offering) + "&observedProperty=" + observedProperties;
         this.yLabels = options.vars;
@@ -84,17 +92,22 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
             }),
             baseParams : {},
             listeners : {
-                load : function(store) {
-                    this.globalArrayUpdate(store);
-                    if (this.sosStore.data.items.length) {
-                        this.ownerWindow.add(this);
-                        this.ownerWindow.show();
-                    } else {
-                        this.ownerWindow.hide();
+                load : function (store) {
+                    this.globalArrayUpdate(store, "modeled");
+                    this.loadingStatus.modeled = "complete";
+                    if (this.loadingStatus.observed === "complete") {
+                        this.dygraphUpdateOptions(store);
+                        if (this.sosStore.data.items.length) {
+                            this.ownerWindow.add(this);
+                            this.ownerWindow.show();
+                        } else {
+                            this.ownerWindow.hide();
+                        }
                     }
                 },
-                exception : function() {
+                exception : function () {
                     LOG.debug('Plotter: SOS store has encountered an exception.');
+                    this.loadingStatus.modeled = "failed";
                     // I only want to display this message once per request,
                     if (!this.errorDisplayed) {
                         this.errorDisplayed = true;
@@ -105,10 +118,10 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
             }
         });
     },
-    loadObserved : function(options) {
+    loadObserved : function (options) {
         var observedProperties = "Discharge";
         var url = CONFIG.PROXY + options.url + "?service=SOS&request=GetObservation&version=1.0.0&offering=MEAN&observedProperty="
-            + observedProperties + "&featureId=" + options.offering + "&beginPosition=2000-01-01";
+            + observedProperties + "&featureId=" + options.offering + "&beginPosition=2000-01-01&endPosition=2000-01-23";
         this.yLabels.push("Observed");
         this.observedStore = new CIDA.SOSGetObservationStore({
             url : url,
@@ -120,17 +133,22 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
             }),
             baseParams : {},
             listeners : {
-                load : function(store) {
-                    this.globalArrayUpdate(store);
-                    if (this.sosStore.data.items.length) {
-                        this.ownerWindow.add(this);
-                        this.ownerWindow.show();
-                    } else {
-                        this.ownerWindow.hide();
+                load : function (store) {
+                    this.globalArrayUpdate(store, "observed");
+                    this.loadingStatus.observed = "complete";
+                    if (this.loadingStatus.modeled === "complete") {
+                        this.dygraphUpdateOptions(store);
+                        if (this.sosStore.data.items.length) {
+                            this.ownerWindow.add(this);
+                            this.ownerWindow.show();
+                        } else {
+                            this.ownerWindow.hide();
+                        }
                     }
                 },
-                exception : function() {
+                exception : function () {
                     LOG.debug('Plotter: SOS store has encountered an exception.');
+                    this.loadingStatus.observed = "failed";
                     // I only want to display this message once per request,
                     if (!this.errorDisplayed) {
                         this.errorDisplayed = true;
@@ -139,10 +157,9 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
                 },
                 scope: this
             }
-            
         });
     },
-    globalArrayUpdate : function(store) {
+    globalArrayUpdate : function (store, series) {
         LOG.debug('Plotter:globalArrayUpdate()');
         var record = store.getAt(0);
         if (!record) {
@@ -152,23 +169,56 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
             }
             return;
         }
-        this.plotterData = function(values) {
-            Ext.each(values, function(item, index, allItems) {
-                for(var i=0; i<item.length; i++) {
-                    var value;
-                    if (i==0) {
-                        value = Date.parseISO8601(item[i].split('T')[0]);
-                    }
-                    else {
-                        value = parseFloat(item[i])
-                    }
-                    allItems[index][i] = value;
-                }
-            });
-            return values;
-        }(record.get('values'));
 
-        this.dygraphUpdateOptions(store);
+        Ext.each(record.get('values'), function (item, index, allItems) {
+            var date;
+            var data = [];
+            for (var i=0; i<item.length; i++) {
+                if (i==0) {
+                    date = Date.parseISO8601(item[i].split('T')[0]);
+                }
+                else {
+                    data.push(parseFloat(item[i]));
+                }
+            }
+            if (!this.combinedSosData[date]) {
+                this.combinedSosData[date] = {};
+            }
+            this.combinedSosData[date][series] = data;
+        }, this);
+    },
+    combineSeries : function() {
+        var returnData = [];
+        if (this.loadingStatus.modeled !== "complete") {
+            NOTIFY.warn({msg: "Modeled data source loaded incorrectly, try again!"});
+            return [];
+        } else if (this.loadingStatus.observed !== "complete") {
+            NOTIFY.warn({msg: "Observed data source loaded incorrectly"});
+        }
+        var keys = []; // need to sort dates
+        for (var key in this.combinedSosData) {
+            if (this.combinedSosData.hasOwnProperty(key)) {
+                keys.push(key);
+            }
+        }
+        keys.sort();
+        for (var index in keys) {
+            var timestep = [];
+            var date = keys[index];
+            timestep.push(date);
+            if (this.combinedSosData[date]["modeled"]) {
+                timestep.push(this.combinedSosData[date]["modeled"]);
+            } else {
+                timestep.push(null);
+            }
+            if (this.combinedSosData[date]["observed"]) {
+                timestep.push(this.combinedSosData[date]["observed"]);
+            } else {
+                timestep.push(null);
+            }
+            returnData.push(timestep);
+        }
+        return returnData;
     },
     resizePlotter : function(width, height) {
         LOG.debug('Plotter:resizePlotter(): Incoming width: '+width+', incoming height: ' + height);
@@ -202,7 +252,7 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
         // TODO figure out what to do if dataRecord has more than time and mean
         this.graph = new Dygraph(
             Ext.get(this.plotterDiv).dom,
-            this.plotterData,
+            this.combineSeries(),
             { // http://dygraphs.com/options.html
                 hideOverlayOnMouseOut : false,
                 legend: 'always',
@@ -233,7 +283,7 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
                     }
                 }
             }
-            );
+        );
     }
 });
     
