@@ -2,12 +2,13 @@ Ext.ns("WaterSMART");
 
 WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
     serviceIdentification : undefined,
-    panelInfo : {},
+    panelInfo : undefined,
     constructor : function(config) {
         LOG.trace('RunPanel.js::constructor()');
         if (!config) config = {};
         
         this.serviceIdentification = config.serviceIdentification;
+        this.panelInfo = {};
         
         this.panelInfo.title = this.serviceIdentification.citation.title.CharacterString.value;
         this.panelInfo.edition = this.serviceIdentification.citation.edition.CharacterString.value;
@@ -20,36 +21,36 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
         this.panelInfo.presentationForm = this.serviceIdentification.citation.presentationForm; // Array
         this.panelInfo.isBestScenario = false;
         this.panelInfo.coupledResource = this.serviceIdentification.coupledResource;
-        
+
         if (this.serviceIdentification.citation.otherCitationDetails && this.serviceIdentification.citation.otherCitationDetails.CharacterString.value.toLowerCase() === 'best') {
             this.panelInfo.isBestScenario = true;
-            this.panelInfo.title += ' -- (Best Available)'
+            this.panelInfo.edition += ' -- (Best Available)';
         }
-        
+
         var revisionDates = [];
-        Ext.each(this.panelInfo.date, function(dateItem){
+        Ext.each(this.panelInfo.date, function (dateItem) {
             if (dateItem.dateType.codeListValue.toLowerCase() === 'revision') {
-                Ext.each(dateItem.date, function(rdItem){
-                    this.push(rdItem.DateTime.value)
-                }, this.revisionDates)
+                Ext.each(dateItem.date, function (rdItem) {
+                    this.push(rdItem.DateTime.value);
+                }, this.revisionDates);
             }
         }, {
             revisionDates : revisionDates
-        })
+        });
 
         var responsibleParties = [];
-        Ext.each(this.panelInfo.citedResponsibleParty, function(crpItem) {
+        Ext.each(this.panelInfo.citedResponsibleParty, function (crpItem) {
             this.push({
                 email : crpItem.contactInfo.address.electronicMailAddress[0].CharacterString.value,
                 name : crpItem.individualName.CharacterString.value,
                 role : crpItem.role.codeListValue
-            })
-        }, responsibleParties)
-        
+            });
+        }, responsibleParties);
+
         var html = '<div class="run-row"><span class="run-label">Calibration/Validation Scenario:</span> <span class="run-value">' + this.serviceIdentification.citation.title.CharacterString.value + '</span></div>';
         html += '<div class="run-row"><span class="run-label">Model Version and Run:</span> <span class="run-value">' + this.panelInfo.edition + '</span></div>';
         html += '<div class="run-row"><span class="run-label">Modeler Name:</span> <span class="run-value">' + responsibleParties[0].name + '</span></div>';
-        
+
         for (var i = 0;i < this.panelInfo.date.length;i++) {
             html += '<div class="run-row"><span class="run-label">Run Date:</span> <span class="run-value">' + this.panelInfo.date[i].date[0].DateTime.value + '</span></div>';
         }
@@ -62,8 +63,9 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
         }
         
         config = Ext.apply({
-            title : this.panelInfo.title,
+            title : this.panelInfo.edition,
             height : 'auto',
+            autoScroll : true,
             width: '100%',
             html : html,
             listeners : {
@@ -77,7 +79,7 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
                     }, me)
                     
                     me.body.on('click', function(){
-                        me.ownerCt.ownerCt.runSelected(me);
+                        me.ownerCt.ownerCt.ownerCt.runSelected(me);
                     }, me)
                 },
                 scope : this

@@ -10,9 +10,9 @@
 <html>
     <head>
         <jsp:include page="template/USGSHead.jsp">
-            <jsp:param name="shortName" value="WaterSMART" />
-            <jsp:param name="title" value="WaterSMART Model Intercomparison Portal" />
-            <jsp:param name="description" value="WaterSMART Model Intercomparison Portal" />
+            <jsp:param name="shortName" value="NWC Portal" />
+            <jsp:param name="title" value="National Water Census Model Intercomparison Portal" />
+            <jsp:param name="description" value="National Water Census Model Intercomparison Portal" />
             <jsp:param name="author" value="Jordan Walker"/>
             <jsp:param name="publisher" value="USGS - U.S. Geological Survey, Water Resources; CIDA - Center for Integrated Data Analytics" />
             <jsp:param name="keywords" value="USGS, U.S. Geological Survey, water, earth science, hydrology, hydrologic, data, streamflow, stream, river, lake, flood, drought, quality, basin, watershed, environment, ground water, groundwater" />
@@ -41,6 +41,7 @@
             CONFIG.DEVELOPMENT = <%= development %>;
             CONFIG.CSW_PARENT_IDENTIFIER = '<%= props.getProperty("watersmart.csw.identifier.parent", "497cf2db-56d6-4cad-9a56-a14b63fb232a") %>';
             CONFIG.COMMON_ATTR = '<%= props.getProperty("watersmart.stations.primaryAttribute", "site_no") %>';
+            CONFIG.OBSERVED_SOS = '<%= props.getProperty("watersmart.sos.observed") %>';
             CONFIG.PROXY = 'service/proxy?';
 
             WATERSMART.USER = '<%= (user == null) ? "" : user.uid %>';
@@ -83,7 +84,7 @@
         </jsp:include>
 
         <jsp:include page="js/openlayers/openlayers.jsp">
-            <jsp:param name="isDevelopment" value="<%= development %>" />
+            <jsp:param name="debug-qualifier" value="<%= development %>" />
         </jsp:include>
         <script type="text/javascript" src="js/watersmart/XMLHttpRequest.js"></script>
 
@@ -109,20 +110,22 @@
         <script type="text/javascript" src="pages/index/WPSProcesses/ExampleEmailWPSWrapperProcess.js"></script>
         <script type="text/javascript" src="pages/index/WPSProcesses/ExampleWPSProcess.js"></script>
         <script type="text/javascript" src="pages/index/Form/ProcessFormPanel.js"></script>
-        <script type="text/javascript" src="pages/index/Form/isoFormPanel.js"></script>
-        <script type="text/javascript" src="pages/index/Form/fileUploadPanel.js"></script>
+        <script type="text/javascript" src="pages/index/Form/IsoFormPanel.js"></script>
+        <script type="text/javascript" src="pages/index/Form/FileUploadPanel.js"></script>
         <script type="text/javascript" src="pages/index/Form/ModelPanel.js"></script>
+        <script type="text/javascript" src="pages/index/Form/ScenarioPanel.js"></script>
         <script type="text/javascript" src="pages/index/Form/RunPanel.js"></script>
         <script type="text/javascript" src="pages/index/Form/ModelRunSelectionPanel.js"></script>
         <script type="text/javascript" src="pages/index/Plotter/PlotterPanel.js"></script>
         <script type="text/javascript" src="pages/index/Map/map.js"></script>
+        <script type="text/javascript" src="pages/index/Plotter/SOSController.js"></script>
         <script type="text/javascript" src="pages/index/onReady.js"></script>
         
     </head>
     <body>
         <jsp:include page="template/USGSHeader.jsp">
             <jsp:param name="header-class" value="x-hidden"/>
-            <jsp:param name="site-title" value="WaterSMART Model Intercomparison Portal"/>
+            <jsp:param name="site-title" value="National Water Census Model Intercomparison Portal"/>
         </jsp:include>
 
         <div id="xslt-output-div"></div>
