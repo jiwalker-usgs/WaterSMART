@@ -44,7 +44,7 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
             itemId : 'legendPanel',
             ref : '../legendPanel',
             contentEl : this.legendDiv,
-            layout : 'fit', 
+            layout : 'fit',
             region : 'east',
             width : this.legendWidth,
             autoShow : true
@@ -66,12 +66,12 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
             observed : "starting"
         };
 
-//        this.loadSOSStore({
-//            url : this.url,
-//            vars : this.vars,
-//            offering : this.offering
-//        });
-        this.loadingStatus.modeled = "complete";
+        this.loadSOSStore({
+            url : this.url,
+            vars : this.vars,
+            offering : this.offering
+        });
+        //this.loadingStatus.modeled = "complete";
 
         this.loadObserved({
             url : CONFIG.OBSERVED_SOS,
@@ -81,7 +81,7 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
     loadSOSStore : function (options) {
         var observedProperties = options.vars.join(",");
         var url = CONFIG.PROXY + options.url + "?service=SOS&request=GetObservation&version=1.0.0&offering=" + encodeURI(options.offering) + "&observedProperty=" + observedProperties;
-        this.yLabels = options.vars;
+        this.yLabels = this.yLabels.concat(options.vars);
         this.sosStore = new CIDA.SOSGetObservationStore({
             url : url,
             autoLoad : true,
@@ -172,14 +172,20 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
 
         Ext.each(record.get('values'), function (item, index, allItems) {
             var date;
-            var data = [];
-            for (var i=0; i<item.length; i++) {
-                if (i==0) {
-                    date = Date.parseISO8601(item[i].split('T')[0]);
+            var data;
+            if (item.length) {
+                for (var i=0; i<item.length; i++) {
+                    if (i==0) {
+                        date = Date.parseISO8601(item[i].split('T')[0]);
+                    }
+                    else {
+                        // sacrificed multiple datatypes here, hoping to get it to work
+                        data = parseFloat(item[i]);
+                    }
                 }
-                else {
-                    data.push(parseFloat(item[i]));
-                }
+            } else {
+                date = Date.parseISO8601(item.time.split('T')[0]);
+                data = parseFloat(item.value);
             }
             if (!this.combinedSosData[date]) {
                 this.combinedSosData[date] = {};
@@ -201,22 +207,28 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
                 keys.push(key);
             }
         }
-        keys.sort();
-        for (var index in keys) {
+        keys.sort(function(a, b) {
+            return new Date(a).getTime() - new Date(b).getTime();
+        });
+        for (var i=0; i<keys.length; i++) {
             var timestep = [];
-            var date = keys[index];
-            timestep.push(date);
-            if (this.combinedSosData[date]["modeled"]) {
-                timestep.push(this.combinedSosData[date]["modeled"]);
+            var date = keys[i];
+            timestep.push(new Date(date));
+            if (this.combinedSosData[date]) {
+                if (this.combinedSosData[date]["modeled"]) {
+                    timestep.push(this.combinedSosData[date]["modeled"]);
+                } else {
+                    timestep.push(null);
+                }
+                if (this.combinedSosData[date]["observed"]) {
+                    timestep.push(this.combinedSosData[date]["observed"]);
+                } else {
+                    timestep.push(null);
+                }
+                returnData.push(timestep);
             } else {
-                timestep.push(null);
+                LOG.debug("Date was somehow: " + date);
             }
-            if (this.combinedSosData[date]["observed"]) {
-                timestep.push(this.combinedSosData[date]["observed"]);
-            } else {
-                timestep.push(null);
-            }
-            returnData.push(timestep);
         }
         return returnData;
     },
@@ -246,8 +258,7 @@ WaterSMART.Plotter = Ext.extend(Ext.Panel, {
     dygraphUpdateOptions : function(store) {
         var record = store.getAt(0);
         
-        // this is mean for us, probably figure this out better?
-        var yaxisUnits = record.get('dataRecord')[1].uom;
+        var yaxisUnits = "cfs";
 
         // TODO figure out what to do if dataRecord has more than time and mean
         this.graph = new Dygraph(
