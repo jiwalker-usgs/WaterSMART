@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -28,9 +29,13 @@ import org.apache.commons.lang.NotImplementedException;
  */
 public class CreateDSGFromZip {
     
-
+    public static class ReturnInfo {
+        public Collection<Station> stations;
+        public List<String> properties;
+        public String filename;
+    }
     
-    public static String create(File srcZip, RunMetadata runMeta) throws IOException, XMLStreamException {
+    public static ReturnInfo create(File srcZip, RunMetadata runMeta) throws IOException, XMLStreamException {
         // Need to put the resulting NetCDF file somewhere that ncSOS knows about
         String sosPath = JNDISingleton.getInstance().getProperty("watersmart.sos.location", System.getProperty("java.io.tmpdir"));
         String filename = srcZip.getName().replace(".zip", ".nc");
@@ -45,6 +50,9 @@ public class CreateDSGFromZip {
         
         StationLookup lookerUpper = new StationLookup(runMeta);
         Collection<Station> stations = lookerUpper.getStations();
+        ReturnInfo info = new ReturnInfo();
+        info.stations = stations;
+        info.filename = filename;
         
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
@@ -67,7 +75,7 @@ public class CreateDSGFromZip {
 
                 // must parse Metadata for each file
                 RecordType meta = dsgParse.parse();
-
+                info.properties = meta.getDataVarNames();
                 // first file sets the rhythm
                 if (nc == null) {
                     Station[] stationArray = stations.toArray(new Station[stations.size()]);
@@ -87,7 +95,7 @@ public class CreateDSGFromZip {
             }
         }
         IOUtils.closeQuietly(nc);
-        return filename;
+        return info;
     }
     
     private static Map<String, String> applyBusinessRulesToMeta(RunMetadata meta) {

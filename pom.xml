@@ -9,10 +9,8 @@
   
     <modules>
         <module>watersmart-ui</module>
-        <module>watersmart-wps</module>
         <module>watersmart-parse</module>
         <module>watersmart-common</module>
-        <module>watersmart-wps-r</module>
     </modules>
     
     <properties>
@@ -191,7 +189,7 @@
             <dependency>
                 <groupId>gov.usgs.cida.netcdf</groupId>
                 <artifactId>netcdf-dsg</artifactId>
-                <version>1.1</version>
+                <version>1.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ws.commons</groupId>
