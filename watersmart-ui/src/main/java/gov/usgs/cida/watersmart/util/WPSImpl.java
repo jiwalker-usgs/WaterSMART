@@ -12,7 +12,6 @@ import gov.usgs.cida.watersmart.communication.HTTPUtils;
 import gov.usgs.cida.watersmart.csw.CSWTransactionHelper;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ReturnInfo;
-import gov.usgs.cida.watersmart.parse.StationLookup;
 import gov.usgs.cida.watersmart.wps.completion.CheckProcessCompletion;
 import gov.usgs.cida.watersmart.wps.completion.ProcessStatus;
 import java.io.ByteArrayInputStream;
@@ -22,13 +21,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
 import javax.mail.MessagingException;
-import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
@@ -122,14 +119,156 @@ class WPSImpl implements WPSInterface {
     }
     
     static String createObservedStatsRequest(String sosEndpoint, Collection<Station> sites, List<String> properties) {
-        throw new NotImplementedException();
+        List<String> siteList = Lists.newLinkedList();
+        for (Station station : sites) {
+            siteList.add(station.station_id);
+        }
+        return new String("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+        "<wps:Execute xmlns:wps=\"http://www.opengis.net/wps/1.0.0\" " +
+            "xmlns:ows=\"http://www.opengis.net/ows/1.1\" " +
+            "xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
+            "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+            "service=\"WPS\" version=\"1.0.0\" " +
+            "xsi:schemaLocation=\"http://www.opengis.net/wps/1.0.0 http://schemas.opengis.net/wps/1.0.0/wpsExecute_request.xsd\">" +
+            "<ows:Identifier>" + stats_csv_obs_test_wps + "</ows:Identifier>" +
+            "<wps:DataInputs>" +
+                "<wps:Input>" +
+                    "<ows:Identifier>sos_url</ows:Identifier>" +
+                    "<wps:Data>" +
+                        "<wps:LiteralData>http://nwisvaws02.er.usgs.gov/ogc-swie/wml2/dv/sos?request=GetObservation&amp;featureID=</wps:LiteralData>" +
+                    "</wps:Data>" +
+                "</wps:Input>" +
+                "<wps:Input>" +
+                    "<ows:Identifier>sites</ows:Identifier>" +
+                    "<wps:Data>" +
+                        "<wps:LiteralData>" +
+                            StringEscapeUtils.escapeXml(StringUtils.join(siteList, ",")) +
+                            //"\\\"02177000\\\",\\\"02178400\\\",\\\"02184500\\\",\\\"02186000\\\"" +
+                        "</wps:LiteralData>" +
+                    "</wps:Data>" +
+                "</wps:Input>" +
+                "<wps:Input>" +
+                    "<ows:Identifier>offering</ows:Identifier>" +
+                    "<wps:Data>" +
+                        "<wps:LiteralData>Mean</wps:LiteralData>" +
+                    "</wps:Data>" +
+                "</wps:Input>" +
+                "<wps:Input>" +
+                    "<ows:Identifier>property</ows:Identifier>" +
+                    "<wps:Data>" +
+                        "<wps:LiteralData>Discharge</wps:LiteralData>" +
+                    "</wps:Data>" +
+                "</wps:Input>" +
+                "<wps:Input>" +
+                    "<ows:Identifier>startdate</ows:Identifier>" +
+                    "<wps:Data>" +
+                        "<wps:LiteralData>1970-01-01</wps:LiteralData>" +
+                    "</wps:Data>" +
+                "</wps:Input>" +
+                "<wps:Input>" +
+                    "<ows:Identifier>enddate</ows:Identifier>" +
+                    "<wps:Data>" +
+                        "<wps:LiteralData>1971-09-30</wps:LiteralData>" +
+                    "</wps:Data>" +
+                "</wps:Input>" +
+                "<wps:Input>" +
+                    "<ows:Identifier>interval</ows:Identifier>" +
+                    "<wps:Data>" +
+                        "<wps:LiteralData/>" +
+                    "</wps:Data>" +
+                "</wps:Input>" +
+                "<wps:Input>" +
+                    "<ows:Identifier>latest</ows:Identifier>" +
+                    "<wps:Data>" +
+                        "<wps:LiteralData/>" +
+                    "</wps:Data>" +
+                "</wps:Input>" +
+            "</wps:DataInputs>" +
+            "<wps:ResponseForm>" +
+                "<wps:ResponseDocument>" +
+                    "<wps:Output>" +
+                        "<ows:Identifier>output</ows:Identifier>" +
+                    "</wps:Output>" +
+                "</wps:ResponseDocument>" +
+            "</wps:ResponseForm>" +
+        "</wps:Execute>");
     }
     
     static String createCompareStatsRequest(String sosEndpoint, Collection<Station> sites, List<String> properties) {
-        throw new NotImplementedException();
+        List<String> siteList = Lists.newLinkedList();
+        for (Station station : sites) {
+            siteList.add(station.station_id);
+        }
+        return new String(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+            "<wps:Execute service=\"WPS\" version=\"1.0.0\" " +
+                    "xmlns:wps=\"http://www.opengis.net/wps/1.0.0\" " +
+                    "xmlns:ows=\"http://www.opengis.net/ows/1.1\" " +
+                    "xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
+                    "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+                    "xsi:schemaLocation=\"http://www.opengis.net/wps/1.0.0 " +
+                    "http://schemas.opengis.net/wps/1.0.0/wpsExecute_request.xsd\">" +
+                "<ows:Identifier>" + stats_compare + "</ows:Identifier>" +
+                "<wps:DataInputs>" +
+                    "<wps:Input>" +
+                        "<ows:Identifier>sos_url</ows:Identifier>" +
+                        "<wps:Data>" +
+                            "<wps:LiteralData>http://nwisvaws02.er.usgs.gov/ogc-swie/wml2/dv/sos?request=GetObservation&amp;featureID=</wps:LiteralData>" +
+                        "</wps:Data>" +
+                    "</wps:Input>" +
+                    "<wps:Input>" +
+                        "<ows:Identifier>sites</ows:Identifier>" +
+                        "<wps:Data>" +
+                            "<wps:LiteralData>" +
+                                StringEscapeUtils.escapeXml(StringUtils.join(siteList, ",")) +
+                                //"\\\"02177000\\\",\\\"02178400\\\",\\\"02184500\\\",\\\"02186000\\\"" +
+                            "</wps:LiteralData>" +
+                        "</wps:Data>" +
+                    "</wps:Input>" +
+                    "<wps:Input>" +
+                        "<ows:Identifier>property</ows:Identifier>" +
+                        "<wps:Data>" +
+                            "<wps:LiteralData>" +
+                                StringEscapeUtils.escapeXml(properties.get(0)) +
+                            "</wps:LiteralData>" +
+                        "</wps:Data>" +
+                    "</wps:Input>" +
+                    "<wps:Input>" +
+                        "<ows:Identifier>model_url</ows:Identifier>" +
+                        "<wps:Data>" +
+                            "<wps:LiteralData>" +
+                                StringEscapeUtils.escapeXml(sosEndpoint) +
+                            "</wps:LiteralData>" +
+                        "</wps:Data>" +
+                    "</wps:Input>" +
+                    "<wps:Input>" +
+                        "<ows:Identifier>modsites</ows:Identifier>" +
+                        "<wps:Data>" +
+                            "<wps:LiteralData>" +
+                                StringEscapeUtils.escapeXml(StringUtils.join(siteList, ",")) +
+                                //"\\\"02177000\\\",\\\"02178400\\\",\\\"02184500\\\",\\\"02186000\\\"" +
+                            "</wps:LiteralData>" +
+                        "</wps:Data>" +
+                    "</wps:Input>" +
+                    "<wps:Input>" +
+                        "<ows:Identifier>modprop</ows:Identifier>" +
+                        "<wps:Data>" +
+                            "<wps:LiteralData>" +
+                                StringEscapeUtils.escapeXml(properties.get(0)) +
+                            "</wps:LiteralData>" +
+                        "</wps:Data>" +
+                    "</wps:Input>" +
+                "</wps:DataInputs>" +
+                "<wps:ResponseForm>" +
+                    "<wps:ResponseDocument storeExecuteResponse=\"true\" status=\"true\">" +
+                        "<wps:Output asReference=\"true\">" +
+                            "<ows:Identifier>output</ows:Identifier>" +
+                        "</wps:Output>" +
+                    "</wps:ResponseDocument>" +
+                "</wps:ResponseForm>" +
+            "</wps:Execute>");
     }
 }
-
 
 
 class WPSTask extends Thread {
