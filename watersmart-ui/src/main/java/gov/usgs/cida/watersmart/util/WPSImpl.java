@@ -94,8 +94,8 @@ class WPSImpl implements WPSInterface {
                         "<ows:Identifier>sites</ows:Identifier>" +
                         "<wps:Data>" +
                             "<wps:LiteralData>" +
-                                StringEscapeUtils.escapeXml(StringUtils.join(siteList, ",")) +
-                                //"\\\"02177000\\\",\\\"02178400\\\",\\\"02184500\\\",\\\"02186000\\\"" +
+                                //StringEscapeUtils.escapeXml(StringUtils.join(siteList, ",")) +
+                                "\\\"02177000\\\",\\\"02178400\\\",\\\"02184500\\\",\\\"02186000\\\"" +
                             "</wps:LiteralData>" +
                         "</wps:Data>" +
                     "</wps:Input>" +
@@ -372,11 +372,11 @@ class WPSTask extends Thread {
 
             Map<String, String> wpsOutputMap = Maps.newHashMap();
             String nahatReq = WPSImpl.createNahatStatsRequest(sosEndpoint, info.stations, info.properties);
-            String obsReq = WPSImpl.createObservedStatsRequest(sosEndpoint, info.stations, info.properties);
-            String compReq = WPSImpl.createCompareStatsRequest(sosEndpoint, info.stations, info.properties);
+            //String obsReq = WPSImpl.createObservedStatsRequest(sosEndpoint, info.stations, info.properties);
+            //String compReq = WPSImpl.createCompareStatsRequest(sosEndpoint, info.stations, info.properties);
             wpsOutputMap.put(WPSImpl.stats_csv_nahat_test_wps, runNamedAlgorithm(nahatReq, is, resultIs));
-            wpsOutputMap.put(WPSImpl.stats_csv_obs_test_wps, runNamedAlgorithm(nahatReq, is, resultIs));
-            wpsOutputMap.put(WPSImpl.stats_compare, runNamedAlgorithm(compReq, is, resultIs));
+            //wpsOutputMap.put(WPSImpl.stats_csv_obs_test_wps, runNamedAlgorithm(obsReq, is, resultIs));
+            //wpsOutputMap.put(WPSImpl.stats_compare, runNamedAlgorithm(compReq, is, resultIs));
             
             // move csw to module?
             CSWTransactionHelper helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
