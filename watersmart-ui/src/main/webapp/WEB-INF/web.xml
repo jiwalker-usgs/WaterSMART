@@ -2,12 +2,10 @@
 <web-app id="WebApp_ID" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
     <description>WaterSMART Model intercomparison Portal</description>
     <display-name>WaterSMART {Owner: DB, Coder: JW}</display-name>
+
     <welcome-file-list>
         <welcome-file>login.jsp</welcome-file>
     </welcome-file-list>
-    <listener>
-        <listener-class>gov.usgs.cida.watersmart.util.StartupListener</listener-class>
-    </listener>
     <!-- Security -->
     <security-constraint>
         <display-name>Security Constraint</display-name>
@@ -57,33 +55,41 @@
         <servlet-class>gov.usgs.service.OWSProxyServletX</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>GeonetworkProxy</servlet-name>
+        <servlet-class>gov.usgs.cida.watersmart.proxy.GeonetworkProxy</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Upload</servlet-name>
+        <servlet-class>gov.usgs.cida.watersmart.util.Upload</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>ISORecord</servlet-name>
         <servlet-class>gov.usgs.cida.watersmart.iso.ISORecord</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UpdateRun</servlet-name>
+        <servlet-class>gov.usgs.cida.watersmart.util.UpdateRun</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Export</servlet-name>
+        <servlet-class>gov.usgs.cida.watersmart.util.Export</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>FileRepository</servlet-name>
+        <servlet-class>gov.usgs.cida.watersmart.repo.FileRepository</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>OWSProxy</servlet-name>
         <url-pattern>/service/proxy</url-pattern>
     </servlet-mapping>
-    <servlet>
-        <servlet-name>Export</servlet-name>
-        <servlet-class>gov.usgs.cida.watersmart.util.Export</servlet-class>
-    </servlet>
     <servlet-mapping>
         <servlet-name>Export</servlet-name>
         <url-pattern>/service/export</url-pattern>
     </servlet-mapping>
-    <servlet>
-        <servlet-name>Upload</servlet-name>
-        <servlet-class>gov.usgs.cida.watersmart.util.Upload</servlet-class>
-    </servlet>
     <servlet-mapping>
         <servlet-name>Upload</servlet-name>
         <url-pattern>/service/upload</url-pattern>
     </servlet-mapping>
-    <servlet>
-        <servlet-name>GeonetworkProxy</servlet-name>
-        <servlet-class>gov.usgs.cida.watersmart.proxy.GeonetworkProxy</servlet-class>
-    </servlet>
     <servlet-mapping>
         <servlet-name>GeonetworkProxy</servlet-name>
         <url-pattern>/service/geonetwork/csw</url-pattern>
@@ -96,12 +102,12 @@
         <servlet-name>ISORecord</servlet-name>
         <url-pattern>/service/isorecord</url-pattern>
     </servlet-mapping>
-    <servlet>
-        <servlet-name>UpdateRun</servlet-name>
-        <servlet-class>gov.usgs.cida.watersmart.util.UpdateRun</servlet-class>
-    </servlet>
     <servlet-mapping>
         <servlet-name>UpdateRun</servlet-name>
         <url-pattern>/update</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FileRepository</servlet-name>
+        <url-pattern>/files/*</url-pattern>
     </servlet-mapping>
 </web-app>
