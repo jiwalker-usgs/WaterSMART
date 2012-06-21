@@ -440,6 +440,13 @@ class WPSTask extends Thread {
             // copy results to persistant location // switch to completed document above
             
             log.debug(resultStr);
+            
+            File destinationDir = new File(props.getProperty("watersmart.file.location")
+                    + props.getProperty("watersmart.file.location.wps.repository"));
+            if (!destinationDir.exists()) {
+                FileUtils.forceMkdir(destinationDir);
+            }
+            
             File destinationFile = new File(
                     props.getProperty("watersmart.file.location")
                     + props.getProperty("watersmart.file.location.wps.repository")
