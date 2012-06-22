@@ -25,214 +25,313 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
             region: 'center',
             layout : 'border',
             tbar : [
-                {
-                    xtype: 'tbtext',
-                    text: 'Models:'
-                },
-                {
-                    xtype: 'combo',
-                    id : 'model-combobox',
-                    store: this.modelStore,
-                    autoWidth: true,
-                    triggerAction : 'all',
-                    width : 'auto',
-                    mode : 'local',
-                    editable : false,
-                    emptyText: 'Select A Model',
-                    displayField : 'title',
-                    listeners : {
-                        select : function (combo, record) {
-                            LOG.debug('ModelRunSelectionPanel.js::User selected a model');
-                            var panelInfo = {};
-                            var storeItem = record.get('rec');
+            {
+                xtype: 'tbtext',
+                text: 'Models:'
+            },
+            {
+                xtype: 'combo',
+                id : 'model-combobox',
+                store: this.modelStore,
+                autoWidth: true,
+                triggerAction : 'all',
+                width : 'auto',
+                mode : 'local',
+                editable : false,
+                emptyText: 'Select A Model',
+                displayField : 'title',
+                listeners : {
+                    select : function (combo, record) {
+                        LOG.debug('ModelRunSelectionPanel.js::User selected a model');
+                        var panelInfo = {};
+                        var storeItem = record.get('rec');
 
-                            panelInfo.fileIdentifier = storeItem.get('fileIdentifier');
-                            panelInfo.metadataStandardName = storeItem.get('metadataStandardName') || '';
-                            panelInfo.metadataStandardVersion = storeItem.get('metadataStandardVersion') || '';
-                            panelInfo.dateStamp = storeItem.get('dateStamp') || '';
-                            panelInfo.language = storeItem.get('language') || '';
-                            panelInfo.scenarioPanels = {};
-                            panelInfo.metadataStandardName = storeItem.get('metadataStandardName');
-                            panelInfo.metadataStandardVersion = storeItem.get('metadataStandardVersion');
-                            panelInfo.isBestScenario = false;
+                        panelInfo.fileIdentifier = storeItem.get('fileIdentifier');
+                        panelInfo.metadataStandardName = storeItem.get('metadataStandardName') || '';
+                        panelInfo.metadataStandardVersion = storeItem.get('metadataStandardVersion') || '';
+                        panelInfo.dateStamp = storeItem.get('dateStamp') || '';
+                        panelInfo.language = storeItem.get('language') || '';
+                        panelInfo.scenarioPanels = {};
+                        panelInfo.metadataStandardName = storeItem.get('metadataStandardName');
+                        panelInfo.metadataStandardVersion = storeItem.get('metadataStandardVersion');
+                        panelInfo.isBestScenario = false;
 
-                            Ext.each(storeItem.get('identificationInfo'), function (idItem) {
+                        Ext.each(storeItem.get('identificationInfo'), function (idItem) {
 
-                                // We have a citation identification block
-                                if (idItem.citation !== undefined) {
-                                    LOG.trace('ModelPanel.js::Citation Identification block found. Parsing out citation information');
-                                    this.title = idItem.citation.title.CharacterString.value;
-                                    this['abstract'] = idItem['abstract'].CharacterString.value || '';
+                            // We have a citation identification block
+                            if (idItem.citation !== undefined) {
+                                LOG.trace('ModelPanel.js::Citation Identification block found. Parsing out citation information');
+                                this.title = idItem.citation.title.CharacterString.value;
+                                this['abstract'] = idItem['abstract'].CharacterString.value || '';
 
-                                    if (idItem.citation.date !== undefined && idItem.citation.date.length > 0) {
-                                        Ext.each(idItem.citation.date, function(dateItem) {
-                                            if (dateItem.dateType.codeListValue.toLowerCase() === 'revision') this.lastRevisedDate = dateItem.date[dateItem.date.length - 1].DateTime.value;
-                                        }, this);
-                                    }
-
-                                    if (idItem.graphicOverview !== undefined && idItem.graphicOverview.length > 0) {
-                                        this.graphicOverview = [];
-                                        Ext.each(idItem.graphicOverview, function (goItem) {
-                                            this.graphicOverview.push(goItem);
-                                        }, this);
-                                    }
+                                if (idItem.citation.date !== undefined && idItem.citation.date.length > 0) {
+                                    Ext.each(idItem.citation.date, function(dateItem) {
+                                        if (dateItem.dateType.codeListValue.toLowerCase() === 'revision') this.lastRevisedDate = dateItem.date[dateItem.date.length - 1].DateTime.value;
+                                    }, this);
                                 }
 
-                                // We have a service identification block. We create run panels here
-                                if (idItem.serviceIdentification !== undefined) {
-                                    LOG.trace('ModelPanel.js::Service Identification block found. Parsing out service information');
-                                    if (idItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
-                                        var scenario = idItem.serviceIdentification.citation.title.CharacterString.value;
-                                        var scenarioPanel;
-                                        if (this.scenarioPanels[scenario]) {
-                                            scenarioPanel = this.scenarioPanels[scenario];
-                                        } else {
-                                            scenarioPanel = new WaterSMART.ScenarioPanel({
-                                                title : scenario
-                                            });
-                                            this.scenarioPanels[scenario] = scenarioPanel;
-                                        }
-                                        scenarioPanel.add(new WaterSMART.RunPanel({
-                                            serviceIdentification : idItem.serviceIdentification
-                                        }));
-                                    }
+                                if (idItem.graphicOverview !== undefined && idItem.graphicOverview.length > 0) {
+                                    this.graphicOverview = [];
+                                    Ext.each(idItem.graphicOverview, function (goItem) {
+                                        this.graphicOverview.push(goItem);
+                                    }, this);
                                 }
+                            }
 
-                                if (idItem.serviceIdentification !== undefined) {
-                                    LOG.trace('ModelPanel.js::Service Identification block found. Parsing out service information');
-                                    if (idItem.serviceIdentification.id.toLowerCase() === 'ows') {
-                                        this.owsEndpoint = idItem.serviceIdentification.operationMetadata.linkage.URL;
-                                        this.owsResourceName = idItem.serviceIdentification.operationMetadata.name.CharacterString.value;
+                            // We have a service identification block. We create run panels here
+                            if (idItem.serviceIdentification !== undefined) {
+                                LOG.trace('ModelPanel.js::Service Identification block found. Parsing out service information');
+                                if (idItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
+                                    var scenario = idItem.serviceIdentification.citation.title.CharacterString.value;
+                                    var scenarioPanel;
+                                    if (this.scenarioPanels[scenario]) {
+                                        scenarioPanel = this.scenarioPanels[scenario];
+                                    } else {
+                                        scenarioPanel = new WaterSMART.ScenarioPanel({
+                                            title : scenario
+                                        });
+                                        this.scenarioPanels[scenario] = scenarioPanel;
                                     }
+                                    scenarioPanel.add(new WaterSMART.RunPanel({
+                                        serviceIdentification : idItem.serviceIdentification
+                                    }));
                                 }
+                            }
 
-                            }, panelInfo);
+                            if (idItem.serviceIdentification !== undefined) {
+                                LOG.trace('ModelPanel.js::Service Identification block found. Parsing out service information');
+                                if (idItem.serviceIdentification.id.toLowerCase() === 'ows') {
+                                    this.owsEndpoint = idItem.serviceIdentification.operationMetadata.linkage.URL;
+                                    this.owsResourceName = idItem.serviceIdentification.operationMetadata.name.CharacterString.value;
+                                }
+                            }
 
-                            var scenarioPanelsClone = [];
-                            Ext.iterate(panelInfo.scenarioPanels, function (key, scenario) {
-                                var scenarioPanelClone = scenario.cloneConfig();
-                                Ext.each(scenario.items.items, function (panel) {
-                                    var clonePanel = panel.cloneConfig();
-                                    clonePanel.panelInfo.owsEndpoint = this.panelInfo.owsEndpoint;
-                                    clonePanel.panelInfo.owsResourceName = this.panelInfo.owsResourceName;
-                                    clonePanel.panelInfo.fileIdentifier = this.panelInfo.fileIdentifier;
-                                    clonePanel.panelInfo.metadataStandardName = this.panelInfo.metadataStandardName;
-                                    clonePanel.panelInfo.metadataStandardVersion = this.panelInfo.metadataStandardVersion;
-                                    this.scenarioPanelClone.add(clonePanel);
-                                }, {
-                                    panelInfo : panelInfo,
-                                    scenarioPanelClone : scenarioPanelClone
-                                });
+                        }, panelInfo);
 
-                                this.scenarioPanelsClone.push(scenarioPanelClone);
+                        var scenarioPanelsClone = [];
+                        Ext.iterate(panelInfo.scenarioPanels, function (key, scenario) {
+                            var scenarioPanelClone = scenario.cloneConfig();
+                            Ext.each(scenario.items.items, function (panel) {
+                                var clonePanel = panel.cloneConfig();
+                                clonePanel.panelInfo.owsEndpoint = this.panelInfo.owsEndpoint;
+                                clonePanel.panelInfo.owsResourceName = this.panelInfo.owsResourceName;
+                                clonePanel.panelInfo.fileIdentifier = this.panelInfo.fileIdentifier;
+                                clonePanel.panelInfo.metadataStandardName = this.panelInfo.metadataStandardName;
+                                clonePanel.panelInfo.metadataStandardVersion = this.panelInfo.metadataStandardVersion;
+                                this.scenarioPanelClone.add(clonePanel);
                             }, {
                                 panelInfo : panelInfo,
-                                scenarioPanelsClone : scenarioPanelsClone
+                                scenarioPanelClone : scenarioPanelClone
                             });
 
-                            this.modelSelected({
-                                scenarioPanels : scenarioPanelsClone,
-                                panelInfo : panelInfo
-                            });
+                            this.scenarioPanelsClone.push(scenarioPanelClone);
+                        }, {
+                            panelInfo : panelInfo,
+                            scenarioPanelsClone : scenarioPanelsClone
+                        });
 
-                            this.mapPanel.removeLayers(null, false);
-                        },
-                        scope : this
-                    }
+                        this.modelSelected({
+                            scenarioPanels : scenarioPanelsClone,
+                            panelInfo : panelInfo
+                        });
+
+                        this.mapPanel.removeLayers(null, false);
+                    },
+                    scope : this
                 }
+            }
             ],
             items : [
-                this.scenarioPanel
+            this.scenarioPanel
             ]
         }, config);
         WaterSMART.ModelRunSelectionPanel.superclass.constructor.call(this, config);
 
-//        var wpsCapsStore = new CIDA.WPSCapabilitiesStore({
-//            url : CONFIG.WPS_URL + '?Service=WPS&Request=GetCapabilities',
-//            listeners : {
-//                load : function(store) {
-//                    var processArray = [];
-//   
-//                    Ext.iterate(store.getRange()[0].get("processOfferings"), function(key, val){
-//                        this.push([
-//                            val.title,
-//                            val
-//                        ]);
-//                    }, processArray);
-//                    this.processStore = new Ext.data.ArrayStore({
-//                        fields : ['title', 'process'],
-//                        idIndex : 0
-//                    });
-//                    this.processStore.loadData(processArray);
-//                    
-//                    this.getTopToolbar().addField({
-//                        xtype: 'tbseparator',
-//                        hidden : true
-//                    });
-//                    
-//                    this.getTopToolbar().addField({
-//                        xtype: 'tbtext',
-//                        text: 'Processes:',
-//                        hidden : true
-//                    });
-//                    
-//                    this.getTopToolbar().addField({
-//                        xtype : 'combo',
-//                        id : 'wps-process-combo',
-//                        store : this.processStore,
-//                        autoWidth : true,
-//                        triggerAction : 'all',
-//                        width : 'auto',
-//                        mode : 'local',
-//                        editable : false,
-//                        emptyText : 'Select A Process',
-//                        displayField : 'title',
-//                        disabled : true,
-//                        hidden : true,
-//                        listeners : {
-//                            select : function(combo, record) {
-//                                LOG.debug('ModelRunSelectionPanel.js:: User selected a WPS process: ' + record.id);
-//                                var describeProcessStore = new CIDA.WPSDescribeProcessStore({
-//                                    url : CONFIG.WPS_URL + '/WebProcessingService?Service=WPS&Request=DescribeProcess&Identifier=' + record.get('process').identifier,
-//                                    listeners : {
-//                                        load : function(store) {
-//                                            
-//                                            var processFormPanel = new WaterSMART.ProcessFormPanel({
-//                                                width: '100%',
-//                                                url : CONFIG.WPS_URL + '/WebProcessingService?Service=WPS&Request=Execute',
-//                                                processIdentifier : record.get('process').identifier,
-//                                                processTitle : record.id,
-//                                                processStore : store,
-//                                                wfsUrl : this.runPanel.currentlySelectedRun.panelInfo.owsEndpoint,
-//                                                layerName : this.runPanel.currentlySelectedRun.panelInfo.owsResourceName,
-//                                                commonAttribute : this.commonAttr,
-//                                                sosEndpoint : this.runPanel.currentlySelectedRun.panelInfo.operationURL
-//                                            });
-//
-//                                            var modalRunWindow = new Ext.Window({
-//                                                width: '30%',
-//                                                height : 'auto',
-//                                                modal : true,
-//                                                items : [ processFormPanel ]
-//                                            });
-//
-//                                            modalRunWindow.show();
-//                                        },
-//                                        scope : this
-//                                    }
-//                                });
-//                                describeProcessStore.load();
-//                            },
-//                            scope : this
-//                        }
-//                    });
-//
-//                    this.doLayout();
-//                },
-//                scope : this
-//            }
-//        });
-//        wpsCapsStore.load();
+    //        var wpsCapsStore = new CIDA.WPSCapabilitiesStore({
+    //            url : CONFIG.WPS_URL + '?Service=WPS&Request=GetCapabilities',
+    //            listeners : {
+    //                load : function(store) {
+    //                    var processArray = [];
+    //   
+    //                    Ext.iterate(store.getRange()[0].get("processOfferings"), function(key, val){
+    //                        this.push([
+    //                            val.title,
+    //                            val
+    //                        ]);
+    //                    }, processArray);
+    //                    this.processStore = new Ext.data.ArrayStore({
+    //                        fields : ['title', 'process'],
+    //                        idIndex : 0
+    //                    });
+    //                    this.processStore.loadData(processArray);
+    //                    
+    //                    this.getTopToolbar().addField({
+    //                        xtype: 'tbseparator',
+    //                        hidden : true
+    //                    });
+    //                    
+    //                    this.getTopToolbar().addField({
+    //                        xtype: 'tbtext',
+    //                        text: 'Processes:',
+    //                        hidden : true
+    //                    });
+    //                    
+    //                    this.getTopToolbar().addField({
+    //                        xtype : 'combo',
+    //                        id : 'wps-process-combo',
+    //                        store : this.processStore,
+    //                        autoWidth : true,
+    //                        triggerAction : 'all',
+    //                        width : 'auto',
+    //                        mode : 'local',
+    //                        editable : false,
+    //                        emptyText : 'Select A Process',
+    //                        displayField : 'title',
+    //                        disabled : true,
+    //                        hidden : true,
+    //                        listeners : {
+    //                            select : function(combo, record) {
+    //                                LOG.debug('ModelRunSelectionPanel.js:: User selected a WPS process: ' + record.id);
+    //                                var describeProcessStore = new CIDA.WPSDescribeProcessStore({
+    //                                    url : CONFIG.WPS_URL + '/WebProcessingService?Service=WPS&Request=DescribeProcess&Identifier=' + record.get('process').identifier,
+    //                                    listeners : {
+    //                                        load : function(store) {
+    //                                            
+    //                                            var processFormPanel = new WaterSMART.ProcessFormPanel({
+    //                                                width: '100%',
+    //                                                url : CONFIG.WPS_URL + '/WebProcessingService?Service=WPS&Request=Execute',
+    //                                                processIdentifier : record.get('process').identifier,
+    //                                                processTitle : record.id,
+    //                                                processStore : store,
+    //                                                wfsUrl : this.runPanel.currentlySelectedRun.panelInfo.owsEndpoint,
+    //                                                layerName : this.runPanel.currentlySelectedRun.panelInfo.owsResourceName,
+    //                                                commonAttribute : this.commonAttr,
+    //                                                sosEndpoint : this.runPanel.currentlySelectedRun.panelInfo.operationURL
+    //                                            });
+    //
+    //                                            var modalRunWindow = new Ext.Window({
+    //                                                width: '30%',
+    //                                                height : 'auto',
+    //                                                modal : true,
+    //                                                items : [ processFormPanel ]
+    //                                            });
+    //
+    //                                            modalRunWindow.show();
+    //                                        },
+    //                                        scope : this
+    //                                    }
+    //                                });
+    //                                describeProcessStore.load();
+    //                            },
+    //                            scope : this
+    //                        }
+    //                    });
+    //
+    //                    this.doLayout();
+    //                },
+    //                scope : this
+    //            }
+    //        });
+    //        wpsCapsStore.load();
+    },
+    submitButton : {
+        text: 'Submit',
+        type: 'submit',
+        formBind: true,
+        handler: function (button) {
+            var uploadPanel = Ext.getCmp('uploadPanel');
+            var isoFormPanel = Ext.getCmp('metadata-form');
+            var metadataForm = isoFormPanel.getForm().getValues();
+
+            LOG.debug('isoFormPanel.js::Preparing to upload file.');
+
+            if (isoFormPanel.create) {
+                uploadPanel.getForm().submit({
+                    url: uploadPanel.url,
+                    scope : this,
+                    params: {
+                        name : metadataForm.name,
+                        modelId : isoFormPanel.modelId,
+                        modelVersion : metadataForm.version,
+                        runIdent : metadataForm.runIdent,
+                        creationDate : metadataForm.creationDate,
+                        scenario : metadataForm.scenario,
+                        comments : metadataForm.comments,
+                        email : WATERSMART.USER_EMAIL,
+                        modeltype : isoFormPanel.modelName,
+                        wfsUrl : isoFormPanel.wfsUrl,
+                        layer : isoFormPanel.layer,
+                        commonAttr : isoFormPanel.commonAttr
+                    },
+                    waitMsg: 'Saving...',
+                    success: function () {
+                        LOG.info('isoFormPanel.js::User upload succeeded.');
+
+                        Ext.getCmp('model-run-selection-panel').reloadRuns();
+
+                        LOG.info('isoFormPanel.js::Closing modal window');
+                        Ext.getCmp('modal-run-window').close();
+                        NOTIFY.info({
+                            msg : 'Your run is being processed. When completed, you will receive an e-mail at ' + WATERSMART.USER_EMAIL + '. You can continue working or close this application.',
+                            hideDelay : 15000
+                        });
+                    },
+                    failure: function (panel, fail) {
+                        LOG.info('isoFormPanel.js:: User upload failed.');
+                        NOTIFY.error({
+                            msg : fail.result.message
+                        });
+                    }
+                });
+            } else {
+                var form = Ext.getCmp('metadata-form');
+                form.getForm().submit({
+                    url: form.url,
+                    scope : this,
+                    params: {
+                        modelId : isoFormPanel.modelId,
+                        originalName : isoFormPanel.originalModelerName,
+                        originalModelVersion : form.originalModelVersion,
+                        originalRunIdent : form.originalRunIdentifier,
+                        originalCreationDate : form.originalRunDate.format('m/d/Y'),
+                        originalScenario : form.originalScenario,
+                        originalComments : form.originalAbstract,
+                        email : WATERSMART.USER_EMAIL,
+                        modeltype : isoFormPanel.modelName,
+                        wfsUrl : isoFormPanel.wfsUrl,
+                        layer : isoFormPanel.layer,
+                        commonAttr : isoFormPanel.commonAttr,
+                        transaction: true
+                    },
+                    waitMsg: 'Saving...',
+                    success: function (form, action) {
+                        LOG.info('isoFormPanel.js::User update succeeded.');
+                        NOTIFY.info({
+                            msg : action.result.msg
+                        });
+                        var task = new Ext.util.DelayedTask(function(){
+                            Ext.getCmp('model-run-selection-panel').reloadRuns();
+
+                            LOG.info('isoFormPanel.js::Closing modal window');
+                            Ext.getCmp('modal-run-window').close();
+                        }, this).delay(500);
+
+                    },
+                    failure: function (form, action) {
+                        if (action.failureType === 'client') {
+                            NOTIFY.warn({
+                                msg : 'Please ensure all input data is valid'
+                            });
+                        } else {
+                            NOTIFY.warn({
+                                msg : action.result.msg
+                            });
+                        }
+
+                    }
+                });
+            }
+        }
     },
     createScenarioPanel : function () {
         return new Ext.Panel({
@@ -245,86 +344,89 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
             disabled : true,
             currentlySelectedRun : undefined,
             tbar : [
-                {
-                    xtype : 'button',
-                    id : 'edit-selected-run-button',
-                    text : 'Edit Selected Run',
-                    disabled : true,
-                    listeners : {
-                        click : function () {
-                            LOG.debug('ModelRunSelectionPanel.js::User clicked on "Edit Selected Run" button.');
-                            var selectedRun = this.scenarioPanel.currentlySelectedRun;
-                            var comboValue = this.getTopToolbar().get('model-combobox').getValue();
-                            var modelStore = this.getTopToolbar().get('model-combobox').getStore().getById(comboValue);
-                            var modelId = modelStore.data.rec.data.fileIdentifier;
-                            var serviceIdentification = selectedRun.serviceIdentification;
-                            var modelerName = '';
-                            var wfsUrl = '';
-                            var layer = '';
-                            var commonAttr = this.commonAttr;
-                            var modelVersion = 0;
-                            var runIdentifier = 0;
-                            var abstrakt = '';
-                            var runDate;
-                            var scenario;
-                            var isBestScenario;
-                            var scenarioVersions = {};
+            {
+                xtype : 'button',
+                id : 'edit-selected-run-button',
+                text : 'Edit Selected Run',
+                disabled : true,
+                listeners : {
+                    click : function () {
+                        LOG.debug('ModelRunSelectionPanel.js::User clicked on "Edit Selected Run" button.');
+                        var selectedRun = this.scenarioPanel.currentlySelectedRun;
+                        var comboValue = this.getTopToolbar().get('model-combobox').getValue();
+                        var modelStore = this.getTopToolbar().get('model-combobox').getStore().getById(comboValue);
+                        var modelId = modelStore.data.rec.data.fileIdentifier;
+                        var serviceIdentification = selectedRun.serviceIdentification;
+                        var modelerName = '';
+                        var wfsUrl = '';
+                        var layer = '';
+                        var commonAttr = this.commonAttr;
+                        var modelVersion = 0;
+                        var runIdentifier = 0;
+                        var abstrakt = '';
+                        var runDate;
+                        var scenario;
+                        var isBestScenario;
+                        var scenarioVersions = {};
 
-                            modelerName = serviceIdentification.citation.citedResponsibleParty[0].individualName.CharacterString.value;
-                            modelVersion = serviceIdentification.citation.edition.CharacterString.value.split('.')[0];
-                            runIdentifier = serviceIdentification.citation.edition.CharacterString.value.split('.')[1];
-                            abstrakt = serviceIdentification['abstract'].CharacterString.value;
-                            runDate = Date.parseDate(serviceIdentification.citation.date[0].date[0].DateTime.value.split('T')[0], 'Y-m-d');
-                            scenario = serviceIdentification.citation.title.CharacterString.value;
-                            isBestScenario = (serviceIdentification.citation.otherCitationDetails && serviceIdentification.citation.otherCitationDetails.CharacterString.value.toLowerCase() === 'best') ? true : false;
+                        modelerName = serviceIdentification.citation.citedResponsibleParty[0].individualName.CharacterString.value;
+                        modelVersion = serviceIdentification.citation.edition.CharacterString.value.split('.')[0];
+                        runIdentifier = serviceIdentification.citation.edition.CharacterString.value.split('.')[1];
+                        abstrakt = serviceIdentification['abstract'].CharacterString.value;
+                        runDate = Date.parseDate(serviceIdentification.citation.date[0].date[0].DateTime.value.split('T')[0], 'Y-m-d');
+                        scenario = serviceIdentification.citation.title.CharacterString.value;
+                        isBestScenario = (serviceIdentification.citation.otherCitationDetails && serviceIdentification.citation.otherCitationDetails.CharacterString.value.toLowerCase() === 'best') ? true : false;
 
-                            for (var i = 0; i < modelStore.data.rec.data.identificationInfo.length; i++) {
-                                var iiItem = modelStore.data.rec.data.identificationInfo[i];
-                                if (iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
-                                    var edition = iiItem.serviceIdentification.citation.edition.CharacterString.value;
-                                    var iiScenario = iiItem.serviceIdentification.citation.title.CharacterString.value;
-                                    if (!scenarioVersions[iiScenario]) {
-                                        scenarioVersions[iiScenario] = [];
-                                    }
-                                    scenarioVersions[iiScenario].push(edition);
+                        for (var i = 0; i < modelStore.data.rec.data.identificationInfo.length; i++) {
+                            var iiItem = modelStore.data.rec.data.identificationInfo[i];
+                            if (iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
+                                var edition = iiItem.serviceIdentification.citation.edition.CharacterString.value;
+                                var iiScenario = iiItem.serviceIdentification.citation.title.CharacterString.value;
+                                if (!scenarioVersions[iiScenario]) {
+                                    scenarioVersions[iiScenario] = [];
                                 }
-                                if (!wfsUrl && iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ows') {
-                                    wfsUrl = iiItem.serviceIdentification.operationMetadata.linkage.URL;
-                                    layer = iiItem.serviceIdentification.operationMetadata.name.CharacterString.value;
-                                }
+                                scenarioVersions[iiScenario].push(edition);
                             }
+                            if (!wfsUrl && iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ows') {
+                                wfsUrl = iiItem.serviceIdentification.operationMetadata.linkage.URL;
+                                layer = iiItem.serviceIdentification.operationMetadata.name.CharacterString.value;
+                            }
+                        }
 
-                            var isoFormPanel = new WaterSMART.ISOFormPanel({
-                                title : selectedRun.title,
-                                modelId : modelId,
-                                'abstract' : abstrakt,
-                                commonAttr : commonAttr,
-                                create : false,
-                                layer : layer,
-                                modelerName : modelerName,
-                                modelName : comboValue,
-                                modelVersion : modelVersion,
-                                runIdentifier : runIdentifier,
-                                existingVersions : scenarioVersions,
-                                wfsUrl : wfsUrl,
-                                runDate : runDate,
-                                scenario : scenario,
-                                isBestScenario : isBestScenario
-                            });
+                        var isoFormPanel = new WaterSMART.ISOFormPanel({
+                            title : selectedRun.title,
+                            modelId : modelId,
+                            'abstract' : abstrakt,
+                            commonAttr : commonAttr,
+                            create : false,
+                            layer : layer,
+                            modelerName : modelerName,
+                            modelName : comboValue,
+                            modelVersion : modelVersion,
+                            runIdentifier : runIdentifier,
+                            existingVersions : scenarioVersions,
+                            wfsUrl : wfsUrl,
+                            runDate : runDate,
+                            scenario : scenario,
+                            isBestScenario : isBestScenario
+                        });
 
-                            var modalRunWindow = new Ext.Window({
-                                autoShow : true,
-                                width: '30%',
-                                id : 'modal-iso-window',
-                                modal : true,
-                                items : isoFormPanel 
-                            })
+                        var modalRunWindow = new Ext.Window({
+                            autoShow : true,
+                            width: '30%',
+                            id : 'modal-run-window',
+                            modal : true,
+                            items : isoFormPanel,
+                            buttons : [
+                                this.submitButton
+                            ]
+                        })
 
-                            modalRunWindow.show();
-                        },
-                        scope : this
-                    }
-                },
+                        modalRunWindow.show();
+                    },
+                    scope : this
+                }
+            },
             {
                 xtype : 'button',
                 id : 'create-run-button',
@@ -386,105 +488,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                             modal : true,
                             items : [ isoFormPanel, new WaterSMART.FileUploadPanel() ],
                             buttons: [
-                                {
-                                    text: 'Submit',
-                                    type: 'submit',
-                                    formBind: true,
-                                    handler: function (button) {
-                                        var uploadPanel = Ext.getCmp('uploadPanel');
-                                        var isoFormPanel = Ext.getCmp('metadata-form');
-                                        var metadataForm = isoFormPanel.getForm().getValues();
-
-                                        LOG.debug('isoFormPanel.js::Preparing to upload file.');
-
-                                        if (isoFormPanel.create) {
-                                            uploadPanel.getForm().submit({
-                                                url: uploadPanel.url,
-                                                scope : this,
-                                                params: {
-                                                    name : metadataForm.name,
-                                                    modelId : isoFormPanel.modelId,
-                                                    modelVersion : metadataForm.version,
-                                                    runIdent : metadataForm.runIdent,
-                                                    creationDate : metadataForm.creationDate,
-                                                    scenario : metadataForm.scenario,
-                                                    comments : metadataForm.comments,
-                                                    email : WATERSMART.USER_EMAIL,
-                                                    modeltype : isoFormPanel.modelName,
-                                                    wfsUrl : isoFormPanel.wfsUrl,
-                                                    layer : isoFormPanel.layer,
-                                                    commonAttr : isoFormPanel.commonAttr
-                                                },
-                                                waitMsg: 'Saving...',
-                                                success: function () {
-                                                    LOG.info('isoFormPanel.js::User upload succeeded.');
-
-                                                    Ext.getCmp('model-run-selection-panel').reloadRuns();
-
-                                                    LOG.info('isoFormPanel.js::Closing modal window');
-                                                    Ext.getCmp('modal-run-window').close();
-                                                    NOTIFY.info({
-                                                        msg : 'Your run is being processed. When completed, you will receive an e-mail at ' + WATERSMART.USER_EMAIL + '. You can continue working or close this application.',
-                                                        hideDelay : 15000
-                                                    });
-                                                },
-                                                failure: function (panel, fail) {
-                                                    LOG.info('isoFormPanel.js:: User upload failed.');
-                                                    NOTIFY.error({
-                                                        msg : fail.result.message
-                                                    });
-                                                }
-                                            });
-                                        } else {
-                                            var form = Ext.getCmp('metadata-form');
-                                            form.getForm().submit({
-                                                url: form.url,
-                                                scope : this,
-                                                params: {
-                                                    modelId : isoFormPanel.modelId,
-                                                    originalName : isoFormPanel.originalModelerName,
-                                                    originalModelVersion : form.originalModelVersion,
-                                                    originalRunIdent : form.originalRunIdentifier,
-                                                    originalCreationDate : form.originalRunDate.format('m/d/Y'),
-                                                    originalScenario : form.originalScenario,
-                                                    originalComments : form.originalAbstract,
-                                                    email : WATERSMART.USER_EMAIL,
-                                                    modeltype : isoFormPanel.modelName,
-                                                    wfsUrl : isoFormPanel.wfsUrl,
-                                                    layer : isoFormPanel.layer,
-                                                    commonAttr : isoFormPanel.commonAttr,
-                                                    transaction: true
-                                                },
-                                                waitMsg: 'Saving...',
-                                                success: function (form, action) {
-                                                    LOG.info('isoFormPanel.js::User update succeeded.');
-                                                    NOTIFY.info({
-                                                        msg : action.result.msg
-                                                    });
-                                                    var task = new Ext.util.DelayedTask(function(){
-                                                        Ext.getCmp('model-run-selection-panel').reloadRuns();
-
-                                                        LOG.info('isoFormPanel.js::Closing modal window');
-                                                        Ext.getCmp('modal-run-window').close();
-                                                    }, this).delay(500);
-
-                                                },
-                                                failure: function (form, action) {
-                                                    if (action.failureType === 'client') {
-                                                        NOTIFY.warn({
-                                                            msg : 'Please ensure all input data is valid'
-                                                        });
-                                                    } else {
-                                                        NOTIFY.warn({
-                                                            msg : action.result.msg
-                                                        });
-                                                    }
-
-                                                }
-                                            });
-                                        }
-                                    }
-                                }
+                                this.submitButton
                             ]
                         })
                     

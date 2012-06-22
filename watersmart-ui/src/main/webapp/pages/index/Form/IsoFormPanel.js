@@ -70,37 +70,6 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
             layout: 'form',
             items: [
                 {
-                    fieldLabel: 'Modeler Name',
-                    name: 'name',
-                    value : this.modelerName,
-                    allowBlank: false
-                }, {
-                    xtype : 'displayfield',
-                    fieldLabel: 'Model Name',
-                    name: 'model',
-                    value : this.modelName,
-                    allowBlank: false
-                }, {
-                    fieldLabel: 'Model Version',
-                    name: 'version',
-                    ref: 'versionField',
-                    value : this.modelVersion,
-                    allowBlank: false,
-                    validator: this.validateForm
-                }, {
-                    fieldLabel: 'Run Identifier',
-                    name: 'runIdent',
-                    ref: 'runIdentField',
-                    value : this.runIdentifier,
-                    allowBlank: false,
-                    validator: this.validateForm
-                }, {
-                    xtype : 'datefield',
-                    fieldLabel: 'Run Date',
-                    name: 'creationDate',
-                    value : this.runDate,
-                    allowBlank: false
-                }, {
                     fieldLabel: 'Calibration/ Validation Scenario',
                     xtype: 'combo',
                     mode: 'local',
@@ -145,6 +114,37 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                         scope : this
                     }
                 }, {
+                    fieldLabel: 'Modeler Name',
+                    name: 'name',
+                    value : this.modelerName,
+                    allowBlank: false
+                }, {
+                    xtype : 'displayfield',
+                    fieldLabel: 'Model Name',
+                    name: 'model',
+                    value : this.modelName,
+                    allowBlank: false
+                }, {
+                    fieldLabel: 'Model Version',
+                    name: 'version',
+                    ref: 'versionField',
+                    value : this.modelVersion,
+                    allowBlank: false,
+                    validator: this.validateForm
+                }, {
+                    fieldLabel: 'Run Identifier',
+                    name: 'runIdent',
+                    ref: 'runIdentField',
+                    value : this.runIdentifier,
+                    allowBlank: false,
+                    validator: this.validateForm
+                }, {
+                    xtype : 'datefield',
+                    fieldLabel: 'Run Date',
+                    name: 'creationDate',
+                    value : this.runDate,
+                    allowBlank: false
+                }, {
                     fieldLabel: 'Comments',
                     xtype : 'textarea',
                     name: 'comments',
@@ -156,7 +156,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
         }, config);
         WaterSMART.ISOFormPanel.superclass.constructor.call(this, config);
 
-        if (!this.isBestScenario) {
+        if (!this.isBestScenario && !this.create) {
             this.add(new Ext.form.Checkbox({
                 fieldLabel: 'Mark As Best',
                 xtype : 'checkbox',
