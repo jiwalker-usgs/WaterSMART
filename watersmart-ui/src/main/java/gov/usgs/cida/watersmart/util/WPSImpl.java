@@ -69,8 +69,9 @@ class WPSImpl implements WPSInterface {
     static String createNahatStatsRequest(String sosEndpoint, Collection<Station> sites, List<String> properties) {
         List<String> siteList = Lists.newLinkedList();
         for (Station station : sites) {
-            siteList.add(station.station_id);
+            siteList.add("\\\"" + station.station_id + "\\\"");                    
         }
+        
         return new String(
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<wps:Execute service=\"WPS\" version=\"1.0.0\" " +
@@ -94,8 +95,8 @@ class WPSImpl implements WPSInterface {
                         "<ows:Identifier>sites</ows:Identifier>" +
                         "<wps:Data>" +
                             "<wps:LiteralData>" +
-                                //StringEscapeUtils.escapeXml(StringUtils.join(siteList, ",")) +
-                                "\\\"02177000\\\",\\\"02178400\\\",\\\"02184500\\\",\\\"02186000\\\"" +
+                                StringEscapeUtils.escapeXml(StringUtils.join(siteList, ",")) +
+                                //"\\\"02177000\\\",\\\"02178400\\\",\\\"02184500\\\",\\\"02186000\\\"" +
                             "</wps:LiteralData>" +
                         "</wps:Data>" +
                     "</wps:Input>" +
@@ -103,6 +104,7 @@ class WPSImpl implements WPSInterface {
                         "<ows:Identifier>property</ows:Identifier>" +
                         "<wps:Data>" +
                             "<wps:LiteralData>" +
+                                // could use multiple properties in the future
                                 StringEscapeUtils.escapeXml(properties.get(0)) +
                             "</wps:LiteralData>" +
                         "</wps:Data>" +
@@ -121,8 +123,9 @@ class WPSImpl implements WPSInterface {
     static String createObservedStatsRequest(String sosEndpoint, Collection<Station> sites, List<String> properties) {
         List<String> siteList = Lists.newLinkedList();
         for (Station station : sites) {
-            siteList.add(station.station_id);
+            siteList.add("\\\"" + station.station_id + "\\\"");                    
         }
+        
         return new String("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
         "<wps:Execute xmlns:wps=\"http://www.opengis.net/wps/1.0.0\" " +
             "xmlns:ows=\"http://www.opengis.net/ows/1.1\" " +
@@ -197,8 +200,9 @@ class WPSImpl implements WPSInterface {
     static String createCompareStatsRequest(String sosEndpoint, Collection<Station> sites, List<String> properties) {
         List<String> siteList = Lists.newLinkedList();
         for (Station station : sites) {
-            siteList.add(station.station_id);
+            siteList.add("\\\"" + station.station_id + "\\\"");                    
         }
+        
         return new String(
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<wps:Execute service=\"WPS\" version=\"1.0.0\" " +
@@ -369,14 +373,15 @@ class WPSTask extends Thread {
             ReturnInfo info = CreateDSGFromZip.create(zipLocation, metaObj);
             String repo = props.getProperty("watersmart.sos.model.repo");
             String sosEndpoint = repo + metaObj.getTypeString() + "/" + info.filename;
+            UUID uuid = UUID.randomUUID();
 
             Map<String, String> wpsOutputMap = Maps.newHashMap();
             String nahatReq = WPSImpl.createNahatStatsRequest(sosEndpoint, info.stations, info.properties);
-            //String obsReq = WPSImpl.createObservedStatsRequest(sosEndpoint, info.stations, info.properties);
-            //String compReq = WPSImpl.createCompareStatsRequest(sosEndpoint, info.stations, info.properties);
-            wpsOutputMap.put(WPSImpl.stats_csv_nahat_test_wps, runNamedAlgorithm(nahatReq, is, resultIs));
-            //wpsOutputMap.put(WPSImpl.stats_csv_obs_test_wps, runNamedAlgorithm(obsReq, is, resultIs));
-            //wpsOutputMap.put(WPSImpl.stats_compare, runNamedAlgorithm(compReq, is, resultIs));
+            String obsReq = WPSImpl.createObservedStatsRequest(sosEndpoint, info.stations, info.properties);
+            String compReq = WPSImpl.createCompareStatsRequest(sosEndpoint, info.stations, info.properties);
+            wpsOutputMap.put(WPSImpl.stats_csv_nahat_test_wps, runNamedAlgorithm("modeled", nahatReq, is, resultIs, uuid, metaObj));
+            wpsOutputMap.put(WPSImpl.stats_csv_obs_test_wps, runNamedAlgorithm("obs", obsReq, is, resultIs, uuid, metaObj));
+            wpsOutputMap.put(WPSImpl.stats_compare, runNamedAlgorithm("compare", compReq, is, resultIs, uuid, metaObj));
             
             // move csw to module?
             CSWTransactionHelper helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
@@ -408,7 +413,7 @@ class WPSTask extends Thread {
      * @throws XPathExpressionException
      * @throws InterruptedException 
      */
-    private String runNamedAlgorithm(String wpsRequest, InputStream is, InputStream resultIs) 
+    private String runNamedAlgorithm(String alg, String wpsRequest, InputStream is, InputStream resultIs, UUID uuid, RunMetadata metaObj) 
             throws IOException, ParserConfigurationException, SAXException, XPathExpressionException, InterruptedException {
         
             //String wpsRequest = WPSImpl.createNahatStatsRequest(sosEndpoint, info.stations, info.properties);
@@ -442,17 +447,16 @@ class WPSTask extends Thread {
             log.debug(resultStr);
             
             File destinationDir = new File(props.getProperty("watersmart.file.location")
-                    + props.getProperty("watersmart.file.location.wps.repository"));
+                    + props.getProperty("watersmart.file.location.wps.repository")
+                    + uuid);
             if (!destinationDir.exists()) {
                 FileUtils.forceMkdir(destinationDir);
             }
-            
-            File destinationFile = new File(
-                    props.getProperty("watersmart.file.location")
-                    + props.getProperty("watersmart.file.location.wps.repository")
-                    + File.separatorChar
-                    + UUID.randomUUID()
-                    + ".txt");
+            String filename = metaObj.getTypeString() + "-" + metaObj.getScenario()
+                    + "-" + metaObj.getModelVersion() + "." + metaObj.getRunIdent()
+                    + "-" + alg + ".txt";
+            File destinationFile = new File(destinationDir.getCanonicalPath()
+                    + File.separatorChar + filename);
             FileUtils.write(destinationFile, resultStr, "UTF-8");
             String destinationFileName = destinationFile.getName();
             String webAccessibleFile = contextPath + props.getProperty("watersmart.file.location.wps.repository") + "/" + destinationFileName;
