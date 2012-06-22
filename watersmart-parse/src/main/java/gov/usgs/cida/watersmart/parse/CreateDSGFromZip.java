@@ -69,6 +69,9 @@ public class CreateDSGFromZip {
                     case AFINCH:
                         dsgParse = new AFINCHParser(inputStream, lookerUpper);
                         break;
+                    case WATERFALL:
+                        // TODO make sure Waterfall uses SYEParser
+                        dsgParse = new SYEParser(inputStream, entry.getName(), lookerUpper);
                     default:
                         throw new NotImplementedException("Parser not written yet");
                 }

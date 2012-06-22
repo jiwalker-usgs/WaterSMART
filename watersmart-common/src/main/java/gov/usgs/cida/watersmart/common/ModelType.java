@@ -8,5 +8,6 @@ public enum ModelType {
     SYE,
     WATERS,
     PRMS,
-    AFINCH;
+    AFINCH,
+    WATERFALL;
 }
