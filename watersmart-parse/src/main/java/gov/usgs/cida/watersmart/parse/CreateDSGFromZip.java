@@ -72,6 +72,7 @@ public class CreateDSGFromZip {
                     case WATERFALL:
                         // TODO make sure Waterfall uses SYEParser
                         dsgParse = new SYEParser(inputStream, entry.getName(), lookerUpper);
+                        break;
                     default:
                         throw new NotImplementedException("Parser not written yet");
                 }
