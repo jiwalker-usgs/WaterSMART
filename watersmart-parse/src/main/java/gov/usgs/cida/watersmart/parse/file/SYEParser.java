@@ -30,13 +30,13 @@ public class SYEParser extends StationPerFileDSGParser {
     
     private static final Pattern stationIdPattern = Pattern.compile("(\\w+)\\.txt");
     
-    private static final Pattern headerLinePattern = Pattern.compile("^\"date\"((?: \"\\w+\")+)$");
-    private static final Pattern headerVariablePattern = Pattern.compile(" \"(\\w+)\"");
+    private static final Pattern headerLinePattern = Pattern.compile("^date((?:\\s+\\w+)+)$");
+    private static final Pattern headerVariablePattern = Pattern.compile("\\s+(\\w+)");
     
     // Line looks like '"x" "mm/dd/yyyy" val1 val2 ...'
-    private static final Pattern dataLinePattern = Pattern.compile("^\"\\d+\" \"(\\d+/\\d+/\\d{4})\"((?: [^ ]+)+)$");
+    private static final Pattern dataLinePattern = Pattern.compile("^(\\d+/\\d+/\\d{4})((?:\\s+\\S+)+)$");
     // Could have split on spaces but using this regex instead
-    private static final Pattern dataValuePattern = Pattern.compile(" ([^ ]+)");
+    private static final Pattern dataValuePattern = Pattern.compile("\\s+(\\S+)");
     
     public static final DateTimeFormatter inputDateFormatter = new DateTimeFormatterBuilder()
             .appendMonthOfYear(1)
