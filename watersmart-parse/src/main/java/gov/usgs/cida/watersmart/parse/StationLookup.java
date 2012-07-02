@@ -108,7 +108,7 @@ public class StationLookup {
             return station.index;
         }
         else {
-            return -1;    
+            return -1;
         }
     }
 
