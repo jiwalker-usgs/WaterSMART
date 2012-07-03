@@ -24,125 +24,136 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
             id: 'model-run-selection-panel',
             region: 'center',
             layout : 'border',
+            buttons : [
+                {
+                    xtype : 'button',
+                    text : 'logout',
+                    listeners : {
+                        click : function () {
+                            window.location.href = "?LOGOUT_HOOK=true";
+                        }
+                    }
+                }
+            ],
             tbar : [
-            {
-                xtype: 'tbtext',
-                text: 'Models:'
-            },
-            {
-                xtype: 'combo',
-                id : 'model-combobox',
-                store: this.modelStore,
-                autoWidth: true,
-                triggerAction : 'all',
-                width : 'auto',
-                mode : 'local',
-                editable : false,
-                emptyText: 'Select A Model',
-                displayField : 'title',
-                listeners : {
-                    select : function (combo, record) {
-                        LOG.debug('ModelRunSelectionPanel.js::User selected a model');
-                        var panelInfo = {};
-                        var storeItem = record.get('rec');
+                {
+                    xtype: 'tbtext',
+                    text: 'Models:'
+                },
+                {
+                    xtype: 'combo',
+                    id : 'model-combobox',
+                    store: this.modelStore,
+                    autoWidth: true,
+                    triggerAction : 'all',
+                    width : 'auto',
+                    mode : 'local',
+                    editable : false,
+                    emptyText: 'Select A Model',
+                    displayField : 'title',
+                    listeners : {
+                        select : function (combo, record) {
+                            LOG.debug('ModelRunSelectionPanel.js::User selected a model');
+                            var panelInfo = {};
+                            var storeItem = record.get('rec');
 
-                        panelInfo.fileIdentifier = storeItem.get('fileIdentifier');
-                        panelInfo.metadataStandardName = storeItem.get('metadataStandardName') || '';
-                        panelInfo.metadataStandardVersion = storeItem.get('metadataStandardVersion') || '';
-                        panelInfo.dateStamp = storeItem.get('dateStamp') || '';
-                        panelInfo.language = storeItem.get('language') || '';
-                        panelInfo.scenarioPanels = {};
-                        panelInfo.metadataStandardName = storeItem.get('metadataStandardName');
-                        panelInfo.metadataStandardVersion = storeItem.get('metadataStandardVersion');
-                        panelInfo.isBestScenario = false;
+                            panelInfo.fileIdentifier = storeItem.get('fileIdentifier');
+                            panelInfo.metadataStandardName = storeItem.get('metadataStandardName') || '';
+                            panelInfo.metadataStandardVersion = storeItem.get('metadataStandardVersion') || '';
+                            panelInfo.dateStamp = storeItem.get('dateStamp') || '';
+                            panelInfo.language = storeItem.get('language') || '';
+                            panelInfo.scenarioPanels = {};
+                            panelInfo.metadataStandardName = storeItem.get('metadataStandardName');
+                            panelInfo.metadataStandardVersion = storeItem.get('metadataStandardVersion');
+                            panelInfo.isBestScenario = false;
 
-                        Ext.each(storeItem.get('identificationInfo'), function (idItem) {
+                            Ext.each(storeItem.get('identificationInfo'), function (idItem) {
 
-                            // We have a citation identification block
-                            if (idItem.citation !== undefined) {
-                                LOG.trace('ModelPanel.js::Citation Identification block found. Parsing out citation information');
-                                this.title = idItem.citation.title.CharacterString.value;
-                                this['abstract'] = idItem['abstract'].CharacterString.value || '';
+                                // We have a citation identification block
+                                if (idItem.citation !== undefined) {
+                                    LOG.trace('ModelPanel.js::Citation Identification block found. Parsing out citation information');
+                                    this.title = idItem.citation.title.CharacterString.value;
+                                    this['abstract'] = idItem['abstract'].CharacterString.value || '';
 
-                                if (idItem.citation.date !== undefined && idItem.citation.date.length > 0) {
-                                    Ext.each(idItem.citation.date, function(dateItem) {
-                                        if (dateItem.dateType.codeListValue.toLowerCase() === 'revision') this.lastRevisedDate = dateItem.date[dateItem.date.length - 1].DateTime.value;
-                                    }, this);
-                                }
-
-                                if (idItem.graphicOverview !== undefined && idItem.graphicOverview.length > 0) {
-                                    this.graphicOverview = [];
-                                    Ext.each(idItem.graphicOverview, function (goItem) {
-                                        this.graphicOverview.push(goItem);
-                                    }, this);
-                                }
-                            }
-
-                            // We have a service identification block. We create run panels here
-                            if (idItem.serviceIdentification !== undefined) {
-                                LOG.trace('ModelPanel.js::Service Identification block found. Parsing out service information');
-                                if (idItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
-                                    var scenario = idItem.serviceIdentification.citation.title.CharacterString.value;
-                                    var scenarioPanel;
-                                    if (this.scenarioPanels[scenario]) {
-                                        scenarioPanel = this.scenarioPanels[scenario];
-                                    } else {
-                                        scenarioPanel = new WaterSMART.ScenarioPanel({
-                                            title : scenario
-                                        });
-                                        this.scenarioPanels[scenario] = scenarioPanel;
+                                    if (idItem.citation.date !== undefined && idItem.citation.date.length > 0) {
+                                        Ext.each(idItem.citation.date, function(dateItem) {
+                                            if (dateItem.dateType.codeListValue.toLowerCase() === 'revision') this.lastRevisedDate = dateItem.date[dateItem.date.length - 1].DateTime.value;
+                                        }, this);
                                     }
-                                    scenarioPanel.add(new WaterSMART.RunPanel({
-                                        serviceIdentification : idItem.serviceIdentification
-                                    }));
+
+                                    if (idItem.graphicOverview !== undefined && idItem.graphicOverview.length > 0) {
+                                        this.graphicOverview = [];
+                                        Ext.each(idItem.graphicOverview, function (goItem) {
+                                            this.graphicOverview.push(goItem);
+                                        }, this);
+                                    }
                                 }
-                            }
 
-                            if (idItem.serviceIdentification !== undefined) {
-                                LOG.trace('ModelPanel.js::Service Identification block found. Parsing out service information');
-                                if (idItem.serviceIdentification.id.toLowerCase() === 'ows') {
-                                    this.owsEndpoint = idItem.serviceIdentification.operationMetadata.linkage.URL;
-                                    this.owsResourceName = idItem.serviceIdentification.operationMetadata.name.CharacterString.value;
+                                // We have a service identification block. We create run panels here
+                                if (idItem.serviceIdentification !== undefined) {
+                                    LOG.trace('ModelPanel.js::Service Identification block found. Parsing out service information');
+                                    if (idItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
+                                        var scenario = idItem.serviceIdentification.citation.title.CharacterString.value;
+                                        var scenarioPanel;
+                                        if (this.scenarioPanels[scenario]) {
+                                            scenarioPanel = this.scenarioPanels[scenario];
+                                        } else {
+                                            scenarioPanel = new WaterSMART.ScenarioPanel({
+                                                title : scenario
+                                            });
+                                            this.scenarioPanels[scenario] = scenarioPanel;
+                                        }
+                                        scenarioPanel.add(new WaterSMART.RunPanel({
+                                            serviceIdentification : idItem.serviceIdentification
+                                        }));
+                                    }
                                 }
-                            }
 
-                        }, panelInfo);
+                                if (idItem.serviceIdentification !== undefined) {
+                                    LOG.trace('ModelPanel.js::Service Identification block found. Parsing out service information');
+                                    if (idItem.serviceIdentification.id.toLowerCase() === 'ows') {
+                                        this.owsEndpoint = idItem.serviceIdentification.operationMetadata.linkage.URL;
+                                        this.owsResourceName = idItem.serviceIdentification.operationMetadata.name.CharacterString.value;
+                                    }
+                                }
 
-                        var scenarioPanelsClone = [];
-                        Ext.iterate(panelInfo.scenarioPanels, function (key, scenario) {
-                            var scenarioPanelClone = scenario.cloneConfig();
-                            Ext.each(scenario.items.items, function (panel) {
-                                var clonePanel = panel.cloneConfig();
-                                clonePanel.panelInfo.owsEndpoint = this.panelInfo.owsEndpoint;
-                                clonePanel.panelInfo.owsResourceName = this.panelInfo.owsResourceName;
-                                clonePanel.panelInfo.fileIdentifier = this.panelInfo.fileIdentifier;
-                                clonePanel.panelInfo.metadataStandardName = this.panelInfo.metadataStandardName;
-                                clonePanel.panelInfo.metadataStandardVersion = this.panelInfo.metadataStandardVersion;
-                                this.scenarioPanelClone.add(clonePanel);
+                            }, panelInfo);
+
+                            var scenarioPanelsClone = [];
+                            Ext.iterate(panelInfo.scenarioPanels, function (key, scenario) {
+                                var scenarioPanelClone = scenario.cloneConfig();
+                                Ext.each(scenario.items.items, function (panel) {
+                                    var clonePanel = panel.cloneConfig();
+                                    clonePanel.panelInfo.owsEndpoint = this.panelInfo.owsEndpoint;
+                                    clonePanel.panelInfo.owsResourceName = this.panelInfo.owsResourceName;
+                                    clonePanel.panelInfo.fileIdentifier = this.panelInfo.fileIdentifier;
+                                    clonePanel.panelInfo.metadataStandardName = this.panelInfo.metadataStandardName;
+                                    clonePanel.panelInfo.metadataStandardVersion = this.panelInfo.metadataStandardVersion;
+                                    this.scenarioPanelClone.add(clonePanel);
+                                }, {
+                                    panelInfo : panelInfo,
+                                    scenarioPanelClone : scenarioPanelClone
+                                });
+
+                                this.scenarioPanelsClone.push(scenarioPanelClone);
                             }, {
                                 panelInfo : panelInfo,
-                                scenarioPanelClone : scenarioPanelClone
+                                scenarioPanelsClone : scenarioPanelsClone
                             });
 
-                            this.scenarioPanelsClone.push(scenarioPanelClone);
-                        }, {
-                            panelInfo : panelInfo,
-                            scenarioPanelsClone : scenarioPanelsClone
-                        });
+                            this.modelSelected({
+                                scenarioPanels : scenarioPanelsClone,
+                                panelInfo : panelInfo
+                            });
 
-                        this.modelSelected({
-                            scenarioPanels : scenarioPanelsClone,
-                            panelInfo : panelInfo
-                        });
-
-                        this.mapPanel.removeLayers(null, false);
-                    },
-                    scope : this
+                            this.mapPanel.removeLayers(null, false);
+                        },
+                        scope : this
+                    }
                 }
-            }
             ],
             items : [
-            this.scenarioPanel
+                this.scenarioPanel
             ]
         }, config);
         WaterSMART.ModelRunSelectionPanel.superclass.constructor.call(this, config);

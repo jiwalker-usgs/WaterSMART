@@ -42,6 +42,7 @@ public class SessionFilter extends HttpServlet implements Filter {
         HttpServletRequest httpreq = (HttpServletRequest) req;
         HttpServletResponse httpresp = (HttpServletResponse) resp;
         HttpSession session = httpreq.getSession();
+        String redirectPath = httpreq.getContextPath() + redirectPage;
 
 //		String serverAuth = req.getHeader(SERVER_AUTH);
         User sessionUser = (developmentMode && null != developmentUser) ? developmentUser : (User)session.getAttribute(APP_AUTH);
@@ -53,7 +54,7 @@ public class SessionFilter extends HttpServlet implements Filter {
         if (null != httpreq.getParameter(LOGOUT)) {
             log.trace("logout: " + sessionUser.uid);
             session.invalidate();
-            httpresp.sendRedirect(redirectPage + "?code=" + LoginMessage.LOGOUT);
+            httpresp.sendRedirect(redirectPath + "?code=" + LoginMessage.LOGOUT);
             return;
         }
 
@@ -71,8 +72,8 @@ public class SessionFilter extends HttpServlet implements Filter {
             }
             else {
                 // special case for the redirect page
-                String redirectServletPath = "/" + redirectPage;
-                if (null != redirectPage && redirectServletPath.equals(
+                //String redirectServletPath = "/" + redirectPage;
+                if (null != redirectPath && redirectPath.equals(
                         httpreq.getServletPath())) {
                     chain.doFilter(req, resp);
                     return;
@@ -86,7 +87,7 @@ public class SessionFilter extends HttpServlet implements Filter {
                     if (redirectOnFail) {
                         log.debug("Failed Authentication. Redirecting to login page.");
                         //redirect to nonauthhome.jsp in HTTPS
-                        httpresp.sendRedirect(redirectPage + "?code=" + LoginMessage.BAD_PASS);
+                        httpresp.sendRedirect(redirectPath + "?code=" + LoginMessage.BAD_PASS);
                     }
                     else {
                         log.debug(
@@ -101,7 +102,7 @@ public class SessionFilter extends HttpServlet implements Filter {
                 }
                 else {
                     log.trace("Correct password, user not in allowed group.");
-                    httpresp.sendRedirect(redirectPage + "?code=" + LoginMessage.BAD_GROUP);
+                    httpresp.sendRedirect(redirectPath + "?code=" + LoginMessage.BAD_GROUP);
                     return;
                 }
             }
@@ -111,7 +112,7 @@ public class SessionFilter extends HttpServlet implements Filter {
                 //HTTP
                 log.debug("Non-HTTPS protocol. Redirecting to secure page.");
                 //redirect to nonauthhome.jsp in HTTPS
-                httpresp.sendRedirect(redirectPage + "?code=" + LoginMessage.NOT_HTTPS);
+                httpresp.sendRedirect(redirectPath + "?code=" + LoginMessage.NOT_HTTPS);
             }
             else {
                 log.debug("Non-HTTPS protocol. Returning empty response.");
