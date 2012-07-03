@@ -29,6 +29,10 @@
             <artifactId>gdp-proxy</artifactId>
         </dependency>
         <dependency>
+            <groupId>gov.usgs.cida</groupId>
+            <artifactId>tomcat-filters</artifactId>
+        </dependency>
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
         </dependency>
