@@ -4,25 +4,27 @@ if (Ext.isIE) { // http://www.mail-archive.com/users@openlayers.org/msg01838.htm
 
 var VIEWPORT;
 
-Ext.onReady(function() {
+Ext.onReady(function () {
     initializeLogging();
     LOG.info('onReady.js::Logging Initialized');
-    
+
     initializeAjax();
     LOG.info('onReady.js::AJAX Initialized');
-    
+
     initializeLoadMask();
     LOADMASK.show();
     LOG.info('onReady.js::Load Mask Initialized');
-    
+
     initializeQuickTips();
     LOG.info('onReady.js::Quick Tips Initialized');
-    
+
     initializeNotification();
     LOG.info('onReady.js::Notifications Initialized');
-	
+
+    initializeSessionTimeout();
+
     LOG.debug('onReady.js::Getting ready to load CSW Record Store');
-    
+
     var parentCswStore = new CIDA.CSWGetRecordsStore({
         url : "service/geonetwork/csw",
         storeId : 'parentCswStore',
@@ -46,7 +48,7 @@ Ext.onReady(function() {
         listeners : {
             load : this.cswStoreFirstLoad,
             exception : function() {
-                NOTIFY.warn({ msg : 'An error has occured - Application may not work properly.'})
+                NOTIFY.warn({msg : 'An error has occured - Application may not work properly.'})
             }, 
             scope : this
         }
@@ -113,7 +115,7 @@ function cswStoreFirstLoad(store) {
         autoShow: true,
         contentEl: 'usgs-footer-panel'
     });
-	
+    
     VIEWPORT = new Ext.Viewport({
         renderTo : document.body,
         layout : 'border',
@@ -124,7 +126,7 @@ function cswStoreFirstLoad(store) {
         ]
     });
     LOADMASK.hide();
-    
+
     store.un('load', this.cswStoreFirstLoad, this);
 }
 
@@ -136,26 +138,26 @@ function initializeAjax() {
         "ajax-request-exception"
         );
         
-    Ext.Ajax.on('beforerequest', function(connection, options) {
+    Ext.Ajax.on('beforerequest', function (connection, options) {
         if (!Ext.Ajax.isLoading()) {
-            Ext.Ajax.fireEvent('ajax-request-firing', 
+            Ext.Ajax.fireEvent('ajax-request-firing',
             {
-                connection : connection, 
+                connection : connection,
                 options : options
             });
         }
     }, this);
-    Ext.Ajax.on('requestcomplete', function(connection, response, options) {
+    Ext.Ajax.on('requestcomplete', function (connection, response, options) {
         if (!Ext.Ajax.isLoading()) {
-            Ext.Ajax.fireEvent('ajax-requests-complete', 
+            Ext.Ajax.fireEvent('ajax-requests-complete',
             {
-                connection : connection, 
-                response : response, 
+                connection : connection,
+                response : response,
                 options : options
             });
         }
     }, this);
-    Ext.Ajax.on('requestexception', function(connection, response, options) {
+    Ext.Ajax.on('requestexception', function (connection, response, options) {
         LOG.error(response);
         if (!Ext.Ajax.isLoading()) {
             Ext.Ajax.fireEvent('ajax-request-exception', 
@@ -180,4 +182,34 @@ function initializeQuickTips() {
         trackMouse: true
     });
     LOG.info('onReady.js::initializeQuickTips(): Initialized Quicktips');
+}
+
+function initializeSessionTimeout() {
+    var confirmLogout = function() {
+        window.clearTimeout(CONFIG.TIMEOUT_ID);
+        Ext.MessageBox.confirm('Session Expiration',
+            'Your session is about to expire, would you like to stay logged into this application',
+            function (choice) {
+                if (choice == 'yes') {
+                    Ext.Ajax.request({
+                        url: 'renew_session.jsp'
+                    });
+                }
+                else {
+                    window.location.href = "?LOGOUT_HOOK=true";
+                }
+            }
+        );
+    }
+    
+    var timeout = (CONFIG.TIMEOUT - 60) * 1000;
+    
+    Ext.Ajax.on(
+        "ajax-requests-complete",
+        function() {
+            CONFIG.TIMEOUT_ID = confirmLogout.defer(timeout);
+        }
+    );
+    
+    LOG.debug('Session timeout updated');
 }

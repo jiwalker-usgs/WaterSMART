@@ -31,6 +31,7 @@
                 props.addJNDIContexts(new String[0]);
                 boolean development = Boolean.parseBoolean(props.getProperty("watersmart.development"));
                 User user = (User)request.getSession().getAttribute("X_AUTH_REAL_USER");
+                int timeout = request.getSession().getMaxInactiveInterval();
             %>
             
             CONFIG.LOG4JS_PATTERN_LAYOUT = '<%= props.getProperty("watersmart.frontend.log4js.pattern.layout","%rms - %-5p - %m%n") %>';
@@ -43,6 +44,8 @@
             CONFIG.COMMON_ATTR = '<%= props.getProperty("watersmart.stations.primaryAttribute", "site_no") %>';
             CONFIG.OBSERVED_SOS = '<%= props.getProperty("watersmart.sos.observed") %>';
             CONFIG.PROXY = 'service/proxy?';
+            CONFIG.TIMEOUT = <%= timeout %>;
+            CONFIG.TIMEOUT_ID = 0;
 
             WATERSMART.USER = '<%= (user == null) ? "" : user.uid %>';
             WATERSMART.USER_NAME = '<%= (user == null) ? "" : user.fullName %>';
