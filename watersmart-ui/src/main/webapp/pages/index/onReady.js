@@ -186,7 +186,6 @@ function initializeQuickTips() {
 
 function initializeSessionTimeout() {
     var confirmLogout = function() {
-        window.clearTimeout(CONFIG.TIMEOUT_ID);
         Ext.MessageBox.confirm('Session Expiration',
             'Your session is about to expire, would you like to stay logged into this application',
             function (choice) {
@@ -207,6 +206,7 @@ function initializeSessionTimeout() {
     Ext.Ajax.on(
         "ajax-requests-complete",
         function() {
+            window.clearTimeout(CONFIG.TIMEOUT_ID);
             CONFIG.TIMEOUT_ID = confirmLogout.defer(timeout);
         }
     );
