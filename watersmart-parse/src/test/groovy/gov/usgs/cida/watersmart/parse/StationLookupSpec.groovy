@@ -5,7 +5,7 @@ import gov.usgs.cida.watersmart.parse.StationLookup
 
 class StationLookupSpec extends Specification {
     
-    def stations = new StationLookup("http://igsarm-cida-javadev1.er.usgs.gov:8081/geoserver/watersmart/ows", "watersmart:se_sites", "site_no")
+    def stations = new StationLookup("http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows", "nwc:se_sites", "site_no")
     
 	def "there should be 509 stations"() {
         expect:

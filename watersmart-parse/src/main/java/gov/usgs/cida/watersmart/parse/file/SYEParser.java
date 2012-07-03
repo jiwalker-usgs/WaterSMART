@@ -29,9 +29,9 @@ public class SYEParser extends StationPerFileDSGParser {
     private static final Logger LOG = LoggerFactory.getLogger(SYEParser.class);
     
     // looking for gageId.txt but may have extra file stuff before it (in folder) use non-greedy for that
-    private static final Pattern stationIdPattern = Pattern.compile("^.*?(\\d+)\\.txt$");
+    private static final Pattern stationIdPattern = Pattern.compile("^(?:[^/]*/)*(\\d+)\\.txt$");
     
-    private static final Pattern headerLinePattern = Pattern.compile("^date((?:\\s+\\w+)+)$");
+    private static final Pattern headerLinePattern = Pattern.compile("^[Dd]ate((?:\\s+\\w+)+)$");
     private static final Pattern headerVariablePattern = Pattern.compile("\\s+(\\w+)");
     
     // Line looks like '"x" "mm/dd/yyyy" val1 val2 ...'

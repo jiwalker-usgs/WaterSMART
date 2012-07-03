@@ -55,10 +55,13 @@ class SYEParserSpec extends Specification {
         def lookup = Mock(StationLookup)
         lookup.lookup("02177000") << 0
         def syeParser = new SYEParser(new FileInputStream(sampleFile), sampleFile.getName(), lookup)
-        syeParser.parse()
+        
+        def recordType = syeParser.parse()
         def ob = syeParser.next()
         
         expect:
+        recordType != null
+        ob != null
         ob.time_offset == 0
         ob.station_index == 0
         ob.values[0](closeTo(70.66, 0.01))
@@ -82,7 +85,7 @@ class SYEParserSpec extends Specification {
         IOUtils.closeQuietly(nc)
         
         expect:
-        FileUtils.sizeOf(ncFile) == 13079
+        FileUtils.sizeOf(ncFile) == 12803
         
         cleanup:
         FileUtils.deleteQuietly(ncFile)
