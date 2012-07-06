@@ -80,6 +80,13 @@
                 }
                 return date;
             };
+            
+            // http://www.factsandpeople.com/facts-mainmenu-5/26-html-and-javascript/104-cloning-javascript-objects
+            function clone(o) {
+                function OneShotConstructor(){}
+                OneShotConstructor.prototype = o;
+                return new OneShotConstructor();
+            }
         </script>
         
         <jsp:include page="js/ext/ext.jsp">

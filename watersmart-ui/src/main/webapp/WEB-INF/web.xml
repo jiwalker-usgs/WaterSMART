@@ -32,7 +32,6 @@
     <filter>
         <filter-name>RequestHeaderFilter</filter-name>
         <filter-class>gov.usgs.cida.tomcatfilters.RequestFilter</filter-class>
-        <description>Filter to use headers inserted by apache to "fix" the request object.</description>
     </filter>
         
     <filter-mapping>
@@ -41,7 +40,7 @@
     </filter-mapping>
     <filter-mapping>
         <filter-name>RequestHeaderFilter</filter-name>
-        <url-pattern>*</url-pattern>
+        <url-pattern>/*</url-pattern>
     </filter-mapping>
     
     <!-- should keep services on different path, put paths here -->

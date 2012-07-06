@@ -105,17 +105,17 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
       
         WaterSMART.Map.superclass.constructor.call(this, config);
         LOG.info('map.js::constructor(): Construction complete.');
-       
+
         this.addEvents(
             "layer-load-start",
             "layer-load-end"
-            );
-                
+        );
+
         //TODO- $.extend(true...) performs a deep copy of a JSON object.
         //Get another way of doing a deep copy of a JSON object so we can
         //remove the JQuery lib from this project. 
-        this.currentMapConfig = $.extend(true, {}, this.defaultMapConfig);
-        this.processMapConfigObject(this.defaultMapConfig);
+        this.currentMapConfig = clone(this.defaultMapConfig);
+        this.processMapConfigObject(this.currentMapConfig);
         this.map.events.on({
             'preremovelayer' :  function () {
                 LOG.debug('map.js::Layer is being removed');
@@ -130,7 +130,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
                             this.fireEvent("layer-load-start");
                         }
                     },
-                    'loadend' : function() {
+                    'loadend' : function () {
                         this.layersLoading--;
                         LOG.debug('map.js::Layer loading ended. Layers loading: ' + this.layersLoading);
                         if (this.layersLoading === 0) {
