@@ -8,6 +8,7 @@ import gov.usgs.cida.netcdf.dsg.StationTimeSeriesNetCDFFile;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import gov.usgs.cida.watersmart.common.RunMetadata;
 import gov.usgs.cida.watersmart.parse.column.AFINCHParser;
+import gov.usgs.cida.watersmart.parse.column.PRMSParser;
 import gov.usgs.cida.watersmart.parse.file.SYEParser;
 import gov.usgs.cida.watersmart.parse.file.WATERSParser;
 import java.io.File;
@@ -17,6 +18,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.xml.stream.XMLStreamException;
@@ -73,6 +75,15 @@ public class CreateDSGFromZip {
                         // TODO make sure Waterfall uses SYEParser
                         dsgParse = new SYEParser(inputStream, entry.getName(), lookerUpper);
                         break;
+                    case PRMS:
+                        Matcher prmsMatcher = PRMSParser.prmsFileNamePattern.matcher(entry.getName());
+                        if (prmsMatcher.matches()) {
+                            InputStream statvarInStream = inputStream;
+                            ZipEntry paramEntry = zip.getEntry(prmsMatcher.group(1) + ".param");
+                            InputStream paramInStream = zip.getInputStream(paramEntry);
+                            dsgParse = new PRMSParser(statvarInStream, paramInStream, lookerUpper);
+                        }
+                        break;
                     default:
                         throw new NotImplementedException("Parser not written yet");
                 }
@@ -93,9 +104,11 @@ public class CreateDSGFromZip {
                         nc.putObservation(ob);
                     }
                     else {
+                        IOUtils.closeQuietly(inputStream);
                         break;
                     }
                 }
+                IOUtils.closeQuietly(inputStream);
             }
         }
         IOUtils.closeQuietly(nc);
