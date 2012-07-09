@@ -1,6 +1,7 @@
 package gov.usgs.cida.watersmart.parse.column;
 
 import com.google.common.collect.*;
+import com.sun.media.sound.InvalidFormatException;
 import gov.usgs.cida.netcdf.dsg.Observation;
 import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Station;
@@ -20,6 +21,7 @@ import java.util.regex.Pattern;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -34,15 +36,10 @@ public class PRMSParser extends StationPerColumnDSGParser {
     
     private static final Logger LOG = LoggerFactory.getLogger(PRMSParser.class);
     
-    private static final Pattern propertyPattern = Pattern.compile("# (\\w+)");
-    private static final Pattern stationLinePattern = Pattern.compile("^\\s+((?:\\d+\\s+)+)$");
-    private static final Pattern headerLinePattern = Pattern.compile("^TIMESTEP\\s+((?:[^\\s\\(]+\\([^\\)]+\\)\\s*)+)$");
-    private static final Pattern dataLinePattern = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z)\\s+((?:[^\\s]+\\s*)+)$");
-    
-    private static final Pattern statisticAndUnitsPattern = Pattern.compile("([^\\(]+)\\(([^\\)]+)\\)");
+    private static final Pattern stationLinePattern = Pattern.compile("^seg_(?:out|in)flow (\\d+)$");
+    private static final Pattern dataLinePattern = Pattern.compile("^\\d+\\s+(\\d{4})\\s+(\\d{1,2})\\s+(\\d{1,2})\\s+(\\d{1,2})\\s+(\\d{1,2})\\s+(\\d{1,2})\\s+((?:[^\\s]+\\s*)+)$");
 
     public static final Pattern prmsFileNamePattern = Pattern.compile("^[^/]*/?(.*)\\.statvar$");
-    public static final DateTimeFormatter inputDateFormatter = ISODateTimeFormat.dateTimeParser();
     
     // Create a hashmap for each station, collect Observations
     private InputStream paramInputStream;
@@ -51,39 +48,57 @@ public class PRMSParser extends StationPerColumnDSGParser {
     private Iterator<Station> stationIterator;
     private Iterator<Observation> observationIterator;
     private RecordType record;
+    private List<String> segments;
     
     public PRMSParser(InputStream statvar, InputStream param, StationLookup lookup) throws IOException, XMLStreamException {
         super(statvar, lookup);
-        paramInputStream = param;
-        segmentMapping = segmentToGageMapping(paramInputStream);
-        allData = LinkedListMultimap.create();
-        stationIterator = null;
-        observationIterator = null;
-        record = null;
+        this.paramInputStream = param;
+        this.segmentMapping = segmentToGageMapping(paramInputStream);
+        this.allData = LinkedListMultimap.create();
+        this.stationIterator = null;
+        this.baseDate = null;
+        this.observationIterator = null;
+        this.record = null;
+        this.segments = Lists.newArrayList();
     }
     
     @Override
     public RecordType parse() throws IOException {
         String line = null;
-        String property = null;
-        String[] stations = null;
-        String[] statistics = null;
 
         while (null != (line = reader.readLine())) {
             Matcher matcher = null;
             matcher = getDataLinePattern().matcher(line);
             if (matcher.matches()) { // actually happens last, put first as common case
-                Instant timestep = Instant.parse(matcher.group(1), getInputDateFormatter());
-                String observations = matcher.group(2);
+                int year = Integer.parseInt(matcher.group(1));
+                int month = Integer.parseInt(matcher.group(2));
+                int day = Integer.parseInt(matcher.group(3));
+                int hour = Integer.parseInt(matcher.group(4));
+                int minute = Integer.parseInt(matcher.group(5));
+                int second = Integer.parseInt(matcher.group(6));
+                DateTime timestep = new DateTime(year, month, day, hour, minute, second);
+                if (this.baseDate == null) {
+                    this.baseDate = timestep;
+                }
+
+                String observations = matcher.group(7);
                 String [] columns = observations.split("\\s+");
+                
+                if (columns.length != segments.size()) {
+                    throw new InvalidFormatException("Must define a seg_outflow for each column of the data");
+                }
+                
                 // add values to list for station, when done, step through and create observations, adding to allData
                 ListMultimap<String,Float> observationBuilderMap = LinkedListMultimap.create();
                 for (int i=0; i<columns.length; i++) {
                     String coli = columns[i];
                     if (StringUtils.isBlank(coli)) continue;
                     Float value = Float.valueOf(coli);
-                    String station = stations[i];
-                    observationBuilderMap.put(station, value);
+                    String segment = segments.get(i);
+                    String station = segmentMapping.get(segment);
+                    if (station != null) {
+                        observationBuilderMap.put(station, value);
+                    }
                 }
                 for (String station : observationBuilderMap.keySet()) {
                     Station stationObj = stationLookup.get(station);
@@ -97,46 +112,28 @@ public class PRMSParser extends StationPerColumnDSGParser {
                             vals.toArray());
                     allData.put(stationObj, ob);
                 }
-                
             }
             else {
-                matcher = propertyPattern.matcher(line);
-                if (matcher.matches()) {
-                    property = matcher.group(1);
-                    continue;
-                }
                 matcher = stationLinePattern.matcher(line);
                 if (matcher.matches()) {
-                    stations = matcher.group(1).split("\\s+");
-                    continue;
-                }
-                matcher = getHeaderLinePattern().matcher(line);
-                if (matcher.matches()) {
-                    statistics = matcher.group(1).split("\\s+");
+                    String segment = matcher.group(1);
+                    segments.add(segment);
                     continue;
                 }
             }
         }
        
         record = new RecordType("days since " + baseDate.toString());
-        // order matters
-        Set<String> uniqueStats = Sets.newLinkedHashSet(Lists.newArrayList(statistics));
         
-        for (String stat : uniqueStats) {
-            Matcher statMatcher = statisticAndUnitsPattern.matcher(stat);
-            if (statMatcher.matches()) {
-                String statname = statMatcher.group(1);
-                String units = statMatcher.group(2);
-                String longname = statname + " " + property;
-                Map<String, Object> attrs = Maps.newHashMap();
-                attrs.put("long_name", longname);
-                attrs.put("units", units);
-                Variable statVar = new Variable(statname, NCUtil.XType.NC_FLOAT, attrs);
-                record.addType(statVar);
-            }
-        }
-        // everything set up, start iterator
-        //allData.entries().iterator();
+        String statname = "flow";
+        String units = "cfs";
+        String longname = "Daily Flow";
+        Map<String, Object> attrs = Maps.newHashMap();
+        attrs.put("long_name", longname);
+        attrs.put("units", units);
+        Variable statVar = new Variable(statname, NCUtil.XType.NC_FLOAT, attrs);
+        record.addType(statVar);
+                
         stationIterator = allData.keySet().iterator();
         return record;
     }
@@ -163,16 +160,6 @@ public class PRMSParser extends StationPerColumnDSGParser {
     @Override
     protected Pattern getDataLinePattern() {
         return dataLinePattern;
-    }
-    
-    @Override
-    protected Pattern getHeaderLinePattern() {
-        return headerLinePattern;
-    }
-
-    @Override
-    protected final DateTimeFormatter getInputDateFormatter() {
-        return inputDateFormatter;
     }
     
     private static Map<String, String> segmentToGageMapping(InputStream is) throws IOException {
@@ -227,5 +214,18 @@ public class PRMSParser extends StationPerColumnDSGParser {
             IOUtils.closeQuietly(buf);
         }
         return segmentMap;
+    }
+
+    @Override
+    protected Pattern getHeaderLinePattern() {
+        // Probably should separate PRMS into a different type since it doesn't have a
+        // header and this method is useless
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    protected DateTimeFormatter getInputDateFormatter() {
+        // I'm not actually sure why I did this this way.
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

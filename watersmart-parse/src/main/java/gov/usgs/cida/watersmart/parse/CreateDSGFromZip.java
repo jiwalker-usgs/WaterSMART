@@ -90,9 +90,10 @@ public class CreateDSGFromZip {
 
                 // must parse Metadata for each file
                 RecordType meta = dsgParse.parse();
-                info.properties = meta.getDataVarNames();
+                
                 // first file sets the rhythm
                 if (nc == null) {
+                    info.properties = meta.getDataVarNames();
                     Station[] stationArray = stations.toArray(new Station[stations.size()]);
                     Map<String,String> globalAttrs = applyBusinessRulesToMeta(runMeta);
                     
