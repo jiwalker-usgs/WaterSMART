@@ -24,12 +24,16 @@ import java.util.zip.ZipFile;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.NotImplementedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Jordan Walker <jiwalker@usgs.gov>
  */
 public class CreateDSGFromZip {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(CreateDSGFromZip.class);
     
     public static class ReturnInfo {
         public Collection<Station> stations;
@@ -44,6 +48,7 @@ public class CreateDSGFromZip {
         
         File ncFile = new File(sosPath + File.separator + runMeta.getTypeString() +
                                File.separator + filename);
+        LOG.debug(ncFile.getName() + " will be saved to " + sosPath);
         ZipFile zip = new ZipFile(srcZip);
         Enumeration<? extends ZipEntry> entries = zip.entries();
         StationTimeSeriesNetCDFFile nc = null;
@@ -58,6 +63,7 @@ public class CreateDSGFromZip {
         
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
+            LOG.debug(entry.getName());
             if (!entry.isDirectory()) {
                 InputStream inputStream = zip.getInputStream(entry);
                 DSGParser dsgParse = null;
@@ -79,9 +85,17 @@ public class CreateDSGFromZip {
                         Matcher prmsMatcher = PRMSParser.prmsFileNamePattern.matcher(entry.getName());
                         if (prmsMatcher.matches()) {
                             InputStream statvarInStream = inputStream;
-                            ZipEntry paramEntry = zip.getEntry(prmsMatcher.group(1) + ".param");
+                            String expectedParamFile = prmsMatcher.group(1) + ".param";
+                            ZipEntry paramEntry = zip.getEntry(expectedParamFile);
+                            if (paramEntry == null) {
+                                LOG.error("could not find matching file: " + expectedParamFile);
+                                continue;
+                            }
                             InputStream paramInStream = zip.getInputStream(paramEntry);
                             dsgParse = new PRMSParser(statvarInStream, paramInStream, lookerUpper);
+                        }
+                        else {
+                            continue;
                         }
                         break;
                     default:

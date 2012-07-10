@@ -1,6 +1,9 @@
 package gov.usgs.cida.watersmart.parse.column;
 
-import com.google.common.collect.*;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.sun.media.sound.InvalidFormatException;
 import gov.usgs.cida.netcdf.dsg.Observation;
 import gov.usgs.cida.netcdf.dsg.RecordType;
@@ -15,16 +18,13 @@ import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
-import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,7 @@ public class PRMSParser extends StationPerColumnDSGParser {
     private static final Pattern stationLinePattern = Pattern.compile("^seg_(?:out|in)flow (\\d+)$");
     private static final Pattern dataLinePattern = Pattern.compile("^\\d+\\s+(\\d{4})\\s+(\\d{1,2})\\s+(\\d{1,2})\\s+(\\d{1,2})\\s+(\\d{1,2})\\s+(\\d{1,2})\\s+((?:[^\\s]+\\s*)+)$");
 
-    public static final Pattern prmsFileNamePattern = Pattern.compile("^[^/]*/?(.*)\\.statvar$");
+    public static final Pattern prmsFileNamePattern = Pattern.compile("^(.*)\\.statvar$");
     
     // Create a hashmap for each station, collect Observations
     private InputStream paramInputStream;
