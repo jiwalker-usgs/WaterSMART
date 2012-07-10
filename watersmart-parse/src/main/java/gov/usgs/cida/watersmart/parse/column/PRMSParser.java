@@ -4,7 +4,6 @@ import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sun.media.sound.InvalidFormatException;
 import gov.usgs.cida.netcdf.dsg.Observation;
 import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Station;
@@ -85,7 +84,7 @@ public class PRMSParser extends StationPerColumnDSGParser {
                 String [] columns = observations.split("\\s+");
                 
                 if (columns.length != segments.size()) {
-                    throw new InvalidFormatException("Must define a seg_outflow for each column of the data");
+                    throw new IOException("Must define a seg_outflow for each column of the data");
                 }
                 
                 // add values to list for station, when done, step through and create observations, adding to allData
