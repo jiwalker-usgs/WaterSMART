@@ -88,6 +88,10 @@
         <servlet-name>FileRepository</servlet-name>
         <servlet-class>gov.usgs.cida.watersmart.repo.FileRepository</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Diagnostics</servlet-name>
+        <servlet-class>gov.usgs.cida.DiagnosticsServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>OWSProxy</servlet-name>
         <url-pattern>/service/proxy</url-pattern>
@@ -103,6 +107,10 @@
     <servlet-mapping>
         <servlet-name>GeonetworkProxy</servlet-name>
         <url-pattern>/service/geonetwork/csw</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Diagnostics</servlet-name>
+        <url-pattern>/diagnostics</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>jsp</servlet-name>
