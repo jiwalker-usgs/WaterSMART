@@ -109,7 +109,6 @@
         <jsp:include page="js/geoext/ux/WPS/WPS.jsp"/>
         <jsp:include page="js/geoext/ux/SOS/SOS.jsp"/>
         <jsp:include page="js/geoext/ux/CSW/CSW.jsp"/>
-        <jsp:include page="js/jquery/jquery.jsp"/>
         <jsp:include page="js/log4javascript/log4javascript.jsp"/>
         <jsp:include page="js/ext/ux/notify/notify.jsp"/>
         <jsp:include page="js/ext/ux/cida-load/cida-load.jsp"/>
