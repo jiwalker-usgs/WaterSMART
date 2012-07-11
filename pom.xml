@@ -128,11 +128,6 @@
                 <version>1.0</version>
             </dependency>
             <dependency>
-                <groupId>gov.usgs.cida.gdp</groupId>
-                <artifactId>gdp-52n-wps-patches</artifactId>
-                <version>14</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
                 <version>4.1.2</version>
@@ -193,7 +188,7 @@
             <dependency>
                 <groupId>gov.usgs.cida.netcdf</groupId>
                 <artifactId>netcdf-dsg</artifactId>
-                <version>1.2-SNAPSHOT</version>
+                <version>1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ws.commons</groupId>
