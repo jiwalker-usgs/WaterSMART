@@ -15,7 +15,6 @@
     
     <properties>
         <cida.maven.url>http://cida-wiwsc-maven.er.usgs.gov:8080/maven</cida.maven.url>
-        <n52.version>3.0</n52.version>
     </properties>
     
     <url>http://cida-usgs.github.com/WaterSMART</url>
@@ -214,7 +213,7 @@
             <dependency>
                 <groupId>gov.usgs.cida.gdp</groupId>
                 <artifactId>gdp-proxy</artifactId>
-                <version>15-SNAPSHOT</version>
+                <version>15.1</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
