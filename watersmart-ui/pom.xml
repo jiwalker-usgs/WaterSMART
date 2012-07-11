@@ -9,13 +9,13 @@
     <parent>
         <groupId>gov.usgs.cida.watersmart</groupId>
         <artifactId>watersmart</artifactId>
-        <version>004-SNAPSHOT</version>
+        <version>005-SNAPSHOT</version>
     </parent>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>watersmart-common</artifactId>
-            <version>004-SNAPSHOT</version>
+            <version>005-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
         <dependency>
