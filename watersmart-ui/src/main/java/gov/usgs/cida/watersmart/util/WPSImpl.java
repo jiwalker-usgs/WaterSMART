@@ -238,6 +238,35 @@ class WPSImpl implements WPSInterface {
                         "</wps:Data>" +
                     "</wps:Input>" +
                     "<wps:Input>" +
+                        "<ows:Identifier>startdate</ows:Identifier>" +
+                        "<wps:Data>" +
+                            "<wps:LiteralData>" +
+                                // What is the right date range
+                                "1970-01-01" +
+                            "</wps:LiteralData>" +
+                        "</wps:Data>" +
+                    "</wps:Input>" +
+                    "<wps:Input>" +
+                        "<ows:Identifier>enddate</ows:Identifier>" +
+                        "<wps:Data>" +
+                            "<wps:LiteralData>" +
+                                "1970-12-31" +
+                            "</wps:LiteralData>" +
+                        "</wps:Data>" +
+                    "</wps:Input>" +
+                    "<wps:Input>" +
+                        "<ows:Identifier>interval</ows:Identifier>" +
+                        "<wps:Data>" +
+                            "<wps:LiteralData />" +
+                        "</wps:Data>" +
+                    "</wps:Input>" +
+                    "<wps:Input>" +
+                        "<ows:Identifier>latest</ows:Identifier>" +
+                        "<wps:Data>" +
+                            "<wps:LiteralData />" +
+                        "</wps:Data>" +
+                    "</wps:Input>" +
+                    "<wps:Input>" +
                         "<ows:Identifier>model_url</ows:Identifier>" +
                         "<wps:Data>" +
                             "<wps:LiteralData>" +
@@ -376,11 +405,11 @@ class WPSTask extends Thread {
             UUID uuid = UUID.randomUUID();
 
             Map<String, String> wpsOutputMap = Maps.newHashMap();
-            String nahatReq = WPSImpl.createNahatStatsRequest(sosEndpoint, info.stations, info.properties);
-            String obsReq = WPSImpl.createObservedStatsRequest(sosEndpoint, info.stations, info.properties);
+            //String nahatReq = WPSImpl.createNahatStatsRequest(sosEndpoint, info.stations, info.properties);
+            //String obsReq = WPSImpl.createObservedStatsRequest(sosEndpoint, info.stations, info.properties);
             String compReq = WPSImpl.createCompareStatsRequest(sosEndpoint, info.stations, info.properties);
-            wpsOutputMap.put(WPSImpl.stats_csv_nahat_test_wps, runNamedAlgorithm("modeled", nahatReq, is, resultIs, uuid, metaObj));
-            wpsOutputMap.put(WPSImpl.stats_csv_obs_test_wps, runNamedAlgorithm("obs", obsReq, is, resultIs, uuid, metaObj));
+            //wpsOutputMap.put(WPSImpl.stats_csv_nahat_test_wps, runNamedAlgorithm("modeled", nahatReq, is, resultIs, uuid, metaObj));
+            //wpsOutputMap.put(WPSImpl.stats_csv_obs_test_wps, runNamedAlgorithm("obs", obsReq, is, resultIs, uuid, metaObj));
             wpsOutputMap.put(WPSImpl.stats_compare, runNamedAlgorithm("compare", compReq, is, resultIs, uuid, metaObj));
             
             // move csw to module?
