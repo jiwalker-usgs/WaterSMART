@@ -47,7 +47,7 @@ class WPSImpl implements WPSInterface {
 
     static final String stats_csv_obs_test_wps = "org.n52.wps.server.r.stats_csv_obs_test_wps";
     static final String stats_csv_nahat_test_wps = "org.n52.wps.server.r.stats_csv_nahat_test_wps";
-    static final String stats_compare = "org.n52.wps.server.r.stats_compare";
+    static final String stats_compare = "org.n52.wps.server.r.stats_compare_wps";
     
     @Override
     public String executeProcess(File zipLocation, RunMetadata metadata) {
