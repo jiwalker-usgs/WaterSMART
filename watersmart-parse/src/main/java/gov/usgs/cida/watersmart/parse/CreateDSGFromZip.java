@@ -81,6 +81,9 @@ public class CreateDSGFromZip {
                         // TODO make sure Waterfall uses SYEParser
                         dsgParse = new SYEParser(inputStream, entry.getName(), lookerUpper);
                         break;
+                    case STATS:
+                        dsgParse = new WATERSParser(inputStream, lookerUpper);
+                        break;
                     case PRMS:
                         Matcher prmsMatcher = PRMSParser.prmsFileNamePattern.matcher(entry.getName());
                         if (prmsMatcher.matches()) {

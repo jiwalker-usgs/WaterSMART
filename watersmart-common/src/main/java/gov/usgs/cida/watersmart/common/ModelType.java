@@ -9,5 +9,6 @@ public enum ModelType {
     WATERS,
     PRMS,
     AFINCH,
-    WATERFALL;
+    WATERFALL,
+    STATS;
 }
