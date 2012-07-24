@@ -476,7 +476,7 @@ class WPSTask extends Thread {
             log.debug(resultStr);
             
             File destinationDir = new File(props.getProperty("watersmart.file.location")
-                    + props.getProperty("watersmart.file.location.wps.repository")
+                    + props.getProperty("watersmart.file.location.wps.repository") + File.separatorChar
                     + uuid);
             if (!destinationDir.exists()) {
                 FileUtils.forceMkdir(destinationDir);
