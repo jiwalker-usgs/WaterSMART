@@ -3,7 +3,7 @@
  ------------------------------------------------------------------------------
 User:	tnwillia
 Date:	1/19/2012 1:36:42 PM
-StationID:	2177000
+StationID:	g02177000
 Date	Discharge (cfs)	Subsurface Flow (cfs)	Impervious Flow (mm)	Infiltration Excess (mm)	Initial Abstracted Flow (mm)	Overland Flow (mm)	PET (mm)	Average Soil Root zone (mm)	Average Soil Upperzone (mm)	Snow Pack (mm)	Precipitation (mm)
 10/1/2001	277.426169629748	27.067934136458	4.01376729741949E-37	0	0	0	1.69468459248181	11.945706222747	0	0	0.0097733575167714
 10/2/2001	276.291457587999	26.9810920804501	1.82224753386115E-41	0	0	0	1.78014851858181	10.2973374937536	0	0	0

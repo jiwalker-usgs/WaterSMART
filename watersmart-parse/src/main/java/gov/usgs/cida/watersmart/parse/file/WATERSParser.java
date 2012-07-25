@@ -28,7 +28,7 @@ public class WATERSParser extends StationPerFileDSGParser {
     private static final Logger LOG = LoggerFactory.getLogger(WATERSParser.class);
     
     private static final Pattern userPattern = Pattern.compile("^User:\t(\\w+)$");
-    private static final Pattern stationIdPattern = Pattern.compile("^StationID:\t(\\d+)$");
+    private static final Pattern stationIdPattern = Pattern.compile("^StationID:\t\\w?(\\d+)$");
     
     // "Date\tVariable1 Name (units)\t..."
     private static final Pattern headerLinePattern = Pattern.compile("^Date((?:\t[^\t\\(]+ \\(\\w+\\))+)$");
