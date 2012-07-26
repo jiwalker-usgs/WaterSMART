@@ -230,40 +230,11 @@ class WPSImpl implements WPSInterface {
                         "</wps:Data>" +
                     "</wps:Input>" +
                     "<wps:Input>" +
-                        "<ows:Identifier>property</ows:Identifier>" +
+                        "<ows:Identifier>offering</ows:Identifier>" +
                         "<wps:Data>" +
                             "<wps:LiteralData>" +
                                 StringEscapeUtils.escapeXml(properties.get(0)) +
                             "</wps:LiteralData>" +
-                        "</wps:Data>" +
-                    "</wps:Input>" +
-                    "<wps:Input>" +
-                        "<ows:Identifier>startdate</ows:Identifier>" +
-                        "<wps:Data>" +
-                            "<wps:LiteralData>" +
-                                // What is the right date range
-                                "1970-01-01" +
-                            "</wps:LiteralData>" +
-                        "</wps:Data>" +
-                    "</wps:Input>" +
-                    "<wps:Input>" +
-                        "<ows:Identifier>enddate</ows:Identifier>" +
-                        "<wps:Data>" +
-                            "<wps:LiteralData>" +
-                                "1970-12-31" +
-                            "</wps:LiteralData>" +
-                        "</wps:Data>" +
-                    "</wps:Input>" +
-                    "<wps:Input>" +
-                        "<ows:Identifier>interval</ows:Identifier>" +
-                        "<wps:Data>" +
-                            "<wps:LiteralData />" +
-                        "</wps:Data>" +
-                    "</wps:Input>" +
-                    "<wps:Input>" +
-                        "<ows:Identifier>latest</ows:Identifier>" +
-                        "<wps:Data>" +
-                            "<wps:LiteralData />" +
                         "</wps:Data>" +
                     "</wps:Input>" +
                     "<wps:Input>" +
