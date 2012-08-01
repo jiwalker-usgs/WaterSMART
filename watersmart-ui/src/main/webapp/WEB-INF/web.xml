@@ -2,7 +2,10 @@
 <web-app id="WebApp_ID" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
     <description>WaterSMART Model intercomparison Portal</description>
     <display-name>WaterSMART {Owner: DB, Coder: JW}</display-name>
-
+    <servlet-mapping>
+        <servlet-name>UnregisterJNA</servlet-name>
+        <url-pattern>/UnregisterJNA</url-pattern>
+    </servlet-mapping>
     <welcome-file-list>
         <welcome-file>login.jsp</welcome-file>
     </welcome-file-list>
@@ -33,8 +36,6 @@
         <filter-name>RequestHeaderFilter</filter-name>
         <filter-class>gov.usgs.cida.tomcatfilters.RequestFilter</filter-class>
     </filter>
-        
-
     <filter-mapping>
         <filter-name>RequestHeaderFilter</filter-name>
         <url-pattern>/*</url-pattern>
@@ -43,7 +44,6 @@
         <filter-name>SessionFilter</filter-name>
         <url-pattern>/index.jsp</url-pattern>
     </filter-mapping>
-    
     <!-- should keep services on different path, put paths here -->
     <filter>
         <filter-name>ServiceSessionFilter</filter-name>
@@ -61,6 +61,11 @@
         <filter-name>ServiceSessionFilter</filter-name>
         <url-pattern>/files/*</url-pattern>
     </filter-mapping>
+    
+    <listener>
+        <listener-class>gov.usgs.cida.jna.NetCDFJNAInitializer</listener-class>
+    </listener>
+    
     <servlet>
         <servlet-name>OWSProxy</servlet-name>
         <servlet-class>gov.usgs.service.OWSProxyServletX</servlet-class>
@@ -88,6 +93,10 @@
     <servlet>
         <servlet-name>FileRepository</servlet-name>
         <servlet-class>gov.usgs.cida.watersmart.repo.FileRepository</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UnregisterJNA</servlet-name>
+        <servlet-class>gov.usgs.cida.jna.NetCDFJNAInitializer</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>OWSProxy</servlet-name>
