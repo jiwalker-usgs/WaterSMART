@@ -9,6 +9,7 @@ import gov.usgs.cida.watersmart.common.JNDISingleton;
 import gov.usgs.cida.watersmart.common.RunMetadata;
 import gov.usgs.cida.watersmart.parse.column.AFINCHParser;
 import gov.usgs.cida.watersmart.parse.column.PRMSParser;
+import gov.usgs.cida.watersmart.parse.file.STATSParser;
 import gov.usgs.cida.watersmart.parse.file.SYEParser;
 import gov.usgs.cida.watersmart.parse.file.WATERSParser;
 import java.io.File;
@@ -82,7 +83,7 @@ public class CreateDSGFromZip {
                         dsgParse = new SYEParser(inputStream, entry.getName(), lookerUpper);
                         break;
                     case STATS:
-                        dsgParse = new WATERSParser(inputStream, lookerUpper);
+                        dsgParse = new STATSParser(inputStream, lookerUpper);
                         break;
                     case PRMS:
                         Matcher prmsMatcher = PRMSParser.prmsFileNamePattern.matcher(entry.getName());

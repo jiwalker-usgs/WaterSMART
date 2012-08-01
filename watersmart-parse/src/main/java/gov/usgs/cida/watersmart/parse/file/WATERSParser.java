@@ -28,7 +28,7 @@ public class WATERSParser extends StationPerFileDSGParser {
     private static final Logger LOG = LoggerFactory.getLogger(WATERSParser.class);
     
     private static final Pattern userPattern = Pattern.compile("^User:\t(\\w+)$");
-    private static final Pattern stationIdPattern = Pattern.compile("^StationID:\t\\w?(\\d+)$");
+    private static final Pattern stationIdPattern = Pattern.compile("^StationID:\t[^\t\\d]?(\\d+)$");
     
     // "Date\tVariable1 Name (units)\t..."
     private static final Pattern headerLinePattern = Pattern.compile("^Date((?:\t[^\t\\(]+ \\(\\w+\\))+)$");
@@ -61,7 +61,7 @@ public class WATERSParser extends StationPerFileDSGParser {
      */
     private List<Variable> headerVariables(String headerLine) {
         LinkedList<Variable> vars = new LinkedList<Variable>();
-        Matcher matcher = headerVariablePattern.matcher(headerLine);
+        Matcher matcher = getHeaderVariablePattern().matcher(headerLine);
         while (matcher.find()) {
             String varname = matcher.group(1);
             String units = matcher.group(2);
@@ -77,7 +77,7 @@ public class WATERSParser extends StationPerFileDSGParser {
     }
     
     private String getUser(String possibleUserLine) {
-        Matcher matcher = userPattern.matcher(possibleUserLine);
+        Matcher matcher = getUserPattern().matcher(possibleUserLine);
         if (matcher.matches()) {
             return matcher.group(1);
         }
@@ -94,7 +94,7 @@ public class WATERSParser extends StationPerFileDSGParser {
             Matcher matcher = getHeaderLinePattern().matcher(line);
             if (headerRead) {
                 // common case
-                matcher = dataLinePattern.matcher(line);
+                matcher = getDataLinePattern().matcher(line);
                 if (matcher.matches()) {
                     String date = matcher.group(1);
                     Instant timestep = Instant.parse(date, getInputDateFormatter());
@@ -161,4 +161,7 @@ public class WATERSParser extends StationPerFileDSGParser {
         return stationIdPattern;
     }
     
+    protected Pattern getUserPattern() {
+        return stationIdPattern;
+    }
 }
