@@ -102,7 +102,15 @@ class WPSImpl implements WPSInterface {
                         "<ows:Identifier>offering</ows:Identifier>" +
                         "<wps:Data>" +
                             "<wps:LiteralData>" +
-                                StringEscapeUtils.escapeXml(properties.get(0)) +
+                                "Mean" +
+                            "</wps:LiteralData>" +
+                        "</wps:Data>" +
+                    "</wps:Input>" +
+                    "<wps:Input>" +
+                        "<ows:Identifier>property</ows:Identifier>" +
+                        "<wps:Data>" +
+                            "<wps:LiteralData>" +
+                                "Discharge" +
                             "</wps:LiteralData>" +
                         "</wps:Data>" +
                     "</wps:Input>" +
@@ -201,10 +209,10 @@ class WPSTask extends Thread {
         StringBuilder content = new StringBuilder();
         content.append("Your process is taking longer than expected.");
         content.append("  It might finish in a bit, but here is the status so far");
-        content.append("\n\tUpload: ").append((uploadSuccessful) ? "success" : "failure");
-        content.append("\n\tParse: ").append((netcdfSuccessful) ? "success" : "failure");
-        content.append("\n\tStatistics: ").append((rStatsSuccessful) ? "success" : "failure");
-        content.append("\n\tMetadata: ").append((cswTransSuccessful) ? "success" : "failure");
+        content.append("\n\tUpload: ").append((uploadSuccessful) ? "success" : "waiting");
+        content.append("\n\tParse: ").append((netcdfSuccessful) ? "success" : "waiting");
+        content.append("\n\tStatistics: ").append((rStatsSuccessful) ? "success" : "waiting");
+        content.append("\n\tMetadata: ").append((cswTransSuccessful) ? "success" : "waiting");
         content.append("\n\nYou will receive another email if there is a success, but may not receive a failure notification.");
         List<String> bcc = new ArrayList<String>();
         String from = props.getProperty("watersmart.email.from");
