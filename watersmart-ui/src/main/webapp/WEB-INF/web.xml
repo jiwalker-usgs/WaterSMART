@@ -2,10 +2,6 @@
 <web-app id="WebApp_ID" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
     <description>WaterSMART Model intercomparison Portal</description>
     <display-name>WaterSMART {Owner: DB, Coder: JW}</display-name>
-    <servlet-mapping>
-        <servlet-name>UnregisterJNA</servlet-name>
-        <url-pattern>/UnregisterJNA</url-pattern>
-    </servlet-mapping>
     <welcome-file-list>
         <welcome-file>login.jsp</welcome-file>
     </welcome-file-list>
@@ -93,10 +89,6 @@
     <servlet>
         <servlet-name>FileRepository</servlet-name>
         <servlet-class>gov.usgs.cida.watersmart.repo.FileRepository</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>UnregisterJNA</servlet-name>
-        <servlet-class>gov.usgs.cida.jna.NetCDFJNAInitializer</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>OWSProxy</servlet-name>
