@@ -317,9 +317,8 @@ class WPSTask extends Thread {
                 if (response != null) {
                     cswTransSuccessful = true;
                 }
+                sendCompleteEmail(wpsOutputMap, metaObj.getEmail());
             }
-            
-            sendCompleteEmail(wpsOutputMap, metaObj.getEmail());
         }
         catch (Exception ex) {
             log.error("This is bad, send email to be fixed: " + ex.getMessage());
