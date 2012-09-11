@@ -16,6 +16,7 @@ library(hydroGOF)
 
 sos_url="http://nwisvaws02.er.usgs.gov/ogc-swie/wml2/dv/sos?request=GetObservation&featureID="
 #sites='"02177000","02178400","021770005"'
+#sites="02177000"
 offering="Mean"
 property="Discharge"
 #startdate="1970-01-01"
@@ -24,9 +25,13 @@ interval=''
 latest=''
 
 #model_url="http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/afinch/afinch-Special-0.1.nc"
-model_url="http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/waters/waters-Special-0.3.nc"
+#model_url="http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/stats/stats-Special-0.3.nc"
+model_url="http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/waters/waters-Special-1.2.nc"
+#model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/waters/waters-Special-0.3.nc"
 #modsites='"02177000","02178400","021770005"'
+#modsites="02177000"
 modprop="Discharge"
+#modprop="Streamflow"
 #modprop="MEAN"
 
 SWE_CSV_IHA <- function(input) {
@@ -728,11 +733,11 @@ return_10 <- function(qfiletempf) {
   rank_10 <- floor(findrank(length(sort_annual_max),0.10))
   return_10 <- sort_annual_max[rank_10]
 }
-#setwd('/Users/jlthomps/Documents/R/')
+setwd('/Users/jlthomps/Documents/R/')
 #a<-read.csv(header=F,colClasses=c("character"),text=sites)
 #a2<-read.csv(header=F,colClasses=c("character"),text=modsites)
-a<-read.csv("sites_waters.txt",header=F,colClasses=c("character"))
-a2<-read.csv("sites_waters.txt",header=F,colClasses=c("character"))
+a<-read.csv("sites_waters_stat.txt",header=F,colClasses=c("character"))
+a2<-read.csv("sites_waters_stat.txt",header=F,colClasses=c("character"))
 al<-length(a)
 nsev<-vector(length=al)
 nselogv<-vector(length=al)
@@ -1063,7 +1068,6 @@ pbiasv_10<-vector(length=al)
 #ggofv<-vector(length=al)
 dfcvbyyrf_list<-vector(mode="list")
 
-pdf("graphs.pdf")
 
 for (i in 1:length(sites)){
   modsites<-a2[i]
@@ -1092,7 +1096,10 @@ x_modz<-x_mod$discharge
 x_obsz<-x_obs$discharge
 dates<-as.Date(x_obs$date)
 pbiasv[i]<-pbias(x_modz,x_obsz)
+file<-paste("graph",toString(sites),".png",sep="")
+png(file)
 ggof(x_modz,x_obsz,na.rm=FALSE,dates,main=modsites)
+dev.off()
 selqfile<-x_obs
 tempdatafr<-NULL
 tempdatafr<-data.frame(selqfile)
@@ -1352,9 +1359,9 @@ mamax22v2[i]<-mamax12.23(qfiletempf2)[11:11,2:2]
 mamax23v2[i]<-mamax12.23(qfiletempf2)[12:12,2:2]
 comment[i]<-""
 
-nsev[i]<-nse(x_mod$discharge,x_obs$discharge)
-nselogv[i]<-nselog(x_mod$discharge,x_obs$discharge)
-rmsev[i]<-rmse(x_mod$discharge,x_obs$discharge)
+nsev[i]<-nse(x_obs$discharge,x_mod$discharge)
+nselogv[i]<-nselog(x_obs$discharge,x_mod$discharge)
+rmsev[i]<-rmse(x_obs$discharge,x_mod$discharge)
 sort_x_obs<-sort(x_obs$discharge)
 sort_x_mod<-sort(x_mod$discharge)
 rank_10<-floor(findrank(length(sort_x_mod),0.10))
@@ -1362,24 +1369,24 @@ rank_25<-floor(findrank(length(sort_x_mod),0.25))
 rank_50<-floor(findrank(length(sort_x_mod),0.5))
 rank_75<-floor(findrank(length(sort_x_mod),0.75))
 rank_90<-floor(findrank(length(sort_x_mod),0.9))
-nsev_90[i]<-nse(sort_x_mod[1:rank_90],sort_x_obs[1:rank_90])
-nsev_75_90[i]<-nse(sort_x_mod[rank_90:rank_75],sort_x_obs[rank_90:rank_75])
-nsev_50_75[i]<-nse(sort_x_mod[rank_75:rank_50],sort_x_obs[rank_75:rank_50])
-nsev_25_50[i]<-nse(sort_x_mod[rank_50:rank_25],sort_x_obs[rank_50:rank_25])
-nsev_10_25[i]<-nse(sort_x_mod[rank_25:rank_10],sort_x_obs[rank_25:rank_10])
-nsev_10[i]<-nse(sort_x_mod[rank_10:length(sort_x_mod)],sort_x_obs[rank_10:length(sort_x_mod)])
-rmsev_90[i]<-rmse(sort_x_mod[1:rank_90],sort_x_obs[1:rank_90])
-rmsev_75_90[i]<-rmse(sort_x_mod[rank_90:rank_75],sort_x_obs[rank_90:rank_75])
-rmsev_50_75[i]<-rmse(sort_x_mod[rank_75:rank_50],sort_x_obs[rank_75:rank_50])
-rmsev_25_50[i]<-rmse(sort_x_mod[rank_50:rank_25],sort_x_obs[rank_50:rank_25])
-rmsev_10_25[i]<-rmse(sort_x_mod[rank_25:rank_10],sort_x_obs[rank_25:rank_10])
-rmsev_10[i]<-rmse(sort_x_mod[rank_10:length(sort_x_mod)],sort_x_obs[rank_10:length(sort_x_mod)])
-pbiasv_90[i]<-pbias(sort_x_mod[1:rank_90],sort_x_obs[1:rank_90])
-pbiasv_75_90[i]<-pbias(sort_x_mod[rank_90:rank_75],sort_x_obs[rank_90:rank_75])
-pbiasv_50_75[i]<-pbias(sort_x_mod[rank_75:rank_50],sort_x_obs[rank_75:rank_50])
-pbiasv_25_50[i]<-pbias(sort_x_mod[rank_50:rank_25],sort_x_obs[rank_50:rank_25])
-pbiasv_10_25[i]<-pbias(sort_x_mod[rank_25:rank_10],sort_x_obs[rank_25:rank_10])
-pbiasv_10[i]<-pbias(sort_x_mod[rank_10:length(sort_x_mod)],sort_x_obs[rank_10:length(sort_x_mod)])
+nsev_90[i]<-nse(sort_x_obs[1:rank_90],sort_x_mod[1:rank_90])
+nsev_75_90[i]<-nse(sort_x_obs[rank_90:rank_75],sort_x_mod[rank_90:rank_75])
+nsev_50_75[i]<-nse(sort_x_obs[rank_75:rank_50],sort_x_mod[rank_75:rank_50])
+nsev_25_50[i]<-nse(sort_x_obs[rank_50:rank_25],sort_x_mod[rank_50:rank_25])
+nsev_10_25[i]<-nse(sort_x_obs[rank_25:rank_10],sort_x_mod[rank_25:rank_10])
+nsev_10[i]<-nse(sort_x_obs[rank_10:length(sort_x_mod)],sort_x_mod[rank_10:length(sort_x_mod)])
+rmsev_90[i]<-rmse(sort_x_obs[1:rank_90],sort_x_mod[1:rank_90])
+rmsev_75_90[i]<-rmse(sort_x_obs[rank_90:rank_75],sort_x_mod[rank_90:rank_75])
+rmsev_50_75[i]<-rmse(sort_x_obs[rank_75:rank_50],sort_x_mod[rank_75:rank_50])
+rmsev_25_50[i]<-rmse(sort_x_obs[rank_50:rank_25],sort_x_mod[rank_50:rank_25])
+rmsev_10_25[i]<-rmse(sort_x_obs[rank_25:rank_10],sort_x_mod[rank_25:rank_10])
+rmsev_10[i]<-rmse(sort_x_obs[rank_10:length(sort_x_mod)],sort_x_mod[rank_10:length(sort_x_mod)])
+pbiasv_90[i]<-pbias(sort_x_obs[1:rank_90],sort_x_mod[1:rank_90])
+pbiasv_75_90[i]<-pbias(sort_x_obs[rank_90:rank_75],sort_x_mod[rank_90:rank_75])
+pbiasv_50_75[i]<-pbias(sort_x_obs[rank_75:rank_50],sort_x_mod[rank_75:rank_50])
+pbiasv_25_50[i]<-pbias(sort_x_obs[rank_50:rank_25],sort_x_mod[rank_50:rank_25])
+pbiasv_10_25[i]<-pbias(sort_x_obs[rank_25:rank_10],sort_x_mod[rank_25:rank_10])
+pbiasv_10[i]<-pbias(sort_x_obs[rank_10:length(sort_x_mod)],sort_x_mod[rank_10:length(sort_x_mod)])
 flow_10_obs[i]<-sort_x_obs[rank_10]
 flow_25_obs[i]<-sort_x_obs[rank_25]
 flow_50_obs[i]<-sort_x_obs[rank_50]
@@ -1395,7 +1402,7 @@ flow_90_mod[i]<-sort_x_mod[rank_90]
   comment[i]<-"No calculations for site"
 }
 }
-dev.off()
+
 ma1vdiff<-abs(ma1v-ma1v2)
 ma2vdiff<-abs(ma2v-ma2v2)
 ma3vdiff<-abs(ma3v-ma3v2)
@@ -1602,10 +1609,9 @@ colnames(statsout)<-c('site_no','nse','nselog','rmse','min_date','max_date','mea
                       'dl9_min_30_day_var_diff','dl10_min_90_day_var_diff','dl18_zero_flow_days_diff','dh5_max_90_day_avg_diff',
                       'dh10_max_90_day_var_diff','tl1_min_flow_julian_day_diff','tl2_min_julian_var_diff','th1_max_flow_julian_day_diff',
                       'th2_max_julian_var_diff','ra1_rise_rate_diff','ra3_fall_rate_diff','ra4_fall_rate_var_diff','7Q10_diff','7Q2_mod','10_year_return_max_diff','percent_bias','comment')
-output="output.txt"
-graphs="graphs.pdf"
+output="output.zip"
 write.table(statsout,file="output.txt",col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
+system("zip -r output graph*png")
+system("zip -r output output*")
 
-
-# wps.out: output, text, output_file, A file containing the mean daily flow median daily flow and skewness of daily flow;
-# wps.out: graphs, pdf, output_file, A file containing graphs of observed vs modelled data for each site;
+# wps.out: output, zip, output_file, A file containing the mean daily flow median daily flow and skewness of daily flow;
