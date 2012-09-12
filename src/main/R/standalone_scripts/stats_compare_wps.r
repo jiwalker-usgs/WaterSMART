@@ -1043,7 +1043,7 @@ pbiasv_10_25<-vector(length=al)
 pbiasv_10<-vector(length=al)
 dfcvbyyrf_list<-vector(mode="list")
 
-pdf("graphs.pdf")
+#pdf("graphs.pdf")
 
 for (i in 1:length(sites)){
   modsites<-a2[i]
@@ -1072,7 +1072,7 @@ for (i in 1:length(sites)){
       x_obsz<-x_obs$discharge
       dates<-as.Date(x_obs$date)
       pbiasv[i]<-pbias(x_modz,x_obsz)
-      ggof(x_modz,x_obsz,na.rm=FALSE,dates,main=modsites)
+#      ggof(x_modz,x_obsz,na.rm=FALSE,dates,main=modsites)
       selqfile<-x_obs
       tempdatafr<-NULL
       tempdatafr<-data.frame(selqfile)
@@ -1371,7 +1371,7 @@ for (i in 1:length(sites)){
     comment[i]<-"No calculations for site"
   }
 }
-dev.off()
+#dev.off()
 ma1vdiff<-abs(ma1v-ma1v2)
 ma2vdiff<-abs(ma2v-ma2v2)
 ma3vdiff<-abs(ma3v-ma3v2)
@@ -1579,7 +1579,7 @@ colnames(statsout)<-c('site_no','nse','nselog','rmse','min_date','max_date','mea
                       'dh10_max_90_day_var_diff','tl1_min_flow_julian_day_diff','tl2_min_julian_var_diff','th1_max_flow_julian_day_diff',
                       'th2_max_julian_var_diff','ra1_rise_rate_diff','ra3_fall_rate_diff','ra4_fall_rate_var_diff','7Q10_diff','7Q2_mod','10_year_return_max_diff','percent_bias','comment')
 output="output.txt"
-graphs="graphs.pdf"
+#graphs="graphs.pdf"
 write.table(statsout,file="output.txt",col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
 
 
