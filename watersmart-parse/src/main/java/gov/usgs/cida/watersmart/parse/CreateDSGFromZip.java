@@ -56,7 +56,7 @@ public class CreateDSGFromZip {
         
         // Get station wfs used for model
         
-        StationLookup lookerUpper = new StationLookup(runMeta);
+        StationLookup lookerUpper = new WFSPointStationLookup(runMeta);
         Collection<Station> stations = lookerUpper.getStations();
         ReturnInfo info = new ReturnInfo();
         info.stations = stations;
