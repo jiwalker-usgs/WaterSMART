@@ -65,6 +65,11 @@ public class SYEParser extends StationPerFileDSGParser {
         super(input, lookup);
         this.filename = name;
     }
+
+    protected RecordType getRecordType() {
+        RecordType recordType = new RecordType("days since " + baseDate.toString());
+        return recordType;
+    }
     
     /**
      * Create a pattern that captures the variable names and gives null for
@@ -72,9 +77,9 @@ public class SYEParser extends StationPerFileDSGParser {
      * @param headerLine Line to parse which has been identified as a header
      * @return String array of variable names
      */
-    private List<Variable> headerVariables(String headerLine) {
+    protected List<Variable> headerVariables(String headerLine) {
         LinkedList<Variable> vars = new LinkedList<Variable>();
-        Matcher matcher = headerVariablePattern.matcher(headerLine);
+        Matcher matcher = getHeaderVariablePattern().matcher(headerLine);
         while (matcher.find()) {
             String varname = matcher.group(1);
             if (null != varname) {
@@ -102,20 +107,20 @@ public class SYEParser extends StationPerFileDSGParser {
         boolean headerRead = false;
         List<Variable> vars = null;
         while (null != (line = reader.readLine())) {
-            Matcher matcher = headerLinePattern.matcher(line);
+            Matcher matcher = getHeaderLinePattern().matcher(line);
             if (matcher.matches()) {
                 vars = headerVariables(matcher.group(1));
                 reader.mark(READ_AHEAD_LIMIT);
                 headerRead = true;
             }
             else if (headerRead) {
-                matcher = dataLinePattern.matcher(line);
+                matcher = getDataLinePattern().matcher(line);
                 if (matcher.matches()) {
                     String date = matcher.group(1);
                     Instant timestep = Instant.parse(date, getInputDateFormatter());
                     this.baseDate = timestep;
 
-                    RecordType recordType = new RecordType("days since " + baseDate.toString());
+                    RecordType recordType = getRecordType();
                     for (Variable var : vars) {
                         recordType.addType(var);
                     }

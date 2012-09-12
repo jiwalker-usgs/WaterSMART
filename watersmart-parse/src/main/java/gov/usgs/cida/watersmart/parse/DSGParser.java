@@ -63,6 +63,10 @@ public abstract class DSGParser implements Iterator<Observation> {
         }
     }
 
+    /**
+     * Iterates through a file observation at a time
+     * @return Observation representing one timestep and array of values
+     */
     public abstract Observation next();
     
     protected int calculateTimeOffset(ReadableInstant time) {
