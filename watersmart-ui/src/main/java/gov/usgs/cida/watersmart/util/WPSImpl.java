@@ -157,6 +157,7 @@ class WPSTask extends Thread {
     public static final int CHECKS_UNTIL_NOTIFY = 28;
     public static final int CHECKS_UNTIL_FAIL = 4 * 60 * 24; // currently 24 hours
     public static final int CHECK_WAIT = 15000;
+    public static final int SLEEP_FOR_THREDDS = 60000; // one minute should do
 
     static org.slf4j.Logger log = LoggerFactory.getLogger(WPSTask.class);
     private static final DynamicReadOnlyProperties props = JNDISingleton.getInstance();
@@ -305,6 +306,8 @@ class WPSTask extends Thread {
             String sosEndpoint = repo + metaObj.getTypeString() + "/" + info.filename;
             UUID uuid = UUID.randomUUID();
 
+            Thread.sleep(SLEEP_FOR_THREDDS);
+            
             Map<String, String> wpsOutputMap = Maps.newHashMap();
             String compReq = WPSImpl.createCompareStatsRequest(sosEndpoint, info.stations, info.properties);
             wpsOutputMap.put(WPSImpl.stats_compare, runNamedAlgorithm("compare", compReq, uuid, metaObj));
