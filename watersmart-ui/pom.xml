@@ -25,10 +25,6 @@
         </dependency>
         
         <dependency>
-            <groupId>gov.usgs.cida.netcdf</groupId>
-            <artifactId>netcdf-jna</artifactId>
-        </dependency>
-        <dependency>
             <groupId>gov.usgs.cida.gdp</groupId>
             <artifactId>gdp-proxy</artifactId>
         </dependency>
