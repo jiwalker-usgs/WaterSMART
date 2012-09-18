@@ -260,6 +260,13 @@ class WPSTask extends Thread {
         content.append("\n\tParse: ").append((netcdfSuccessful) ? "success" : "failure");
         content.append("\n\tStatistics: ").append((rStatsSuccessful) ? "success" : "failure");
         content.append("\n\tMetadata: ").append((cswTransSuccessful) ? "success" : "failure");
+        
+        RunMetadata metaObj = RunMetadata.getInstance(metadata);
+        content.append("\n\n\tFile: ").append(metaObj.getFileName());
+        content.append("\n\tModeler: ").append(metaObj.getName());
+        content.append("\n\tComments: ").append(metaObj.getComments());
+        content.append("\n\tDate: ").append(metaObj.getCreationDate());
+        
         content.append("\n\nHave a nice day!");
         List<String> bcc = new ArrayList<String>();
         String from = props.getProperty("watersmart.email.from");
