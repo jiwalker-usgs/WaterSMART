@@ -154,13 +154,25 @@ class WPSImpl implements WPSInterface {
 
 class WPSTask extends Thread {
     
+
+    
+    static org.slf4j.Logger log = LoggerFactory.getLogger(WPSTask.class);
+    private static final DynamicReadOnlyProperties props = JNDISingleton.getInstance();
+    
     public static final int CHECKS_UNTIL_NOTIFY = 28;
     public static final int CHECKS_UNTIL_FAIL = 4 * 60 * 24; // currently 24 hours
     public static final int CHECK_WAIT = 15000;
-    public static final int SLEEP_FOR_THREDDS = 60000; // one minute should do
-
-    static org.slf4j.Logger log = LoggerFactory.getLogger(WPSTask.class);
-    private static final DynamicReadOnlyProperties props = JNDISingleton.getInstance();
+    
+    public static int SLEEP_FOR_THREDDS;
+    static {
+        try {
+            SLEEP_FOR_THREDDS = Integer.parseInt(props.getProperty("watersmart.wps.delay.ms"));
+        }
+        catch (NumberFormatException nfe) {
+            SLEEP_FOR_THREDDS = 300000;
+        }
+    }
+    
     private File zipLocation;
     private Map<String, String> metadata;
     
@@ -269,6 +281,13 @@ class WPSTask extends Thread {
         content.append("\n\tParse: ").append((netcdfSuccessful) ? "success" : "failure");
         content.append("\n\tStatistics: ").append((rStatsSuccessful) ? "success" : "failure");
         content.append("\n\tMetadata: ").append((cswTransSuccessful) ? "success" : "failure");
+        
+        RunMetadata metaObj = RunMetadata.getInstance(metadata);
+        content.append("\n\n\tFile: ").append(metaObj.getFileName());
+        content.append("\n\tModeler: ").append(metaObj.getName());
+        content.append("\n\tComments: ").append(metaObj.getComments());
+        content.append("\n\tDate: ").append(metaObj.getCreationDate());
+        
         content.append("\n\nhere is the stack trace for troubleshooting:\n\n");
         for (StackTraceElement el : ex.getStackTrace()) {
             content.append(el.toString()).append("\n");
