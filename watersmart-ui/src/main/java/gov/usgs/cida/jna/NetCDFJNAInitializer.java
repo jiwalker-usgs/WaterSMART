@@ -1,6 +1,5 @@
 package gov.usgs.cida.jna;
 
-import com.sun.jna.Native;
 import gov.usgs.cida.netcdf.jna.NC;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -19,7 +18,7 @@ public class NetCDFJNAInitializer implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        Native.unregister(NC.class);
+        NC.unregister();
     }
 
 }
