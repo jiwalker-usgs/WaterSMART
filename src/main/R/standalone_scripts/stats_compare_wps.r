@@ -14,6 +14,9 @@ library(chron)
 library(doBy)
 library(hydroGOF)
 
+interval=''
+latest=''
+
 SWE_CSV_IHA <- function(input) {
   cat(paste("Retrieving data from: \n", input, "\n", 
             sep = " "))
