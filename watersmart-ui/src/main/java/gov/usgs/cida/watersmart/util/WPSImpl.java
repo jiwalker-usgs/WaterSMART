@@ -118,7 +118,8 @@ class WPSImpl implements WPSInterface {
                         "<ows:Identifier>model_url</ows:Identifier>" +
                         "<wps:Data>" +
                             "<wps:LiteralData>" +
-                                StringEscapeUtils.escapeXml(sosEndpoint) +
+                                StringEscapeUtils.escapeXml(sosEndpoint + 
+                                    "?request=GetObservation&service=SOS&version=1.0.0&offering") +
                             "</wps:LiteralData>" +
                         "</wps:Data>" +
                     "</wps:Input>" +
