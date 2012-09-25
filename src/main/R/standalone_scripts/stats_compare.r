@@ -26,12 +26,13 @@ latest=''
 
 #model_url="http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/afinch/afinch-Special-0.1.nc"
 #model_url="http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/stats/stats-Special-0.3.nc"
-model_url="http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/waters/waters-Special-1.2.nc"
+#model_url="http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/waters/waters-Special-1.2.nc"
+model_url="http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/stats/stats-Dense1-0.3.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
 #model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/waters/waters-Special-0.3.nc"
 #modsites='"02177000","02178400","021770005"'
 #modsites="02177000"
-modprop="Discharge"
-#modprop="Streamflow"
+#modprop="Discharge"
+modprop="Streamflow"
 #modprop="MEAN"
 
 SWE_CSV_IHA <- function(input) {
@@ -62,7 +63,6 @@ getXMLDV2Data <- function(sos_url,sites,property,offering,startdate,enddate,inte
   baseURL <- sos_url
   
   url <- paste(baseURL,sites, "&observedProperty=",property, "&offering=", offering, sep = "")
-  cat(paste("Retrieving data from: \n", url, "\n", sep = " "))
   
   if (nzchar(startdate)) {
     url <- paste(url,"&beginPosition=",startdate,sep="")
@@ -77,6 +77,7 @@ getXMLDV2Data <- function(sos_url,sites,property,offering,startdate,enddate,inte
   if (nzchar(latest)) {
     url <- paste(url,"&Latest",sep="")
   }
+  cat(paste("Retrieving data from: \n", url, "\n", sep = " "))
   
   # Imports the XML:
   doc <- xmlTreeParse(url, getDTD = F, useInternalNodes=TRUE)
@@ -1071,7 +1072,7 @@ dfcvbyyrf_list<-vector(mode="list")
 
 for (i in 1:length(sites)){
   modsites<-a2[i]
-url<-paste(model_url,'?request=GetObservation&service=SOS&version=1.0.0&offering=',modsites,'&observedProperty=',modprop,sep='',collapse=NULL)
+url<-paste(model_url,'=',modsites,'&observedProperty=',modprop,sep='',collapse=NULL)
 x_mod<-SWE_CSV_IHA(url)
 if (length(sapply(x_mod,nchar))>1) {
 startdate<-min(x_mod$date)
@@ -1080,6 +1081,7 @@ interval<-''
 latest<-''
 sites=a[i]
 x_obs <- getXMLDV2Data(sos_url,sites,property,offering,startdate,enddate,interval,latest)
+if (nrow(x_obs)>2) {
 x2<-(x_mod$date)
 x_mod<-data.frame(strptime(x2, "%Y-%m-%d"),x_mod$discharge)
 colnames(x_mod)<-c("date","discharge")
@@ -1397,6 +1399,9 @@ flow_25_mod[i]<-sort_x_mod[rank_25]
 flow_50_mod[i]<-sort_x_mod[rank_50]
 flow_75_mod[i]<-sort_x_mod[rank_75]
 flow_90_mod[i]<-sort_x_mod[rank_90]
+}
+} else {
+  comment[i]<-"No observed data for this site"
 }
 } else { 
   comment[i]<-"No calculations for site"
