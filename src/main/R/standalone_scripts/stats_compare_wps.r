@@ -1058,6 +1058,7 @@ for (i in 1:length(sites)){
     latest<-''
     sites=a[i]
     x_obs <- getXMLDV2Data(sos_url,sites,property,offering,startdate,enddate,interval,latest)
+    if (nrow(x_obs)>2) {
     x2<-(x_mod$date)
     x_mod<-data.frame(strptime(x2, "%Y-%m-%d"),x_mod$discharge)
     colnames(x_mod)<-c("date","discharge")
@@ -1367,6 +1368,9 @@ for (i in 1:length(sites)){
       flow_50_mod[i]<-sort_x_mod[rank_50]
       flow_75_mod[i]<-sort_x_mod[rank_75]
       flow_90_mod[i]<-sort_x_mod[rank_90]
+    }
+    } else {
+      comment[i]<-"No observed data for this site"
     }
   } else { 
     comment[i]<-"No calculations for site"
