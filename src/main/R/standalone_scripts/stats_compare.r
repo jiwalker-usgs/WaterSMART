@@ -24,16 +24,17 @@ property="Discharge"
 interval=''
 latest=''
 
-#model_url="http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/afinch/afinch-Special-0.1.nc"
-#model_url="http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/stats/stats-Special-0.3.nc"
+model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/afinch/afinch-Special-0.3.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
+#model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/stats/stats-Special-0.3.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
 #model_url="http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/waters/waters-Special-1.2.nc"
-model_url="http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/stats/stats-Dense1-0.3.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
+#model_url="http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/stats/stats-Dense1-0.3.nc"
 #model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/waters/waters-Special-0.3.nc"
 #modsites='"02177000","02178400","021770005"'
 #modsites="02177000"
 #modprop="Discharge"
-modprop="Streamflow"
-#modprop="MEAN"
+#modprop="Streamflow"
+#modprop="streamflow"
+modprop="MEAN"
 
 SWE_CSV_IHA <- function(input) {
   cat(paste("Retrieving data from: \n", input, "\n", 
@@ -713,7 +714,11 @@ l7Q10 <- function(qfiletempf) {
                               list(rollingavgs7day$year_val), min, na.rm=TRUE)
   sort_7day<-sort(min7daybyyear$x)
   rank_90<-floor(findrank(length(sort_7day),0.90))
+  if (rank_90 > 0) { 
   l7Q10<-sort_7day[rank_90]
+  } else { 
+    l7Q10<-FALSE 
+    }
 }
 
 l7Q2 <- function(qfiletempf) {
@@ -726,7 +731,11 @@ l7Q2 <- function(qfiletempf) {
                               list(rollingavgs7day$year_val), min, na.rm=TRUE)
   sort_7day<-sort(min7daybyyear$x)
   rank_50<-floor(findrank(length(sort_7day),0.50))
-  l7Q2<-sort_7day[rank_50]
+  if (rank_50 > 0) { 
+  l7Q2<-sort_7day[rank_50] 
+} else { 
+  l7Q2<-FALSE 
+  }
 }
 return_10 <- function(qfiletempf) {
   annual_max <- aggregate(qfiletempf$discharge, list(qfiletempf$year_val), max, na.rm=TRUE)
@@ -1070,7 +1079,7 @@ pbiasv_10<-vector(length=al)
 dfcvbyyrf_list<-vector(mode="list")
 
 
-for (i in 1:length(sites)){
+for (i in 1:length(a2)){
   modsites<-a2[i]
 url<-paste(model_url,'=',modsites,'&observedProperty=',modprop,sep='',collapse=NULL)
 x_mod<-SWE_CSV_IHA(url)
@@ -1244,7 +1253,7 @@ dfcvbyyrf_list[[as.character(sites)]]<-dfcvbyyrf
   ra3v[i]<-ra3(qfiletempf)
   ra4v[i]<-ra4(qfiletempf)
 l7Q10v[i]<-l7Q10(qfiletempf)
-l7Q10v[i]<-l7Q10(qfiletempf)
+l7Q2v[i]<-l7Q2(qfiletempf)
 return_10v[i]<-return_10(qfiletempf)
 mamin12v[i]<-mamax12.23(qfiletempf)[1:1,2:2]
 mamin13v[i]<-mamax12.23(qfiletempf)[2:2,2:2]
@@ -1333,7 +1342,7 @@ mamax23v[i]<-mamax12.23(qfiletempf)[12:12,2:2]
   ra3v2[i]<-ra3(qfiletempf2)
   ra4v2[i]<-ra4(qfiletempf2)
 l7Q10v2[i]<-l7Q10(qfiletempf2)
-l7Q10v2[i]<-l7Q10(qfiletempf2)
+l7Q2v2[i]<-l7Q2(qfiletempf2)
 return_10v2[i]<-return_10(qfiletempf2)
 mamin12v2[i]<-mamax12.23(qfiletempf2)[1:1,2:2]
 mamin13v2[i]<-mamax12.23(qfiletempf2)[2:2,2:2]
@@ -1405,7 +1414,7 @@ flow_90_mod[i]<-sort_x_mod[rank_90]
 }
 } else { 
   comment[i]<-"No calculations for site"
-}
+} 
 }
 
 ma1vdiff<-abs(ma1v-ma1v2)
@@ -1615,8 +1624,14 @@ colnames(statsout)<-c('site_no','nse','nselog','rmse','min_date','max_date','mea
                       'dh10_max_90_day_var_diff','tl1_min_flow_julian_day_diff','tl2_min_julian_var_diff','th1_max_flow_julian_day_diff',
                       'th2_max_julian_var_diff','ra1_rise_rate_diff','ra3_fall_rate_diff','ra4_fall_rate_var_diff','7Q10_diff','7Q2_mod','10_year_return_max_diff','percent_bias','comment')
 output="output.zip"
+if (i==length(a2)) {
 write.table(statsout,file="output.txt",col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
-system("zip -r output graph*png")
-system("zip -r output output*")
+#system("zip -r output graph*png")
+#system("zip -r output output*")
+} else { 
+  output="output.zip" 
+  message<-"One or more web service calls resulted in failure. Please try again."
+  write.table(message,file="output.txt",col.names=FALSE,row.names=FALSE,quote=FALSE)
+}
 
 # wps.out: output, zip, output_file, A file containing the mean daily flow median daily flow and skewness of daily flow;
