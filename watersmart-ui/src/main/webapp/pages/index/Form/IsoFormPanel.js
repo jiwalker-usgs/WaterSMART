@@ -63,43 +63,13 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
         config = Ext.apply({
             id: 'metadata-form',
             padding: 5,
-            region: 'center',
             width: '100%',
             url: 'update',
             defaultType: 'textfield',
+            xtype: 'panel',
+            layout: 'form',
             items: [
                 {
-                    fieldLabel: 'Modeler Name',
-                    name: 'name',
-                    value : this.modelerName,
-                    allowBlank: false
-                }, {
-                    xtype : 'displayfield',
-                    fieldLabel: 'Model Name',
-                    name: 'model',
-                    value : this.modelName,
-                    allowBlank: false
-                }, {
-                    fieldLabel: 'Model Version',
-                    name: 'version',
-                    ref: 'versionField',
-                    value : this.modelVersion,
-                    allowBlank: false,
-                    validator: this.validateForm
-                }, {
-                    fieldLabel: 'Run Identifier',
-                    name: 'runIdent',
-                    ref: 'runIdentField',
-                    value : this.runIdentifier,
-                    allowBlank: false,
-                    validator: this.validateForm
-                }, {
-                    xtype : 'datefield',
-                    fieldLabel: 'Run Date',
-                    name: 'creationDate',
-                    value : this.runDate,
-                    allowBlank: false
-                }, {
                     fieldLabel: 'Calibration/ Validation Scenario',
                     xtype: 'combo',
                     mode: 'local',
@@ -144,6 +114,37 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                         scope : this
                     }
                 }, {
+                    fieldLabel: 'Modeler Name',
+                    name: 'name',
+                    value : this.modelerName,
+                    allowBlank: false
+                }, {
+                    xtype : 'displayfield',
+                    fieldLabel: 'Model Name',
+                    name: 'model',
+                    value : this.modelName,
+                    allowBlank: false
+                }, {
+                    fieldLabel: 'Model Version',
+                    name: 'version',
+                    ref: 'versionField',
+                    value : this.modelVersion,
+                    allowBlank: false,
+                    validator: this.validateForm
+                }, {
+                    fieldLabel: 'Run Identifier',
+                    name: 'runIdent',
+                    ref: 'runIdentField',
+                    value : this.runIdentifier,
+                    allowBlank: false,
+                    validator: this.validateForm
+                }, {
+                    xtype : 'datefield',
+                    fieldLabel: 'Run Date',
+                    name: 'creationDate',
+                    value : this.runDate,
+                    allowBlank: false
+                }, {
                     fieldLabel: 'Comments',
                     xtype : 'textarea',
                     name: 'comments',
@@ -151,115 +152,11 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                     allowBlank: true,
                     anchor: '95%'
                 }
-            ],
-            buttons: [
-                {
-                    text: 'Submit',
-                    type: 'submit',
-                    formBind: true,
-                    handler: function(button) {
-                        var uploadPanel = Ext.getCmp('uploadPanel');
-                        var metadataForm = Ext.getCmp('metadata-form').getForm().getValues();
-                        var isoFormPanel = button.ownerCt.ownerCt;
-
-                        LOG.debug('isoFormPanel.js::Preparing to upload file.');
-
-                        if (isoFormPanel.create) {
-                            uploadPanel.getForm().submit({
-                                url: uploadPanel.url,
-                                scope : this,
-                                params: {
-                                    name : metadataForm.name,
-                                    modelId : isoFormPanel.modelId,
-                                    modelVersion : metadataForm.version,
-                                    runIdent : metadataForm.runIdent,
-                                    creationDate : metadataForm.creationDate,
-                                    scenario : metadataForm.scenario,
-                                    comments : metadataForm.comments,
-                                    email : WATERSMART.USER_EMAIL,
-                                    modeltype : isoFormPanel.modelName,
-                                    wfsUrl : isoFormPanel.wfsUrl,
-                                    layer : isoFormPanel.layer,
-                                    commonAttr : isoFormPanel.commonAttr
-    //                                markAsBest : isoFormPanel.isBestScenario
-                                },
-                                waitMsg: 'Saving...',
-                                success: function () {
-                                    LOG.info('isoFormPanel.js::User upload succeeded.');
-
-                                    Ext.getCmp('model-run-selection-panel').reloadRuns();
-
-                                    LOG.info('isoFormPanel.js::Closing modal window');
-                                    this.ownerCt.ownerCt.ownerCt.close();
-                                    NOTIFY.info({
-                                        msg : 'Your run is being processed. When completed, you will receive an e-mail at ' + WATERSMART.USER_EMAIL + '. You can continue working or close this application.',
-                                        hideDelay : 15000
-                                    });
-                                },
-                                failure: function (panel, fail) {
-                                    LOG.info('isoFormPanel.js:: User upload failed.');
-                                    NOTIFY.error({
-                                        msg : fail.result.message
-                                    });
-                                }
-                            });
-                        } else {
-                            var form = Ext.getCmp('metadata-form');
-                            form.getForm().submit({
-                                url: form.url,
-                                scope : this,
-                                params: {
-                                    modelId : isoFormPanel.modelId,
-                                    originalName : isoFormPanel.originalModelerName,
-                                    originalModelVersion : form.originalModelVersion,
-                                    originalRunIdent : form.originalRunIdentifier,
-                                    originalCreationDate : form.originalRunDate.format('m/d/Y'),
-                                    originalScenario : form.originalScenario,
-                                    originalComments : form.originalAbstract,
-                                    email : WATERSMART.USER_EMAIL,
-                                    modeltype : isoFormPanel.modelName,
-                                    wfsUrl : isoFormPanel.wfsUrl,
-                                    layer : isoFormPanel.layer,
-                                    commonAttr : isoFormPanel.commonAttr,
-                                    transaction: true
-                                },
-                                waitMsg: 'Saving...',
-                                success: function(form, action) {
-                                    LOG.info('isoFormPanel.js::User update succeeded.');
-                                    NOTIFY.info({
-                                        msg : action.result.msg
-                                    });
-                                    var task = new Ext.util.DelayedTask(function(){
-                                        Ext.getCmp('model-run-selection-panel').reloadRuns();
-
-                                        LOG.info('isoFormPanel.js::Closing modal window');
-                                        this.ownerCt.ownerCt.ownerCt.close();
-                                    }, this).delay(500);
-
-                                },
-                                failure: function(form, action) {
-                                    if (action.failureType === 'client') {
-                                        NOTIFY.warn({
-                                            msg : 'Please ensure all input data is valid'
-                                        });
-                                    } else {
-                                        NOTIFY.warn({
-                                            msg : action.result.msg
-                                        });
-                                    }
-
-                                }
-                            });
-                        }
-                    }
-                }
             ]
         }, config);
         WaterSMART.ISOFormPanel.superclass.constructor.call(this, config);
 
-        if (this.create) {
-            this.add(new WaterSMART.FileUploadPanel());
-        } else if (!this.isBestScenario) {
+        if (!this.isBestScenario && !this.create) {
             this.add(new Ext.form.Checkbox({
                 fieldLabel: 'Mark As Best',
                 xtype : 'checkbox',

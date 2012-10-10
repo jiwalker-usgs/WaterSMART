@@ -1,6 +1,5 @@
 /target/
-/src/main/webapp/js/geoext/
 /watersmart-ui/target/
-/watersmart-wps/target/
 /watersmart-common/target/
 /watersmart-parse/target/
+/watersmart-ui/src/main/webapp/META-INF/context.xml

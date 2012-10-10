@@ -2,6 +2,7 @@ package gov.usgs.cida.watersmart.iso;
 
 import gov.usgs.cida.watersmart.common.RunMetadata;
 import static gov.usgs.cida.watersmart.csw.CSWTransactionHelper.*;
+import java.util.Map;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -15,27 +16,28 @@ public class ISOServiceIdentification {
     
     private RunMetadata metadata;
     private String sosEndpoint;
-    private String algorithmName;
-    private String accessibleUrl;
+    private Map<String, String> algorithmOutputMap;
     private Document document;
     
-    public ISOServiceIdentification(RunMetadata meta, String sosEndpoint, String algorithmName, String accessibleUrl, Document doc) {
+    public ISOServiceIdentification(RunMetadata meta, String sosEndpoint, Map<String, String> algorithmOutputMap, Document doc) {
         this.metadata = meta;
         this.sosEndpoint = sosEndpoint;
-        this.algorithmName = algorithmName;
-        this.accessibleUrl = accessibleUrl;
+        this.algorithmOutputMap = algorithmOutputMap;
         this.document = doc;
     }
     
     public Node makeIdentificationInfo() {
         Node identificationInfo = document.createElementNS(NAMESPACE_GMD, "gmd:identificationInfo");
         Element serviceIdentification = document.createElementNS(NAMESPACE_SRV, "srv:SV_ServiceIdentification");
-        ISOCoupling couplingType = new ISOCoupling(document, algorithmName, accessibleUrl);
+        
         serviceIdentification.setAttribute("id", "ncSOS");
         serviceIdentification.appendChild(makeCitation());
         serviceIdentification.appendChild(makeAbstract());
         serviceIdentification.appendChild(makeServiceType());
-        serviceIdentification.appendChild(couplingType.makeCoupledResource());
+        for (String key : algorithmOutputMap.keySet()) {
+            ISOCoupling couplingType = new ISOCoupling(document, key, algorithmOutputMap.get(key));
+            serviceIdentification.appendChild(couplingType.makeCoupledResource());
+        }
         serviceIdentification.appendChild(makeCouplingType());
         serviceIdentification.appendChild(makeContainsOperations());
         serviceIdentification.appendChild(makeOperatesOn());

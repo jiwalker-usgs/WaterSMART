@@ -31,6 +31,7 @@
                 props.addJNDIContexts(new String[0]);
                 boolean development = Boolean.parseBoolean(props.getProperty("watersmart.development"));
                 User user = (User)request.getSession().getAttribute("X_AUTH_REAL_USER");
+                int timeout = request.getSession().getMaxInactiveInterval();
             %>
             
             CONFIG.LOG4JS_PATTERN_LAYOUT = '<%= props.getProperty("watersmart.frontend.log4js.pattern.layout","%rms - %-5p - %m%n") %>';
@@ -43,6 +44,8 @@
             CONFIG.COMMON_ATTR = '<%= props.getProperty("watersmart.stations.primaryAttribute", "site_no") %>';
             CONFIG.OBSERVED_SOS = '<%= props.getProperty("watersmart.sos.observed") %>';
             CONFIG.PROXY = 'service/proxy?';
+            CONFIG.TIMEOUT = <%= timeout %>;
+            CONFIG.TIMEOUT_ID = 0;
 
             WATERSMART.USER = '<%= (user == null) ? "" : user.uid %>';
             WATERSMART.USER_NAME = '<%= (user == null) ? "" : user.fullName %>';
@@ -77,6 +80,13 @@
                 }
                 return date;
             };
+            
+            // http://www.factsandpeople.com/facts-mainmenu-5/26-html-and-javascript/104-cloning-javascript-objects
+            function clone(o) {
+                function OneShotConstructor(){}
+                OneShotConstructor.prototype = o;
+                return new OneShotConstructor();
+            }
         </script>
         
         <jsp:include page="js/ext/ext.jsp">
@@ -99,7 +109,6 @@
         <jsp:include page="js/geoext/ux/WPS/WPS.jsp"/>
         <jsp:include page="js/geoext/ux/SOS/SOS.jsp"/>
         <jsp:include page="js/geoext/ux/CSW/CSW.jsp"/>
-        <jsp:include page="js/jquery/jquery.jsp"/>
         <jsp:include page="js/log4javascript/log4javascript.jsp"/>
         <jsp:include page="js/ext/ux/notify/notify.jsp"/>
         <jsp:include page="js/ext/ux/cida-load/cida-load.jsp"/>

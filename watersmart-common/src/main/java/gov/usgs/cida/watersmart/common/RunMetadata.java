@@ -56,6 +56,7 @@ public class RunMetadata {
     private static final String XPATH_SUBSTITUTION_RUN_IDENTIFIER = "{runIdentifier}";
     private static final String UPDATE_XPATH_SCENARIO_TEMPLATE = "gmd:identificationInfo/srv:SV_ServiceIdentification[@id='ncSOS']/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString[text()='"
             + XPATH_SUBSTITUTION_SCENARIO + "']";
+    private static final String UPDATE_XPATH_BEST_TEMPLATE = "/../../gmd:otherCitationDetails/gco:CharacterString[text()='BEST']";
     private static final String UPDATE_XPATH_EDITION_TEMPLATE = "/../../gmd:edition/gco:CharacterString[text()='"
             + XPATH_SUBSTITUTION_MODEL_VERSION + "." + XPATH_SUBSTITUTION_RUN_IDENTIFIER
             + "']";
@@ -424,9 +425,10 @@ public class RunMetadata {
                 if (!isBest()) {
                     continue;
                 }
-                String removeBestsXpath = UPDATE_XPATH_SCENARIO_TEMPLATE.replace(XPATH_SUBSTITUTION_SCENARIO, getScenario()) // clear best for target scenario
+                String removeBestXpath = UPDATE_XPATH_SCENARIO_TEMPLATE.replace(XPATH_SUBSTITUTION_SCENARIO, getScenario()) 
+                              + UPDATE_XPATH_BEST_TEMPLATE // clear best for target scenario
                               + "/../../../.." + XPATH_MAP.get(key);
-                propsMap.put(removeBestsXpath, "");
+                propsMap.put(removeBestXpath, " ");
                 updateXpath = UPDATE_XPATH_TEMPLATE.replace(XPATH_SUBSTITUTION_SCENARIO, getScenario()) // scenario has already been changed
                         .replace(XPATH_SUBSTITUTION_MODEL_VERSION, oldMetadata.getModelVersion())
                         .replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, oldMetadata.getRunIdent());

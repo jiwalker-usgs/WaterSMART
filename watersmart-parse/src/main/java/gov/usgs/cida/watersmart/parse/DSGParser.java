@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import javax.xml.stream.XMLStreamException;
 import org.joda.time.Days;
 import org.joda.time.Instant;
+import org.joda.time.ReadableInstant;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,7 @@ public abstract class DSGParser implements Iterator<Observation> {
 
     protected abstract DateTimeFormatter getInputDateFormatter();
     protected BufferedReader reader;
-    protected Instant baseDate;
+    protected ReadableInstant baseDate;
     protected String stationNum;
     protected StationLookup stationLookup;
 
@@ -62,9 +63,13 @@ public abstract class DSGParser implements Iterator<Observation> {
         }
     }
 
+    /**
+     * Iterates through a file observation at a time
+     * @return Observation representing one timestep and array of values
+     */
     public abstract Observation next();
     
-    protected int calculateTimeOffset(Instant time) {
+    protected int calculateTimeOffset(ReadableInstant time) {
         // may want to support other units (hours, months, years, etc)
         int days = Days.daysBetween(this.baseDate, time).getDays();
         return days;

@@ -55,20 +55,21 @@ public class CSWTransactionHelper {
     private RunMetadata metadataBean;
     private String sosEndpoint;
     private GeonetworkSession cswSession;
-    private String algorithmName;
-    private String accessibleUrl;
+    private Map<String, String> algorithmOutputMap;
 
     
-    public CSWTransactionHelper(RunMetadata runMeta, String sosEndpoint, String algorithmName, String accessibleUrl) {
+    public CSWTransactionHelper(RunMetadata runMeta, String sosEndpoint, Map<String, String> algorithmOutputMap) {
         this.metadataBean = runMeta;
         this.sosEndpoint = sosEndpoint;
-        this.algorithmName = algorithmName;
-        this.accessibleUrl = accessibleUrl;
+        this.algorithmOutputMap = algorithmOutputMap;
         this.cswSession = new GeonetworkSession();
     }
     
+    /*
+     * Only used for updating CSW records
+     */
     public CSWTransactionHelper(RunMetadata runMeta) {
-        this(runMeta, null, null, null);
+        this(runMeta, null, null);
     }
     
     public String insert() throws IOException, UnsupportedEncodingException, URISyntaxException, ParserConfigurationException, SAXException, TransformerException {
@@ -238,7 +239,7 @@ public class CSWTransactionHelper {
     }
     
     private Node buildServiceIdentificationNode(Document doc) {
-        ISOServiceIdentification iso = new ISOServiceIdentification(metadataBean, sosEndpoint, algorithmName, accessibleUrl, doc);
+        ISOServiceIdentification iso = new ISOServiceIdentification(metadataBean, sosEndpoint, algorithmOutputMap, doc);
         Node idNode = iso.makeIdentificationInfo();
         return idNode;
     }

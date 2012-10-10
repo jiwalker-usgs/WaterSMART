@@ -27,4 +27,6 @@
         <appender-ref ref="stdout"/>
         <appender-ref ref="file"/>
     </root>
+    
+    <logger name="org.apache.http.wire" level="WARN" />
 </configuration>
