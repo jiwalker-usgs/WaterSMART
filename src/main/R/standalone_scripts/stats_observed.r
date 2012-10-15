@@ -19,17 +19,20 @@ sos_url="http://nwisvaws02.er.usgs.gov/ogc-swie/wml2/dv/sos?request=GetObservati
 offering="Mean"
 property="Discharge"
 #startdate="1970-01-01"
-#enddate="1995-12-31"
+#enddate="1970-12-31"
 interval=''
 latest=''
+statCd='00003'
+parameterCd='00060'
 
+obs_url="http://waterservices.usgs.gov/nwis/dv/?format=waterml,1.1&sites="
+site_url="http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=nwc:se_sites"
 
 getXMLDV2Data <- function(sos_url,sites,property,offering,startdate,enddate,interval,latest){
   
   baseURL <- sos_url
   
   url <- paste(baseURL,sites, "&observedProperty=",property, "&offering=", offering, sep = "")
-  cat(paste("Retrieving data from: \n", url, "\n", sep = " "))
   
   if (nzchar(startdate)) {
     url <- paste(url,"&beginPosition=",startdate,sep="")
@@ -44,6 +47,7 @@ getXMLDV2Data <- function(sos_url,sites,property,offering,startdate,enddate,inte
   if (nzchar(latest)) {
     url <- paste(url,"&Latest",sep="")
   }
+  cat(paste("Retrieving data from: \n", url, "\n", sep = " "))
   
   # Imports the XML:
   doc <- xmlTreeParse(url, getDTD = F, useInternalNodes=TRUE)
@@ -58,6 +62,73 @@ getXMLDV2Data <- function(sos_url,sites,property,offering,startdate,enddate,inte
   Daily$discharge <- values
   Daily$date <- dates
   return (Daily)
+}
+
+getAllSites <- function(site_url){
+  cat(paste("Retrieving data from: \n", site_url, "\n", sep = " "))
+  doc<-xmlTreeParse(site_url, getDTD=F, useInternalNodes=TRUE)
+  values<-xpathSApply(doc, "//gml:featureMember//nwc:site_no")
+  values<-sapply(values, function(x) toString(xmlValue(x)))
+  all_sites<-vector(length=length(values))
+  all_sites<-values
+  return (all_sites)
+}
+
+getXMLWML1.1Data <- function(obs_url){
+  cat(paste("Retrieving data from: \n", obs_url, "\n", sep = " "))
+  doc<-xmlTreeParse(obs_url, getDTD=F, useInternalNodes=TRUE)
+  values<-xpathSApply(doc, "//ns1:timeSeries//ns1:value")
+  values2<-sapply(values,function(x) as.numeric(xmlValue(x)))
+  dateSet<-xpathSApply(doc, "//@dateTime")
+  dateSet2<-sapply(dateSet,function(x) toString(substr(x,1,10)))
+  Daily<-as.data.frame(matrix(ncol=2,nrow=length(values2)))
+  colnames(Daily)<-c('date','discharge')
+  Daily$discharge<-values2
+  if (length(dateSet)>2) {
+    Daily$date<-dateSet}
+  return (Daily)
+}
+
+# This function computes the Nash-Sutcliffe value between two data series
+nse<-function(timeseries1,timeseries2) {
+  numerat<-sum((timeseries1-timeseries2)^2,na.rm=TRUE)
+  denomin<-sum((timeseries1-mean(timeseries1,na.rm=TRUE))^2,na.rm=TRUE)  #6/18/11: NSE value calculation has been fixed
+  nse<-(1-(numerat/denomin))
+  return(nse)
+}
+
+# This function computes the Nash-Sutcliffe value for the natural
+# logarithms of the two timeseries. Zeros are removed from the data series first.
+nselog<-function(timeseries1,timeseries2) {
+  # Count of zeros in dataset
+  sszeros<<-subset(timeseries1,timeseries1==0)
+  czeros<<-length(sszeros)
+  
+  # Put timeseries1 and timeseries2 into a data frame  and add header
+  obsestq<-data.frame(timeseries1,timeseries2)
+  colnames(obsestq)<-c("obs","est")
+  #attach(obsestq)
+  
+  # If zeroes in timeseries1, display message and delete zeroes
+  if (czeros>0) {
+    cat("\n", czeros, "streamflows with a zero value were detected in this dataset. \nThese values will be removed before computing the \nNash-Sutcliffe efficiency value from the natural logs \nof the streamflows.")
+  } else {} #Do nothing if no zeros
+  nozeros<-subset(obsestq,obsestq$obs>0)
+  
+  # Compute NS
+  numerat<-sum((log(nozeros$obs)-log(nozeros$est))^2,na.rm=TRUE)
+  denomin<-sum((log(nozeros$obs)-mean(log(nozeros$obs),na.rm=TRUE))^2,na.rm=TRUE)
+  nselog<-(1-(numerat/denomin))
+  return(nselog)
+}
+
+# This function computes the root-mean-square error between two data series
+rmse<-function(timeseries1,timeseries2) {
+  sqerror<-(timeseries1-timeseries2)^2
+  sumsqerr<-sum(sqerror)
+  n<-length(timeseries1)
+  rmse<-sqrt(sumsqerr/n)
+  return(rmse)
 }
 
 medflowbyyear <- function(qfiletempf) {
@@ -637,7 +708,11 @@ l7Q10 <- function(qfiletempf) {
                               list(rollingavgs7day$year_val), min, na.rm=TRUE)
   sort_7day<-sort(min7daybyyear$x)
   rank_90<-floor(findrank(length(sort_7day),0.90))
-  l7Q10<-sort_7day[rank_90]
+  if (rank_90 > 0) { 
+    l7Q10<-sort_7day[rank_90]
+  } else { 
+    l7Q10<-FALSE 
+  }
 }
 
 l7Q2 <- function(qfiletempf) {
@@ -650,7 +725,11 @@ l7Q2 <- function(qfiletempf) {
                               list(rollingavgs7day$year_val), min, na.rm=TRUE)
   sort_7day<-sort(min7daybyyear$x)
   rank_50<-floor(findrank(length(sort_7day),0.50))
-  l7Q2<-sort_7day[rank_50]
+  if (rank_50 > 0) { 
+    l7Q2<-sort_7day[rank_50] 
+  } else { 
+    l7Q2<-FALSE 
+  }
 }
 return_10 <- function(qfiletempf) {
   annual_max <- aggregate(qfiletempf$discharge, list(qfiletempf$year_val), max, na.rm=TRUE)
@@ -660,8 +739,8 @@ return_10 <- function(qfiletempf) {
 }
 setwd('/Users/jlthomps/Documents/R/')
 #a<-read.csv(header=F,colClasses=c("character"),text=sites)
-#a2<-read.csv(header=F,colClasses=c("character"),text=modsites)
-a<-read.csv("sites_waters_stat.txt",header=F,colClasses=c("character"))
+#a<-read.csv("sites_waters_stat.txt",header=F,colClasses=c("character"))
+a<-t(getAllSites(site_url))
 al<-length(a)
 yv<-vector(length=al)
 ma1v<-vector(length=al)
@@ -774,19 +853,19 @@ dfcvbyyrf_list<-vector(mode="list")
 
 
 for (i in 1:length(sites)){
-#startdate<-min(x_mod$date)
-#enddate<-max(x_mod$date)
+startdate<-"1900-01-01"
+enddate<-"2012-10-01"
 interval<-''
 latest<-''
 sites=a[i]
-x_obs <- getXMLDV2Data(sos_url,sites,property,offering,startdate,enddate,interval,latest)
+url2<-paste(obs_url,sites,'&startDT=',startdate,'&endDT=',enddate,'&statCd=',statCd,'&parameterCd=',parameterCd,'&access=3',sep='')
+x_obs <- getXMLWML1.1Data(url2)
+#x_obs <- getXMLDV2Data(sos_url,sites,property,offering,startdate,enddate,interval,latest)
+if (nrow(x_obs)>2) {
 x2<-(x_obs$date)
 x_obs<-data.frame(strptime(x2, "%Y-%m-%d"),x_obs$discharge)
 colnames(x_obs)<-c("date","discharge")
-yv[i]<-as.character(min(x2))
-ymaxv[i]<-as.character(max(x2))
-x_obsz<-x_obs$discharge
-dates<-as.Date(x_obs$date)
+
 selqfile<-x_obs
 tempdatafr<-NULL
 tempdatafr<-data.frame(selqfile)
@@ -796,24 +875,32 @@ day_val<-rep(0,length(tempdatafr$date))
 jul_val<-rep(0,length(tempdatafr$date))
 qfiletempf<-data.frame(tempdatafr$date,tempdatafr$discharge,month_val,year_val,day_val,jul_val)
 colnames(qfiletempf)<-c('date','discharge','month_val','year_val','day_val','jul_val')
-qfiletempf$month_val<-substr(x2,6,7)
+qfiletempf$month_val<-substr(x_obs$date,6,7)
 as.numeric(qfiletempf$month_val)
-qfiletempf$year_val<-substr(x2,3,4)
+qfiletempf$year_val<-substr(x_obs$date,3,4)
 as.numeric(qfiletempf$year_val)
-qfiletempf$day_val<-substr(x2,9,10)
+qfiletempf$day_val<-substr(x_obs$date,9,10)
 as.numeric(qfiletempf$day_val)
-qfiletempf$jul_val<-strptime(x2, "%Y-%m-%d")$yday+1
+qfiletempf$jul_val<-strptime(x_obs$date, "%Y-%m-%d")$yday+1
 as.numeric(qfiletempf$jul_val)
-#flowdata<-data.frame(qfiletempf$date,qfiletempf$discharge,qfiletempf$month_val,qfiletempf$year_val,qfiletempf$day_val,qfiletempf$jul_val)  
-#colnames(flowdata)<-c('date','discharge','month_val','year_val','day_val','jul_val')
-
-sdbyyr <- aggregate(qfiletempf$discharge, list(qfiletempf$year_val), 
+countbyyr<-aggregate(qfiletempf$discharge, list(qfiletempf$year_val), length)
+colnames(countbyyr)<-c('year','num_samples')
+sub_countbyyr<-subset(countbyyr,num_samples >= 365)
+obs_data<-merge(qfiletempf,sub_countbyyr,by.x="year_val",by.y="year")
+if (length(obs_data$discharge)<4) { 
+  comment[i]<-"No complete years of data available"
+} else {
+yv[i]<-as.character(min(obs_data$date))
+ymaxv[i]<-as.character(max(obs_data$date))
+x_obsz<-obs_data$discharge
+dates<-as.Date(obs_data$date)
+sdbyyr <- aggregate(obs_data$discharge, list(obs_data$year_val), 
                     sd)
 colnames(sdbyyr) <- c("Year", "sdq")
-meanbyyr <- aggregate(qfiletempf$discharge, list(qfiletempf$year_val), 
+meanbyyr <- aggregate(obs_data$discharge, list(obs_data$year_val), 
                       mean, na.rm=TRUE)
 colnames(meanbyyr) <- c("Year", "meanq")
-medbyyr <- aggregate(qfiletempf$discharge, list(qfiletempf$year_val), 
+medbyyr <- aggregate(obs_data$discharge, list(obs_data$year_val), 
                       median, na.rm=TRUE)
 colnames(medbyyr) <- c("Year","medq")
 dfcvbyyr <- data.frame(meanbyyr$Year, sdbyyr$sdq, 
@@ -828,98 +915,98 @@ dfcvbyyrf_list[[as.character(sites)]]<-dfcvbyyrf
   mean_flow[i]<-mean(dfcvbyyrf$meanq,na.rm=TRUE)
   med_flow[i]<-median(dfcvbyyrf$meanq,na.rm=TRUE)
   cv_flow[i]<-sd(dfcvbyyrf$meanq,na.rm=TRUE)/mean(dfcvbyyrf$meanq,na.rm=TRUE)
-  cv_daily[i]<-cv(x_obs)
-  ma1v[i]<-ma1(x_obs)
-  ma2v[i]<-ma2(x_obs)
-  ma3v[i]<-ma3(qfiletempf)
-  ma5v[i]<-ma5(x_obs)
-  ma12v[i]<-ma12.23(qfiletempf)[1:1,2:2]
-  ma13v[i]<-ma12.23(qfiletempf)[2:2,2:2]
-  ma14v[i]<-ma12.23(qfiletempf)[3:3,2:2]
-  ma15v[i]<-ma12.23(qfiletempf)[4:4,2:2]
-  ma16v[i]<-ma12.23(qfiletempf)[5:5,2:2]
-  ma17v[i]<-ma12.23(qfiletempf)[6:6,2:2]
-  ma18v[i]<-ma12.23(qfiletempf)[7:7,2:2]
-  ma19v[i]<-ma12.23(qfiletempf)[8:8,2:2]
-  ma20v[i]<-ma12.23(qfiletempf)[9:9,2:2]
-  ma21v[i]<-ma12.23(qfiletempf)[10:10,2:2]
-  ma22v[i]<-ma12.23(qfiletempf)[11:11,2:2]
-  ma23v[i]<-ma12.23(qfiletempf)[12:12,2:2]
-  ma24v[i]<-ma24.35(qfiletempf)[1,1]
-  ma25v[i]<-ma24.35(qfiletempf)[2,1]
-  ma26v[i]<-ma24.35(qfiletempf)[3,1]
-  ma27v[i]<-ma24.35(qfiletempf)[4,1]
-  ma28v[i]<-ma24.35(qfiletempf)[5,1]
-  ma29v[i]<-ma24.35(qfiletempf)[6,1]
-  ma30v[i]<-ma24.35(qfiletempf)[7,1]
-  ma31v[i]<-ma24.35(qfiletempf)[8,1]
-  ma32v[i]<-ma24.35(qfiletempf)[9,1]
-  ma33v[i]<-ma24.35(qfiletempf)[10,1]
-  ma34v[i]<-ma24.35(qfiletempf)[11,1]
-  ma35v[i]<-ma24.35(qfiletempf)[12,1]
-  ma37v[i]<-unname(ma37(qfiletempf))
-  ma39v[i]<-ma39(qfiletempf)
-  ma40v[i]<-unname(ma40(qfiletempf))
-  ml13v[i]<-ml13(qfiletempf)
-  ml14v[i]<-ml14(qfiletempf)
-  ml17v[i]<-ml14(qfiletempf)
-  ml18v[i]<-ml18(qfiletempf)
-  mh14v[i]<-mh14(qfiletempf)
-  mh16v[i]<-mh16(qfiletempf)
-  mh26v[i]<-mh26(qfiletempf)
-  fl1v[i]<-fl1(qfiletempf)
-  fl2v[i]<-fl2(qfiletempf)
-  fh1v[i]<-fh1(qfiletempf)
-  fh2v[i]<-fh2(qfiletempf)
-  fh3v[i]<-fh3(qfiletempf)
-  fh4v[i]<-fh4(qfiletempf)
-  dl1v[i]<-dl1(qfiletempf)
-  dl2v[i]<-dl2(qfiletempf)
-  dl4v[i]<-dl4(qfiletempf)
-  dl5v[i]<-dl5(qfiletempf)
-  dl6v[i]<-dl6(qfiletempf)
-  dl9v[i]<-dl9(qfiletempf)
-  dl10v[i]<-dl10(qfiletempf)
-  dl18v[i]<-dl18(qfiletempf)
-  dh5v[i]<-dh5(qfiletempf)
-  dh10v[i]<-dh10(qfiletempf)
-  tl1v[i]<-tl1(qfiletempf)
-  tl2v[i]<-tl2(qfiletempf)
-  th1v[i]<-th1(qfiletempf)
-  th2v[i]<-th2(qfiletempf)
-  ra1v[i]<-ra1(qfiletempf)
-  ra3v[i]<-ra3(qfiletempf)
-  ra4v[i]<-ra4(qfiletempf)
-l7Q10v[i]<-l7Q10(qfiletempf)
-l7Q2v[i]<-l7Q2(qfiletempf)
-return_10v[i]<-return_10(qfiletempf)
-mamin12v[i]<-mamax12.23(qfiletempf)[1:1,2:2]
-mamin13v[i]<-mamax12.23(qfiletempf)[2:2,2:2]
-mamin14v[i]<-mamax12.23(qfiletempf)[3:3,2:2]
-mamin15v[i]<-mamax12.23(qfiletempf)[4:4,2:2]
-mamin16v[i]<-mamax12.23(qfiletempf)[5:5,2:2]
-mamin17v[i]<-mamax12.23(qfiletempf)[6:6,2:2]
-mamin18v[i]<-mamax12.23(qfiletempf)[7:7,2:2]
-mamin19v[i]<-mamax12.23(qfiletempf)[8:8,2:2]
-mamin20v[i]<-mamax12.23(qfiletempf)[9:9,2:2]
-mamin21v[i]<-mamax12.23(qfiletempf)[10:10,2:2]
-mamin22v[i]<-mamax12.23(qfiletempf)[11:11,2:2]
-mamin23v[i]<-mamax12.23(qfiletempf)[12:12,2:2]
-mamax12v[i]<-mamax12.23(qfiletempf)[1:1,2:2]
-mamax13v[i]<-mamax12.23(qfiletempf)[2:2,2:2]
-mamax14v[i]<-mamax12.23(qfiletempf)[3:3,2:2]
-mamax15v[i]<-mamax12.23(qfiletempf)[4:4,2:2]
-mamax16v[i]<-mamax12.23(qfiletempf)[5:5,2:2]
-mamax17v[i]<-mamax12.23(qfiletempf)[6:6,2:2]
-mamax18v[i]<-mamax12.23(qfiletempf)[7:7,2:2]
-mamax19v[i]<-mamax12.23(qfiletempf)[8:8,2:2]
-mamax20v[i]<-mamax12.23(qfiletempf)[9:9,2:2]
-mamax21v[i]<-mamax12.23(qfiletempf)[10:10,2:2]
-mamax22v[i]<-mamax12.23(qfiletempf)[11:11,2:2]
-mamax23v[i]<-mamax12.23(qfiletempf)[12:12,2:2]
+  cv_daily[i]<-cv(obs_data)
+                    ma1v[i]<-ma1(obs_data)
+                    ma2v[i]<-ma2(obs_data)
+                    ma3v[i]<-ma3(obs_data)
+                    ma5v[i]<-ma5(obs_data)
+                    ma12v[i]<-ma12.23(obs_data)[1:1,2:2]
+                    ma13v[i]<-ma12.23(obs_data)[2:2,2:2]
+                    ma14v[i]<-ma12.23(obs_data)[3:3,2:2]
+                    ma15v[i]<-ma12.23(obs_data)[4:4,2:2]
+                    ma16v[i]<-ma12.23(obs_data)[5:5,2:2]
+                    ma17v[i]<-ma12.23(obs_data)[6:6,2:2]
+                    ma18v[i]<-ma12.23(obs_data)[7:7,2:2]
+                    ma19v[i]<-ma12.23(obs_data)[8:8,2:2]
+                    ma20v[i]<-ma12.23(obs_data)[9:9,2:2]
+                    ma21v[i]<-ma12.23(obs_data)[10:10,2:2]
+                    ma22v[i]<-ma12.23(obs_data)[11:11,2:2]
+                    ma23v[i]<-ma12.23(obs_data)[12:12,2:2]
+                    ma24v[i]<-ma24.35(obs_data)[1,1]
+                    ma25v[i]<-ma24.35(obs_data)[2,1]
+                    ma26v[i]<-ma24.35(obs_data)[3,1]
+                    ma27v[i]<-ma24.35(obs_data)[4,1]
+                    ma28v[i]<-ma24.35(obs_data)[5,1]
+                    ma29v[i]<-ma24.35(obs_data)[6,1]
+                    ma30v[i]<-ma24.35(obs_data)[7,1]
+                    ma31v[i]<-ma24.35(obs_data)[8,1]
+                    ma32v[i]<-ma24.35(obs_data)[9,1]
+                    ma33v[i]<-ma24.35(obs_data)[10,1]
+                    ma34v[i]<-ma24.35(obs_data)[11,1]
+                    ma35v[i]<-ma24.35(obs_data)[12,1]
+                    ma37v[i]<-unname(ma37(obs_data))
+                    ma39v[i]<-ma39(obs_data)
+                    ma40v[i]<-unname(ma40(obs_data))
+                    ml13v[i]<-ml13(obs_data)
+                    ml14v[i]<-ml14(obs_data)
+                    ml17v[i]<-ml14(obs_data)
+                    ml18v[i]<-ml18(obs_data)
+                    mh14v[i]<-mh14(obs_data)
+                    mh16v[i]<-mh16(obs_data)
+                    mh26v[i]<-mh26(obs_data)
+                    fl1v[i]<-fl1(obs_data)
+                    fl2v[i]<-fl2(obs_data)
+                    fh1v[i]<-fh1(obs_data)
+                    fh2v[i]<-fh2(obs_data)
+                    fh3v[i]<-fh3(obs_data)
+                    fh4v[i]<-fh4(obs_data)
+                    dl1v[i]<-dl1(obs_data)
+                    dl2v[i]<-dl2(obs_data)
+                    dl4v[i]<-dl4(obs_data)
+                    dl5v[i]<-dl5(obs_data)
+                    dl6v[i]<-dl6(obs_data)
+                    dl9v[i]<-dl9(obs_data)
+                    dl10v[i]<-dl10(obs_data)
+                    dl18v[i]<-dl18(obs_data)
+                    dh5v[i]<-dh5(obs_data)
+                    dh10v[i]<-dh10(obs_data)
+                    tl1v[i]<-tl1(obs_data)
+                    tl2v[i]<-tl2(obs_data)
+                    th1v[i]<-th1(obs_data)
+                    th2v[i]<-th2(obs_data)
+                    ra1v[i]<-ra1(obs_data)
+                    ra3v[i]<-ra3(obs_data)
+                    ra4v[i]<-ra4(obs_data)
+                    l7Q10v[i]<-l7Q10(obs_data)
+                    l7Q2v[i]<-l7Q2(obs_data)
+                    return_10v[i]<-return_10(obs_data)
+                    mamin12v[i]<-mamax12.23(obs_data)[1:1,2:2]
+                    mamin13v[i]<-mamax12.23(obs_data)[2:2,2:2]
+                    mamin14v[i]<-mamax12.23(obs_data)[3:3,2:2]
+                    mamin15v[i]<-mamax12.23(obs_data)[4:4,2:2]
+                    mamin16v[i]<-mamax12.23(obs_data)[5:5,2:2]
+                    mamin17v[i]<-mamax12.23(obs_data)[6:6,2:2]
+                    mamin18v[i]<-mamax12.23(obs_data)[7:7,2:2]
+                    mamin19v[i]<-mamax12.23(obs_data)[8:8,2:2]
+                    mamin20v[i]<-mamax12.23(obs_data)[9:9,2:2]
+                    mamin21v[i]<-mamax12.23(obs_data)[10:10,2:2]
+                    mamin22v[i]<-mamax12.23(obs_data)[11:11,2:2]
+                    mamin23v[i]<-mamax12.23(obs_data)[12:12,2:2]
+                    mamax12v[i]<-mamax12.23(obs_data)[1:1,2:2]
+                    mamax13v[i]<-mamax12.23(obs_data)[2:2,2:2]
+                    mamax14v[i]<-mamax12.23(obs_data)[3:3,2:2]
+                    mamax15v[i]<-mamax12.23(obs_data)[4:4,2:2]
+                    mamax16v[i]<-mamax12.23(obs_data)[5:5,2:2]
+                    mamax17v[i]<-mamax12.23(obs_data)[6:6,2:2]
+                    mamax18v[i]<-mamax12.23(obs_data)[7:7,2:2]
+                    mamax19v[i]<-mamax12.23(obs_data)[8:8,2:2]
+                    mamax20v[i]<-mamax12.23(obs_data)[9:9,2:2]
+                    mamax21v[i]<-mamax12.23(obs_data)[10:10,2:2]
+                    mamax22v[i]<-mamax12.23(obs_data)[11:11,2:2]
+                    mamax23v[i]<-mamax12.23(obs_data)[12:12,2:2]
 comment[i]<-""
 
-sort_x_obs<-sort(x_obs$discharge)
+sort_x_obs<-sort(obs_data$discharge)
 rank_10obs<-floor(findrank(length(sort_x_obs),0.10))
 rank_25obs<-floor(findrank(length(sort_x_obs),0.25))
 rank_50obs<-floor(findrank(length(sort_x_obs),0.5))
@@ -930,6 +1017,9 @@ flow_25_obs[i]<-sort_x_obs[rank_25obs]
 flow_50_obs[i]<-sort_x_obs[rank_50obs]
 flow_75_obs[i]<-sort_x_obs[rank_75obs]
 flow_90_obs[i]<-sort_x_obs[rank_90obs]
+}
+} else {
+  comment[i]<-"No observed data for this site"
 }
 }
 
