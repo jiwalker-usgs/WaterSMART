@@ -5,7 +5,7 @@
 		<wps:Input>
 			<ows:Identifier>sos_url</ows:Identifier>
 			<wps:Data>
-				<wps:LiteralData>http://nwisvaws02.er.usgs.gov/ogc-swie/wml2/dv/sos?request=GetObservation&amp;featureID=</wps:LiteralData>
+				<wps:LiteralData>http://waterservices.usgs.gov/nwis/dv/?format=waterml,1.1&amp;sites=</wps:LiteralData>
 			</wps:Data>
 		</wps:Input>
 		<wps:Input>
@@ -17,13 +17,13 @@
 		<wps:Input>
 			<ows:Identifier>offering</ows:Identifier>
 			<wps:Data>
-				<wps:LiteralData>Mean</wps:LiteralData>
+				<wps:LiteralData>00003</wps:LiteralData>
 			</wps:Data>
 		</wps:Input>
 		<wps:Input>
 			<ows:Identifier>property</ows:Identifier>
 			<wps:Data>
-				<wps:LiteralData>Discharge</wps:LiteralData>
+				<wps:LiteralData>00060</wps:LiteralData>
 			</wps:Data>
 		</wps:Input>
 		<wps:Input>
