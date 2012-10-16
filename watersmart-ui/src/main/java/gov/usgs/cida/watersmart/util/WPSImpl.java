@@ -18,11 +18,15 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.mail.MessagingException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPathExpressionException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -154,9 +158,6 @@ class WPSImpl implements WPSInterface {
 
 
 class WPSTask extends Thread {
-    
-
-    
     static org.slf4j.Logger log = LoggerFactory.getLogger(WPSTask.class);
     private static final DynamicReadOnlyProperties props = JNDISingleton.getInstance();
     
@@ -318,42 +319,83 @@ class WPSTask extends Thread {
     
     @Override
     public void run() {
+        CSWTransactionHelper helper;
+        Map<String, String> wpsOutputMap = Maps.newHashMap();
+        ReturnInfo info;
         RunMetadata metaObj = RunMetadata.getInstance(metadata);
-
+        String repo = props.getProperty("watersmart.sos.model.repo");
+        String netCDFFailMessage = "NetCDF failed unexpectedly ";
+        String cswResponse;
+        String sosEndpoint;
+        UUID uuid = UUID.randomUUID();
+        
         try {
-            ReturnInfo info = CreateDSGFromZip.create(zipLocation, metaObj);
+            // CreateDSGFromZip.create() seems to cause a lot of grief. We keep getting:
+            // java.lang.UnsatisfiedLinkError: Native Library ${application_path}/loader/com/sun/jna/linux-amd64/libnetcdf.so already loaded in another classloader
+            // When developing and I see this, I have to restart the server and redeploy the project
+            // The fault happens at gov.usgs.cida.jna.NetCDFJNAInitializer.contextDestroyed(NetCDFJNAInitializer.java:21)
+            info = CreateDSGFromZip.create(zipLocation, metaObj);
             if (info != null && info.properties != null) {
                 netcdfSuccessful = true;
+            } else {
+                throw new IOException();
             }
-            else {
-                sendFailedEmail(new RuntimeException("NetCDF failed unexpectedly"), metaObj.getEmail());
-                return;
+        } catch (IOException ex) {
+            log.error(netCDFFailMessage + ex.getMessage());
+            sendFailedEmail(new RuntimeException(netCDFFailMessage), metaObj.getEmail());
+            return;
+        } catch (XMLStreamException ex) {
+            log.error(netCDFFailMessage + ex.getMessage());
+            sendFailedEmail(new RuntimeException(netCDFFailMessage), metaObj.getEmail());
+            return;
+        }
+        
+        sosEndpoint = repo + metaObj.getTypeString() + "/" + info.filename;
+        helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
+        
+        try {
+            // Insert what we have so far into CSW
+            cswResponse = helper.addServiceIdentification();
+            if (cswResponse != null) {
+                cswTransSuccessful = true;
             }
-            String repo = props.getProperty("watersmart.sos.model.repo");
-            String sosEndpoint = repo + metaObj.getTypeString() + "/" + info.filename;
-            UUID uuid = UUID.randomUUID();
-
+            sendCompleteEmail(wpsOutputMap, metaObj.getEmail());
+        } catch (Exception ex) {
+            log.error("This is bad, send email to be fixed: " + ex.getMessage());
+            sendFailedEmail(ex, metaObj.getEmail());
+        }
+        
+        /*
+        // Run the compare stats using the R-WPS package
+        String compReq = WPSImpl.createCompareStatsRequest(sosEndpoint, info.stations, info.properties);
+        try {
             Thread.sleep(SLEEP_FOR_THREDDS);
-            
-            Map<String, String> wpsOutputMap = Maps.newHashMap();
-            String compReq = WPSImpl.createCompareStatsRequest(sosEndpoint, info.stations, info.properties);
             wpsOutputMap.put(WPSImpl.stats_compare, runNamedAlgorithm("compare", compReq, uuid, metaObj));
+        } catch (Exception ex) {
+            log.error("This is bad, send email to be fixed: " + ex.getMessage());
+            sendFailedEmail(ex, metaObj.getEmail());
+        }
+        
+        try {
             if (wpsOutputMap.get(WPSImpl.stats_compare) != null) {
                 rStatsSuccessful = true;
                 // move csw to module?
-                CSWTransactionHelper helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
-                String response = helper.insert();
-                // should really check response for "inserted 1 record" equivilent
-                if (response != null) {
+                helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
+                cswResponse = helper.updateRunMetadata(metaObj);
+                // should really check response for "inserted 1 record" equivalent
+                if (cswResponse != null) {
                     cswTransSuccessful = true;
                 }
                 sendCompleteEmail(wpsOutputMap, metaObj.getEmail());
             }
+        } catch (MessagingException ex) {
+            Logger.getLogger(WPSTask.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(WPSTask.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(WPSTask.class.getName()).log(Level.SEVERE, null, ex);
         }
-        catch (Exception ex) {
-            log.error("This is bad, send email to be fixed: " + ex.getMessage());
-            sendFailedEmail(ex, metaObj.getEmail());
-        }
+        */
     }
     
     /**

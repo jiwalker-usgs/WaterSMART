@@ -96,7 +96,7 @@ public class UpdateRun extends HttpServlet {
         
         CSWTransactionHelper helper = new CSWTransactionHelper(metaData);
         try {
-            String results = helper.update(originalMetaData);
+            String results = helper.updateRunMetadata(originalMetaData);
             // parse xml, make sure stuff happened alright, if so don't say success
             responseText = "{success: true, msg: 'The record has been updated'}";
         }
