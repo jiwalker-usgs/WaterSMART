@@ -739,8 +739,8 @@ return_10 <- function(qfiletempf) {
 }
 setwd('/Users/jlthomps/Documents/R/')
 #a<-read.csv(header=F,colClasses=c("character"),text=sites)
-#a<-read.csv("sites_waters_stat.txt",header=F,colClasses=c("character"))
-a<-t(getAllSites(site_url))
+a<-read.csv("sites_waters_stat.txt",header=F,colClasses=c("character"))
+#a<-t(getAllSites(site_url))
 al<-length(a)
 yv<-vector(length=al)
 ma1v<-vector(length=al)
@@ -873,8 +873,10 @@ month_val<-rep(0,length(tempdatafr$date))
 year_val<-rep(0,length(tempdatafr$date))
 day_val<-rep(0,length(tempdatafr$date))
 jul_val<-rep(0,length(tempdatafr$date))
-qfiletempf<-data.frame(tempdatafr$date,tempdatafr$discharge,month_val,year_val,day_val,jul_val)
-colnames(qfiletempf)<-c('date','discharge','month_val','year_val','day_val','jul_val')
+wy_val<-rep(0,length(tempdatafr$date))
+ones_val<-rep(1,length(tempdatafr$date))
+qfiletempf<-data.frame(tempdatafr$date,tempdatafr$discharge,month_val,year_val,day_val,jul_val,wy_val)
+colnames(qfiletempf)<-c('date','discharge','month_val','year_val','day_val','jul_val','wy_val')
 qfiletempf$month_val<-substr(x_obs$date,6,7)
 as.numeric(qfiletempf$month_val)
 qfiletempf$year_val<-substr(x_obs$date,3,4)
@@ -883,12 +885,14 @@ qfiletempf$day_val<-substr(x_obs$date,9,10)
 as.numeric(qfiletempf$day_val)
 qfiletempf$jul_val<-strptime(x_obs$date, "%Y-%m-%d")$yday+1
 as.numeric(qfiletempf$jul_val)
-countbyyr<-aggregate(qfiletempf$discharge, list(qfiletempf$year_val), length)
-colnames(countbyyr)<-c('year','num_samples')
+qfiletempf$wy_val<-ifelse(as.numeric(qfiletempf$month_val)>=10,toString(as.numeric(qfiletempf$year_val)+ones_val),qfiletempf$year_val) 
+
+countbyyr<-aggregate(qfiletempf$discharge, list(qfiletempf$wy_val), length)
+colnames(countbyyr)<-c('wy','num_samples')
 sub_countbyyr<-subset(countbyyr,num_samples >= 365)
-obs_data<-merge(qfiletempf,sub_countbyyr,by.x="year_val",by.y="year")
+obs_data<-merge(qfiletempf,sub_countbyyr,by.x="wy_val",by.y="wy")
 if (length(obs_data$discharge)<4) { 
-  comment[i]<-"No complete years of data available"
+  comment[i]<-"No complete water years of data available"
 } else {
 yv[i]<-as.character(min(obs_data$date))
 ymaxv[i]<-as.character(max(obs_data$date))
