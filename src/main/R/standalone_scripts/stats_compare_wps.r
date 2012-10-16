@@ -14,6 +14,10 @@ library(chron)
 library(doBy)
 library(hydroGOF)
 
+sos_url_temp="http://nwisvaws02.er.usgs.gov/ogc-swie/wml2/dv/sos?request=GetObservation&featureID="
+offering_temp='00003'
+property_temp='00060'
+
 SWE_CSV_IHA <- function(input) {
   cat(paste("Retrieving data from: \n", input, "\n", 
             sep = " "))
@@ -1090,7 +1094,7 @@ for (i in 1:length(a2)){
     interval<-''
     latest<-''
     sites=a[i]
-    url2<-paste(sos_url,sites,'&startDT=',startdate,'&endDT=',enddate,'&statCd=',offering,'&parameterCd=',property,'&access=3',sep='')
+    url2<-paste(sos_url_temp,sites,'&startDT=',startdate,'&endDT=',enddate,'&statCd=',offering_temp,'&parameterCd=',property_temp,'&access=3',sep='')
     x_obs <- getXMLWML1.1Data(url2)
 
     if (nrow(x_obs)>2) {
