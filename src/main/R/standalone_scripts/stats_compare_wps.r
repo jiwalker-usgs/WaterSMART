@@ -1110,8 +1110,10 @@ for (i in 1:length(a2)){
       year_val<-rep(0,length(tempdatafr$date))
       day_val<-rep(0,length(tempdatafr$date))
       jul_val<-rep(0,length(tempdatafr$date))
-      qfiletempf<-data.frame(tempdatafr$date,tempdatafr$discharge,month_val,year_val,day_val,jul_val)
-      colnames(qfiletempf)<-c('date','discharge','month_val','year_val','day_val','jul_val')
+      wy_val<-rep(0,length(tempdatafr$date))
+      ones_val<-rep(1,length(tempdatafr$date))
+      qfiletempf<-data.frame(tempdatafr$date,tempdatafr$discharge,month_val,year_val,day_val,jul_val,wy_val)
+      colnames(qfiletempf)<-c('date','discharge','month_val','year_val','day_val','jul_val','wy_val')
       qfiletempf$month_val<-substr(x_obs$date,6,7)
       as.numeric(qfiletempf$month_val)
       qfiletempf$year_val<-substr(x_obs$date,3,4)
@@ -1120,6 +1122,7 @@ for (i in 1:length(a2)){
       as.numeric(qfiletempf$day_val)
       qfiletempf$jul_val<-strptime(x_obs$date, "%Y-%m-%d")$yday+1
       as.numeric(qfiletempf$jul_val)
+      qfiletempf$wy_val<-ifelse(as.numeric(qfiletempf$month_val)>=10,as.character(as.numeric(qfiletempf$year_val)+ones_val),qfiletempf$year_val)
       #flowdata<-data.frame(qfiletempf$date,qfiletempf$discharge,qfiletempf$month_val,qfiletempf$year_val,qfiletempf$day_val,qfiletempf$jul_val)  
       #colnames(flowdata)<-c('date','discharge','month_val','year_val','day_val','jul_val')
       selqfile2<-x_mod
@@ -1129,8 +1132,10 @@ for (i in 1:length(a2)){
       year_val<-rep(0,length(tempdatafr2$date))
       day_val<-rep(0,length(tempdatafr2$date))
       jul_val<-rep(0,length(tempdatafr2$date))
-      qfiletempf2<-data.frame(tempdatafr2$date,tempdatafr2$discharge,month_val,year_val,day_val,jul_val)
-      colnames(qfiletempf2)<-c('date','discharge','month_val','year_val','day_val','jul_val')
+      wy_val<-rep(0,length(tempdatafr2$date))
+      ones_val<-rep(1,length(tempdatafr2$date))
+      qfiletempf2<-data.frame(tempdatafr2$date,tempdatafr2$discharge,month_val,year_val,day_val,jul_val,wy_val)
+      colnames(qfiletempf2)<-c('date','discharge','month_val','year_val','day_val','jul_val','wy_val')
       qfiletempf2$month_val<-substr(x_mod$date,6,7)
       as.numeric(qfiletempf2$month_val)
       qfiletempf2$year_val<-substr(x_mod$date,3,4)
@@ -1139,15 +1144,20 @@ for (i in 1:length(a2)){
       as.numeric(qfiletempf2$day_val)
       qfiletempf2$jul_val<-strptime(x_mod$date, "%Y-%m-%d")$yday+1
       as.numeric(qfiletempf2$jul_val)
-      countbyyr<-aggregate(qfiletempf$discharge, list(qfiletempf$year_val), length)
-      countbyyr_mod<-aggregate(qfiletempf2$discharge, list(qfiletempf2$year_val), length)
-      colnames(countbyyr)<-c('year','num_samples')
-      colnames(countbyyr_mod)<-c('year','num_samples')
+      qfiletempf2$wy_val<-ifelse(as.numeric(qfiletempf2$month_val)>=10,as.character(as.numeric(qfiletempf2$year_val)+ones_val),qfiletempf2$year_val) 
+      
+      countbyyr<-aggregate(qfiletempf$discharge, list(qfiletempf$wy_val), length)
+      countbyyr_mod<-aggregate(qfiletempf2$discharge, list(qfiletempf2$wy_val), length)
+      colnames(countbyyr)<-c('wy','num_samples')
+      colnames(countbyyr_mod)<-c('wy','num_samples')
       sub_countbyyr<-subset(countbyyr,num_samples >= 365)
       sub_countbyyr_mod<-subset(countbyyr_mod,num_samples >= 365)
       include_yrs<-merge(sub_countbyyr,sub_countbyyr_mod)
-      obs_data<-merge(qfiletempf,include_yrs,by.x="year_val",by.y="year")
-      mod_data<-merge(qfiletempf2,include_yrs,by.x="year_val",by.y="year")
+      obs_data<-merge(qfiletempf,include_yrs,by.x="wy_val",by.y="wy")
+      mod_data<-merge(qfiletempf2,include_yrs,by.x="wy_val",by.y="wy")
+      if (length(mod_data$discharge)<3) { 
+        comment[i]<-"No matching complete water years for site" 
+      } else {
       if (length(mod_data$discharge)!=length(obs_data$discharge)) { 
         comment[i]<-"Observed and modeled time-series don't match for site"
       } else {
@@ -1421,6 +1431,7 @@ for (i in 1:length(a2)){
         flow_50_mod[i]<-sort_x_mod[rank_50]
         flow_75_mod[i]<-sort_x_mod[rank_75]
         flow_90_mod[i]<-sort_x_mod[rank_90]
+      }
       }
     } else {
       comment[i]<-"No observed data for this site"
