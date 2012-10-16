@@ -29,7 +29,7 @@
 		<wps:Input>
 			<ows:Identifier>model_url</ows:Identifier>
 			<wps:Data>
-				<wps:LiteralData>http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/stats/stats-Dense1-0.3.nc?request=GetObservation&amp;service=SOS&amp;version=1.0.0&amp;offering</wps:LiteralData>
+				<wps:LiteralData>http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/stats/stats-Dense1-1.05.nc?request=GetObservation&amp;service=SOS&amp;version=1.0.0&amp;offering</wps:LiteralData>
 			</wps:Data>
 		</wps:Input>
 		<wps:Input>
