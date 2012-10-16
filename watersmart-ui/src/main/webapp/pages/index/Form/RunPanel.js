@@ -62,6 +62,10 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
             html += '<div class="run-row"><span class="run-label">Output Link:</span> <span class="run-value"><a href="'+this.panelInfo.coupledResource.svCoupledResource.identifier[0].CharacterString.value+'" target="_blank">' + this.panelInfo.coupledResource.svCoupledResource.identifier[0].CharacterString.value + '</a></span></div>';
         }
         
+        if (this.panelInfo.operationName === 'GetOperation' && this.panelInfo.serviceType === 'OGC:SOS' && this.panelInfo.operationURL) {
+            html += '<div class="run-row"><span class="run-label">SOS Endpoint:</span> <span class="run-value"><a href="'+this.panelInfo.operationURL+'" target="_blank">' + this.panelInfo.operationURL + '</a></span></div>';
+        }
+        
         config = Ext.apply({
             title : this.panelInfo.edition,
             height : 'auto',
