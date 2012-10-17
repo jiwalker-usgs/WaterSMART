@@ -411,15 +411,19 @@ public class RunMetadata {
         return keyValMap;
     }
     
+    public static String updateXPath(String scenario, String modelVersion, String runIdentifier) {
+        return UPDATE_XPATH_TEMPLATE.replace(XPATH_SUBSTITUTION_SCENARIO, scenario)
+                .replace(XPATH_SUBSTITUTION_MODEL_VERSION, modelVersion)
+                .replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, runIdentifier);
+    }
+    
     public Map<String, String> getUpdateMap(RunMetadata oldMetadata) {
         String updateXpath;
 
         Map<String, String> propsMap = Maps.newLinkedHashMap();
         for (String key : XPATH_MAP.keySet()) {
             if (EDITION.equals(key)) {
-                updateXpath = UPDATE_XPATH_TEMPLATE.replace(XPATH_SUBSTITUTION_SCENARIO, getScenario()) // scenario has already been changed
-                        .replace(XPATH_SUBSTITUTION_MODEL_VERSION, oldMetadata.getModelVersion())
-                        .replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, oldMetadata.getRunIdent());
+                updateXpath = updateXPath(getScenario(), oldMetadata.getModelVersion(), oldMetadata.getRunIdent());
             }
             else if (BEST.equals(key)) {
                 if (!isBest()) {
@@ -429,14 +433,10 @@ public class RunMetadata {
                               + UPDATE_XPATH_BEST_TEMPLATE // clear best for target scenario
                               + "/../../../.." + XPATH_MAP.get(key);
                 propsMap.put(removeBestXpath, " ");
-                updateXpath = UPDATE_XPATH_TEMPLATE.replace(XPATH_SUBSTITUTION_SCENARIO, getScenario()) // scenario has already been changed
-                        .replace(XPATH_SUBSTITUTION_MODEL_VERSION, oldMetadata.getModelVersion())
-                        .replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, oldMetadata.getRunIdent());
+                updateXpath =  updateXPath(getScenario(), oldMetadata.getModelVersion(), oldMetadata.getRunIdent());
             }
             else {
-                updateXpath = UPDATE_XPATH_TEMPLATE.replace(XPATH_SUBSTITUTION_SCENARIO, oldMetadata.getScenario())
-                        .replace(XPATH_SUBSTITUTION_MODEL_VERSION, oldMetadata.getModelVersion())
-                        .replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, oldMetadata.getRunIdent());
+                updateXpath = updateXPath(oldMetadata.getScenario(), oldMetadata.getModelVersion(), oldMetadata.getRunIdent());
             }
 
             propsMap.put(updateXpath + XPATH_MAP.get(key), this.get(key));
