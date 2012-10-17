@@ -784,7 +784,7 @@ return_10 <- function(qfiletempf) {
   return_10 <- sort_annual_max[rank_10]
 }
 setwd('/Users/jlthomps/Documents/R/')
-system("rm graph*png")
+system("del graph*png")
 #a<-read.csv(header=F,colClasses=c("character"),text=sites)
 #a2<-read.csv(header=F,colClasses=c("character"),text=modsites)
 #a<-read.csv("sites_waters_stat.txt",header=F,colClasses=c("character"))
@@ -1698,7 +1698,7 @@ colnames(statsout)<-c('site_no','nse','nselog','rmse','min_date','max_date','mea
 output="output.zip"
 if (i==length(a2)) {
 write.table(statsout,file="output.txt",col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
-system("rm output.zip")
+system("del output.zip")
 system("zip -r output graph*png")
 system("zip -r output output*")
 } else { 
