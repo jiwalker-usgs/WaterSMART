@@ -372,8 +372,7 @@ class WPSTask extends Thread {
         String compReq = WPSImpl.createCompareStatsRequest(sosEndpoint, info.stations, info.properties);
         try {
             Thread.sleep(SLEEP_FOR_THREDDS);
-//            wpsOutputMap.put(WPSImpl.stats_compare, runNamedAlgorithm("compare", compReq, uuid, metaObj));
-            wpsOutputMap.put(WPSImpl.stats_compare, "hi");
+            wpsOutputMap.put(WPSImpl.stats_compare, runNamedAlgorithm("compare", compReq, uuid, metaObj));
         } catch (Exception ex) {
             log.error("This is bad, send email to be fixed: " + ex.getMessage());
             sendFailedEmail(ex, metaObj.getEmail());
@@ -386,15 +385,8 @@ class WPSTask extends Thread {
                 helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
                 try {
                                     cswResponse = helper.updateRunMetadata(metaObj);
-//                                    String result = helper.addCoupledResource();
                 } catch (UnsupportedEncodingException ex) {
                     Logger.getLogger(WPSTask.class.getName()).log(Level.SEVERE, null, ex);
-//                } catch (ParserConfigurationException ex) {
-//                    Logger.getLogger(WPSTask.class.getName()).log(Level.SEVERE, null, ex);
-//                } catch (SAXException ex) {
-//                    Logger.getLogger(WPSTask.class.getName()).log(Level.SEVERE, null, ex);
-//                } catch (TransformerException ex) {
-//                    Logger.getLogger(WPSTask.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 // should really check response for "inserted 1 record" equivalent
                 if (cswResponse != null) {
