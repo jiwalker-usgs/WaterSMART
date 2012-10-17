@@ -29,7 +29,7 @@ parameterCd='00060'
 #model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/afinch/afinch-Special-0.3.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
 #model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/stats/stats-Special-0.3.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
 #model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/waters/waters-Special-1.2.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
-model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/stats/stats-Dense1-0.3.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
+model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/stats/stats-Dense1-0.11.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
 #model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/waters/waters-Special-0.3.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
 #modsites='"02177000","02178400","021770005"'
 #modsites="02177000"
@@ -39,6 +39,7 @@ modprop="Streamflow"
 #modprop="MEAN"
 
 obs_url="http://waterservices.usgs.gov/nwis/dv/?format=waterml,1.1&sites="
+scenario_url=paste(substr(model_url,1,regexpr("Get",model_url)-1),"GetCapabilities&service=SOS&version=1.0.0",sep="")
 site_url="http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=nwc:se_sites"
 
 SWE_CSV_IHA <- function(input) {
@@ -123,6 +124,15 @@ getXMLWML1.1Data <- function(obs_url){
   if (length(dateSet)>2) {
   Daily$date<-dateSet}
   return (Daily)
+}
+
+getScenarioSites <- function(scenario_url){
+  cat(paste("Retrieving list of sites in scenario from: \n", scenario_url, "\n", sep=" "))
+  doc<-xmlTreeParse(scenario_url, getDTD=F, useInternalNodes=TRUE)
+  sites<-xpathSApply(doc, "//@gml:id")
+  scenario_sites<-vector(length=length(sites))
+  scenario_sites<-unname(sites)
+  return (scenario_sites)
 }
 
 # This function computes the Nash-Sutcliffe value between two data series
@@ -774,11 +784,13 @@ return_10 <- function(qfiletempf) {
   return_10 <- sort_annual_max[rank_10]
 }
 setwd('/Users/jlthomps/Documents/R/')
+system("rm graph*png")
 #a<-read.csv(header=F,colClasses=c("character"),text=sites)
 #a2<-read.csv(header=F,colClasses=c("character"),text=modsites)
-a<-read.csv("sites_waters_stat.txt",header=F,colClasses=c("character"))
+#a<-read.csv("sites_waters_stat.txt",header=F,colClasses=c("character"))
 #a2<-read.csv("sites_waters_stat.txt",header=F,colClasses=c("character"))
 #a<-t(getAllSites(site_url))
+a<-t(getScenarioSites(scenario_url))
 a2<-a
 al<-length(a)
 nsev<-vector(length=al)
@@ -1201,8 +1213,9 @@ x_obsz<-obs_data$discharge
 dates<-as.Date(obs_data$date)
 pbiasv[i]<-pbias(x_modz,x_obsz)
 file<-paste("graph",toString(sites),".png",sep="")
-png(file)
+#png(file)
 ggof(x_modz,x_obsz,na.rm=FALSE,dates,main=modsites)
+dev.copy(png,file)
 dev.off()
 
 #flowdatal<-data.frame(qfiletempf2$date,qfiletempf2$discharge,qfiletempf2$month_val,qfiletempf2$year_val,qfiletempf2$day_val,qfiletempf2$jul_val)  
@@ -1223,23 +1236,23 @@ cvbyyr <- dfcvbyyr$sdq/dfcvbyyr$meanq
 dfcvbyyrf <- data.frame(dfcvbyyr, cvbyyr)
 colnames(dfcvbyyrf) <- c("Year", "sdq", "meanq", "medq", 
                          "cvq")
-sdbyyr_mod <- aggregate(obs_data$discharge, list(obs_data$year_val), 
+sdbyyr_mod <- aggregate(mod_data$discharge, list(mod_data$year_val), 
                     FUN = sd, na.rm=TRUE)
 colnames(sdbyyr_mod) <- c("Year", "sdq")
-meanbyyr_mod <- aggregate(obs_data$discharge, list(obs_data$year_val), 
+meanbyyr_mod <- aggregate(mod_data$discharge, list(mod_data$year_val), 
                       mean, na.rm=TRUE)
 colnames(meanbyyr_mod) <- c("Year", "meanq")
-medbyyr_mod <- aggregate(obs_data$discharge, list(obs_data$year_val), 
+medbyyr_mod <- aggregate(mod_data$discharge, list(mod_data$year_val), 
                      median, na.rm=TRUE)
 colnames(medbyyr_mod) <- c("Year","medq")
-dfcvbyyr_mod <- data.frame(meanbyyr$Year, sdbyyr$sdq, 
-                       meanbyyr$meanq, medbyyr$medq)
+dfcvbyyr_mod <- data.frame(meanbyyr_mod$Year, sdbyyr_mod$sdq, 
+                       meanbyyr_mod$meanq, medbyyr_mod$medq)
 colnames(dfcvbyyr_mod) <- c("Year", "sdq", "meanq", "medq")
-cvbyyr_mod <- dfcvbyyr$sdq/dfcvbyyr$meanq
-dfcvbyyrf_mod <- data.frame(dfcvbyyr, cvbyyr)
+cvbyyr_mod <- dfcvbyyr_mod$sdq/dfcvbyyr_mod$meanq
+dfcvbyyrf_mod <- data.frame(dfcvbyyr_mod, cvbyyr_mod)
 colnames(dfcvbyyrf_mod) <- c("Year", "sdq", "meanq", "medq", 
                          "cvq")
-dfcvbyyrf_list[[as.character(sites)]]<-dfcvbyyrf
+#dfcvbyyrf_list[[as.character(sites)]]<-dfcvbyyrf
 
   mean_flow[i]<-mean(dfcvbyyrf$meanq,na.rm=TRUE)
   med_flow[i]<-median(dfcvbyyrf$meanq,na.rm=TRUE)
@@ -1685,6 +1698,7 @@ colnames(statsout)<-c('site_no','nse','nselog','rmse','min_date','max_date','mea
 output="output.zip"
 if (i==length(a2)) {
 write.table(statsout,file="output.txt",col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
+system("rm output.zip")
 system("zip -r output graph*png")
 system("zip -r output output*")
 } else { 
