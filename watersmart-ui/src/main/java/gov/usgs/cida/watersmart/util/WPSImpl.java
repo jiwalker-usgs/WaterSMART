@@ -18,6 +18,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
@@ -27,6 +28,7 @@ import javax.mail.MessagingException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -325,7 +327,7 @@ class WPSTask extends Thread {
         RunMetadata metaObj = RunMetadata.getInstance(metadata);
         String repo = props.getProperty("watersmart.sos.model.repo");
         String netCDFFailMessage = "NetCDF failed unexpectedly ";
-        String cswResponse;
+        String cswResponse = null;
         String sosEndpoint;
         UUID uuid = UUID.randomUUID();
         
@@ -351,6 +353,7 @@ class WPSTask extends Thread {
         }
         
         sosEndpoint = repo + metaObj.getTypeString() + "/" + info.filename;
+        wpsOutputMap.put(WPSImpl.stats_compare, "");
         helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
         
         try {
@@ -365,12 +368,12 @@ class WPSTask extends Thread {
             sendFailedEmail(ex, metaObj.getEmail());
         }
         
-        /*
         // Run the compare stats using the R-WPS package
         String compReq = WPSImpl.createCompareStatsRequest(sosEndpoint, info.stations, info.properties);
         try {
             Thread.sleep(SLEEP_FOR_THREDDS);
-            wpsOutputMap.put(WPSImpl.stats_compare, runNamedAlgorithm("compare", compReq, uuid, metaObj));
+//            wpsOutputMap.put(WPSImpl.stats_compare, runNamedAlgorithm("compare", compReq, uuid, metaObj));
+            wpsOutputMap.put(WPSImpl.stats_compare, "hi");
         } catch (Exception ex) {
             log.error("This is bad, send email to be fixed: " + ex.getMessage());
             sendFailedEmail(ex, metaObj.getEmail());
@@ -381,7 +384,18 @@ class WPSTask extends Thread {
                 rStatsSuccessful = true;
                 // move csw to module?
                 helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
-                cswResponse = helper.updateRunMetadata(metaObj);
+                try {
+                                    cswResponse = helper.updateRunMetadata(metaObj);
+//                                    String result = helper.addCoupledResource();
+                } catch (UnsupportedEncodingException ex) {
+                    Logger.getLogger(WPSTask.class.getName()).log(Level.SEVERE, null, ex);
+//                } catch (ParserConfigurationException ex) {
+//                    Logger.getLogger(WPSTask.class.getName()).log(Level.SEVERE, null, ex);
+//                } catch (SAXException ex) {
+//                    Logger.getLogger(WPSTask.class.getName()).log(Level.SEVERE, null, ex);
+//                } catch (TransformerException ex) {
+//                    Logger.getLogger(WPSTask.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 // should really check response for "inserted 1 record" equivalent
                 if (cswResponse != null) {
                     cswTransSuccessful = true;
@@ -395,7 +409,7 @@ class WPSTask extends Thread {
         } catch (URISyntaxException ex) {
             Logger.getLogger(WPSTask.class.getName()).log(Level.SEVERE, null, ex);
         }
-        */
+        
     }
     
     /**

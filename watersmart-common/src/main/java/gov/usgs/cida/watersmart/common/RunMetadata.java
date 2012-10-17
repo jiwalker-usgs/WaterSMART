@@ -33,6 +33,7 @@ public class RunMetadata {
     protected static final String SCENARIO = "scenario";
     protected static final String TYPE = "modeltype";
     protected static final String WFS_URL = "wfsurl";
+    protected static final String C_RESOURCE = "coupledresource";
 
     private static final Logger LOG = LoggerFactory.getLogger(RunMetadata.class);
     private static final String UPLOAD_EXTENSION = ".zip";
@@ -54,12 +55,16 @@ public class RunMetadata {
     private static final String XPATH_SUBSTITUTION_SCENARIO = "{scenario}";
     private static final String XPATH_SUBSTITUTION_MODEL_VERSION = "{modelVersion}";
     private static final String XPATH_SUBSTITUTION_RUN_IDENTIFIER = "{runIdentifier}";
+    private static final String XPATH_SUBSTITUTION_COUPLED_RESOURCE = "{coupledResource}";
+    
     private static final String UPDATE_XPATH_SCENARIO_TEMPLATE = "gmd:identificationInfo/srv:SV_ServiceIdentification[@id='ncSOS']/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString[text()='"
             + XPATH_SUBSTITUTION_SCENARIO + "']";
     private static final String UPDATE_XPATH_BEST_TEMPLATE = "/../../gmd:otherCitationDetails/gco:CharacterString[text()='BEST']";
     private static final String UPDATE_XPATH_EDITION_TEMPLATE = "/../../gmd:edition/gco:CharacterString[text()='"
             + XPATH_SUBSTITUTION_MODEL_VERSION + "." + XPATH_SUBSTITUTION_RUN_IDENTIFIER
             + "']";
+    private static final String UPDATE_COUPLED_RESOURCE = "/srv:coupledResource/srv:SV_CoupledResource/srv:operationName/gco:CharacterString[text()='"
+            + XPATH_SUBSTITUTION_COUPLED_RESOURCE + "']/../../srv:identifier/gco:CharacterString";
     private static final String UPDATE_XPATH_TEMPLATE = UPDATE_XPATH_SCENARIO_TEMPLATE + UPDATE_XPATH_EDITION_TEMPLATE + "/../../../..";
     private static final List<DateTimeFormatter> dateInputFormats = Lists.newArrayList();
 
@@ -415,6 +420,13 @@ public class RunMetadata {
         return UPDATE_XPATH_TEMPLATE.replace(XPATH_SUBSTITUTION_SCENARIO, scenario)
                 .replace(XPATH_SUBSTITUTION_MODEL_VERSION, modelVersion)
                 .replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, runIdentifier);
+    }
+    
+    public static String updateCoupledResourceXPath(String scenario, String modelVersion, String runIdentifier, String algorithmName) {
+        return UPDATE_XPATH_TEMPLATE.replace(XPATH_SUBSTITUTION_SCENARIO, scenario)
+                .replace(XPATH_SUBSTITUTION_MODEL_VERSION, modelVersion)
+                .replace(XPATH_SUBSTITUTION_RUN_IDENTIFIER, runIdentifier) +
+                UPDATE_COUPLED_RESOURCE.replace(XPATH_SUBSTITUTION_COUPLED_RESOURCE, algorithmName);
     }
     
     public Map<String, String> getUpdateMap(RunMetadata oldMetadata) {
