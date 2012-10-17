@@ -14,9 +14,11 @@ library(chron)
 library(doBy)
 library(hydroGOF)
 
-sos_url_temp="http://nwisvaws02.er.usgs.gov/ogc-swie/wml2/dv/sos?request=GetObservation&featureID="
+sos_url_temp="http://waterservices.usgs.gov/nwis/dv/?format=waterml,1.1&sites="
 offering_temp='00003'
 property_temp='00060'
+
+scenario_url=paste(substr(model_url,1,regexpr("Get",model_url)-1),"GetCapabilities&service=SOS&version=1.0.0",sep="")
 
 SWE_CSV_IHA <- function(input) {
   cat(paste("Retrieving data from: \n", input, "\n", 
@@ -100,6 +102,15 @@ getXMLWML1.1Data <- function(obs_url){
   if (length(dateSet)>2) {
     Daily$date<-dateSet}
   return (Daily)
+}
+
+getScenarioSites <- function(scenario_url){
+  cat(paste("Retrieving list of sites in scenario from: \n", scenario_url, "\n", sep=" "))
+  doc<-xmlTreeParse(scenario_url, getDTD=F, useInternalNodes=TRUE)
+  sites<-xpathSApply(doc, "//@gml:id")
+  scenario_sites<-vector(length=length(sites))
+  scenario_sites<-unname(sites)
+  return (scenario_sites)
 }
 
 # This function computes the Nash-Sutcliffe value between two data series
@@ -751,8 +762,9 @@ return_10 <- function(qfiletempf) {
   return_10 <- sort_annual_max[rank_10]
 }
 #setwd('/Users/jlthomps/Documents/R/')
-a<-read.csv(header=F,colClasses=c("character"),text=sites)
-a2<-read.csv(header=F,colClasses=c("character"),text=sites)
+#a<-read.csv(header=F,colClasses=c("character"),text=sites)
+#a2<-read.csv(header=F,colClasses=c("character"),text=sites)
+a<-t(getScenarioSites(scenario_url))
 a2<-a
 al<-length(a)
 nsev<-vector(length=al)
@@ -1192,23 +1204,22 @@ for (i in 1:length(a2)){
         dfcvbyyrf <- data.frame(dfcvbyyr, cvbyyr)
         colnames(dfcvbyyrf) <- c("Year", "sdq", "meanq", "medq", 
                                  "cvq")
-        sdbyyr_mod <- aggregate(obs_data$discharge, list(obs_data$year_val), 
+        sdbyyr_mod <- aggregate(mod_data$discharge, list(mod_data$year_val), 
                                 FUN = sd, na.rm=TRUE)
         colnames(sdbyyr_mod) <- c("Year", "sdq")
-        meanbyyr_mod <- aggregate(obs_data$discharge, list(obs_data$year_val), 
+        meanbyyr_mod <- aggregate(mod_data$discharge, list(mod_data$year_val), 
                                   mean, na.rm=TRUE)
         colnames(meanbyyr_mod) <- c("Year", "meanq")
-        medbyyr_mod <- aggregate(obs_data$discharge, list(obs_data$year_val), 
+        medbyyr_mod <- aggregate(mod_data$discharge, list(mod_data$year_val), 
                                  median, na.rm=TRUE)
         colnames(medbyyr_mod) <- c("Year","medq")
-        dfcvbyyr_mod <- data.frame(meanbyyr$Year, sdbyyr$sdq, 
-                                   meanbyyr$meanq, medbyyr$medq)
+        dfcvbyyr_mod <- data.frame(meanbyyr_mod$Year, sdbyyr_mod$sdq, 
+                                   meanbyyr_mod$meanq, medbyyr_mod$medq)
         colnames(dfcvbyyr_mod) <- c("Year", "sdq", "meanq", "medq")
-        cvbyyr_mod <- dfcvbyyr$sdq/dfcvbyyr$meanq
-        dfcvbyyrf_mod <- data.frame(dfcvbyyr, cvbyyr)
+        cvbyyr_mod <- dfcvbyyr_mod$sdq/dfcvbyyr_mod$meanq
+        dfcvbyyrf_mod <- data.frame(dfcvbyyr_mod, cvbyyr_mod)
         colnames(dfcvbyyrf_mod) <- c("Year", "sdq", "meanq", "medq", 
                                      "cvq")
-        dfcvbyyrf_list[[as.character(sites)]]<-dfcvbyyrf
         
         mean_flow[i]<-mean(dfcvbyyrf$meanq,na.rm=TRUE)
         med_flow[i]<-median(dfcvbyyrf$meanq,na.rm=TRUE)
