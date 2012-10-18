@@ -126,6 +126,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                     allowBlank: false
                 }, {
                     fieldLabel: 'Model Version',
+                    xtype: this.create ? 'textfield' : 'displayfield',
                     name: 'version',
                     ref: 'versionField',
                     value : this.modelVersion,
