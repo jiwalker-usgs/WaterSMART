@@ -89,7 +89,8 @@ class WPSImpl implements WPSInterface {
                     "<wps:Input>" +
                         "<ows:Identifier>sos_url</ows:Identifier>" +
                         "<wps:Data>" +
-                            "<wps:LiteralData>http://nwisvaws02.er.usgs.gov/ogc-swie/wml2/dv/sos?request=GetObservation&amp;featureID=</wps:LiteralData>" +
+                            //"<wps:LiteralData>http://nwisvaws02.er.usgs.gov/ogc-swie/wml2/dv/sos?request=GetObservation&amp;featureID=</wps:LiteralData>" +
+                            "<wps:LiteralData>http://waterservices.usgs.gov/nwis/dv/?format=waterml,1.1&amp;sites=</wps:LiteralData>" +
                         "</wps:Data>" +
                     "</wps:Input>" +
                     "<wps:Input>" +
@@ -97,7 +98,7 @@ class WPSImpl implements WPSInterface {
                         "<wps:Data>" +
                             "<wps:LiteralData>" +
                                 StringEscapeUtils.escapeXml(StringUtils.join(siteList, ",")) +
-                                //"\\\"02177000\\\",\\\"02178400\\\",\\\"02184500\\\",\\\"02186000\\\"" +
+                                //"deprecated" +
                             "</wps:LiteralData>" +
                         "</wps:Data>" +
                     "</wps:Input>" +
@@ -130,6 +131,7 @@ class WPSImpl implements WPSInterface {
                         "<ows:Identifier>modsites</ows:Identifier>" +
                         "<wps:Data>" +
                             "<wps:LiteralData>" +
+                                //"deprecated" +
                                 StringEscapeUtils.escapeXml(StringUtils.join(siteList, ",")) +
                                 //"\\\"02177000\\\",\\\"02178400\\\",\\\"02184500\\\",\\\"02186000\\\"" +
                             "</wps:LiteralData>" +
