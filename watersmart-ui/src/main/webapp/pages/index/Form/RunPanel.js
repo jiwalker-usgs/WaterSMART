@@ -58,8 +58,12 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
         html += '<div class="run-row"><span class="run-label">Other Information:</span> <span class="run-value">' + this.panelInfo['abstract'] + '</span></div>';
         
         if (this.panelInfo.coupledResource && this.panelInfo.coupledResource.svCoupledResource && this.panelInfo.coupledResource.svCoupledResource.identifier[0].CharacterString.value) {
+            var outputLink = this.panelInfo.coupledResource.svCoupledResource.identifier[0].CharacterString.value;
             html += '<div class="run-row"><span class="run-label">Run Algorithm:</span> <span class="run-algorithm">' + this.panelInfo.coupledResource.svCoupledResource.operationName.CharacterString.value + '</span></div>';
-            html += '<div class="run-row"><span class="run-label">Output Link:</span> <span class="run-value"><a href="'+this.panelInfo.coupledResource.svCoupledResource.identifier[0].CharacterString.value+'" target="_blank">' + this.panelInfo.coupledResource.svCoupledResource.identifier[0].CharacterString.value + '</a></span></div>';
+            html += '<div class="run-row"><span class="run-label">Output Link:</span> <span class="run-value">';
+            html += outputLink == '' ? '' : '<a href="'+outputLink+'" target="_blank">';
+            html += outputLink == '' ? 'Processing Not Yet Completed': outputLink;
+            html += outputLink == '' ? '' : '</a></span></div>';
         }
         
         if (this.panelInfo.operationName === 'GetOperation' && this.panelInfo.serviceType === 'OGC:SOS' && this.panelInfo.operationURL) {
