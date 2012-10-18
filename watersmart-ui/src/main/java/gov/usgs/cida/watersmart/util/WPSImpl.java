@@ -18,17 +18,14 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -191,7 +188,7 @@ class WPSTask extends Thread {
     }
 
     String postToWPS(String url, String wpsRequest) throws IOException {
-        HttpPost post = null;
+        HttpPost post;
         HttpClient httpClient = new DefaultHttpClient();
 
         post = new HttpPost(url);
@@ -241,13 +238,14 @@ class WPSTask extends Thread {
                                                 content.toString());
         try {
             EmailHandler.sendMessage(message);
-        }
-        catch (MessagingException me) {
-            log.error("Can't send email to maintainers for troubleshooting");
+        } catch (AddressException ex) {
+            log.error("Unable to send maybe e-mail:\n" + message, ex);
+        } catch (MessagingException ex) {
+            log.error("Unable to send maybe e-mail:\n" + message, ex);
         }
     }
 
-    public void sendCompleteEmail(Map<String, String> outputs, String to) throws MessagingException {
+    public void sendCompleteEmail(Map<String, String> outputs, String to) {
         String subject = "Processing Complete";
         StringBuilder content = new StringBuilder();
         content.append("Your upload has finished conversion and processing,")
@@ -281,7 +279,13 @@ class WPSTask extends Thread {
 
         EmailMessage message = new EmailMessage(from, to, null, bcc, subject,
                                                 content.toString());
-        EmailHandler.sendMessage(message);
+        try {
+            EmailHandler.sendMessage(message);
+        } catch (AddressException ex) {
+            log.error("Unable to send completed e-mail:\n" + message, ex);
+        } catch (MessagingException ex) {
+            log.error("Unable to send completed e-mail:\n" + message, ex);
+        }
     }
     
     public void sendFailedEmail(Exception ex, String to) {
@@ -313,9 +317,10 @@ class WPSTask extends Thread {
                                                 content.toString());
         try {
             EmailHandler.sendMessage(message);
-        }
-        catch (MessagingException me) {
-            log.error("Can't send email to maintainers for troubleshooting", ex);
+        } catch (AddressException ex1) {
+            log.error("Unable to send failed e-mail:\n" + message + "\n\nOriginal Exception:\n" + ex.getMessage(), ex1);
+        } catch (MessagingException ex1) {
+            log.error("Unable to send failed e-mail:\n" + message + "\n\nOriginal Exception:\n" + ex.getMessage(), ex1);
         }
     }
     
@@ -325,12 +330,21 @@ class WPSTask extends Thread {
         Map<String, String> wpsOutputMap = Maps.newHashMap();
         ReturnInfo info;
         RunMetadata metaObj = RunMetadata.getInstance(metadata);
+        String compReq;
         String repo = props.getProperty("watersmart.sos.model.repo");
         String netCDFFailMessage = "NetCDF failed unexpectedly ";
-        String cswResponse = null;
+        String cswResponse;
         String sosEndpoint;
+        String email = metaObj.getEmail();
         UUID uuid = UUID.randomUUID();
-        
+
+        // 1. Create NetCDF file
+        // 2. Add results from NetCDF creation to CSW record
+        // 3. Wait for THREDDS
+        // 4. Run the compare stats WPS process
+        // 5. Add results from WPS process to CSW record
+
+        // 1. Create NetCDF file
         try {
             // CreateDSGFromZip.create() seems to cause a lot of grief. We keep getting:
             // java.lang.UnsatisfiedLinkError: Native Library ${application_path}/loader/com/sun/jna/linux-amd64/libnetcdf.so already loaded in another classloader
@@ -340,68 +354,79 @@ class WPSTask extends Thread {
             if (info != null && info.properties != null) {
                 netcdfSuccessful = true;
             } else {
-                throw new IOException();
+                throw new IOException("Output from NetCDF creation process was null");
             }
         } catch (IOException ex) {
-            log.error(netCDFFailMessage + ex.getMessage());
-            sendFailedEmail(new RuntimeException(netCDFFailMessage), metaObj.getEmail());
+            log.error("Failed to create NetCDF file: " + netCDFFailMessage, ex);
+            sendFailedEmail(new RuntimeException(netCDFFailMessage), email);
             return;
         } catch (XMLStreamException ex) {
-            log.error(netCDFFailMessage + ex.getMessage());
-            sendFailedEmail(new RuntimeException(netCDFFailMessage), metaObj.getEmail());
+            log.error("Failed to create NetCDF file: " + netCDFFailMessage, ex);
+            sendFailedEmail(new RuntimeException(netCDFFailMessage), email);
             return;
         }
-        
+
+        // The NetCDF process has passed so create a CSW record for the run and 
+        // insert what we have so far.
+        // The WPS output will be updated once the process succeeds/fails.  The UI
+        // will show "Process not yet completed" in the meantime.
         sosEndpoint = repo + metaObj.getTypeString() + "/" + info.filename;
-        wpsOutputMap.put(WPSImpl.stats_compare, "");
+        wpsOutputMap.put(WPSImpl.stats_compare, "Processing Not Yet Completed");
         helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
-        
+        compReq = WPSImpl.createCompareStatsRequest(sosEndpoint, info.stations, info.properties);
+
+        // 2. Add results from NetCDF creation to CSW record
         try {
-            // Insert what we have so far into CSW
             cswResponse = helper.addServiceIdentification();
             if (cswResponse != null) {
                 cswTransSuccessful = true;
+                sendCompleteEmail(wpsOutputMap, email);
+            } else {
+                cswTransSuccessful = false;
+                throw new IOException("Unable to update CSW Record");
             }
-            sendCompleteEmail(wpsOutputMap, metaObj.getEmail());
         } catch (Exception ex) {
-            log.error("This is bad, send email to be fixed: " + ex.getMessage());
-            sendFailedEmail(ex, metaObj.getEmail());
+            log.error("Failed to perform CSW insert", ex);
+            sendFailedEmail(ex, email);
         }
-        
-        // Run the compare stats using the R-WPS package
-        String compReq = WPSImpl.createCompareStatsRequest(sosEndpoint, info.stations, info.properties);
+
+        // 3. Wait for THREDDS
         try {
             Thread.sleep(SLEEP_FOR_THREDDS);
-            wpsOutputMap.put(WPSImpl.stats_compare, runNamedAlgorithm("compare", compReq, uuid, metaObj));
-        } catch (Exception ex) {
-            log.error("This is bad, send email to be fixed: " + ex.getMessage());
-            sendFailedEmail(ex, metaObj.getEmail());
+        } catch (InterruptedException ex) {
+            // Typically we don't care about this, but we can log and move on.
+            log.warn("THREDDS wait period was interrupted.");
+            // If anything needs to be handled on an interruption, handle it here
         }
-        
+
+        // 4. Run the compare stats using the R-WPS package
         try {
-            if (wpsOutputMap.get(WPSImpl.stats_compare) != null) {
-                rStatsSuccessful = true;
-                // move csw to module?
-                helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
-                try {
-                                    cswResponse = helper.updateRunMetadata(metaObj);
-                } catch (UnsupportedEncodingException ex) {
-                    Logger.getLogger(WPSTask.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                // should really check response for "inserted 1 record" equivalent
-                if (cswResponse != null) {
-                    cswTransSuccessful = true;
-                }
-                sendCompleteEmail(wpsOutputMap, metaObj.getEmail());
-            }
-        } catch (MessagingException ex) {
-            Logger.getLogger(WPSTask.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(WPSTask.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(WPSTask.class.getName()).log(Level.SEVERE, null, ex);
+            String algorithmOutput = runNamedAlgorithm("compare", compReq, uuid, metaObj);
+            wpsOutputMap.put(WPSImpl.stats_compare, algorithmOutput);
+        } catch (Exception ex) {
+            log.error("Failed to run WPS algorithm", ex);
+            sendFailedEmail(ex, email);
         }
-        
+
+        // 5. Add results from WPS process to CSW record
+        if (wpsOutputMap.get(WPSImpl.stats_compare) != null) {
+            rStatsSuccessful = true;
+            helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
+            try {
+                cswResponse = helper.updateRunMetadata(metaObj);
+                cswTransSuccessful = cswResponse != null;
+                sendCompleteEmail(wpsOutputMap, email);
+            } catch (IOException ex) {
+                log.error("Failed to perform CSW update", ex);
+                sendFailedEmail(ex, email);
+            } catch (URISyntaxException ex) {
+                log.error("Failed to perform CSW update,", ex);
+                sendFailedEmail(ex, email);
+            }
+        } else {
+            log.error("Failed to run WPS algorithm");
+            sendFailedEmail(new Exception("Failed to run WPS algorithm"), email);
+        }
     }
     
     /**
@@ -435,14 +460,13 @@ class WPSTask extends Thread {
             InputStream resultIs = null;
 
             try {
-                // leave this commented out until process exists
                 boolean completed = false;
                 Document document = null;
                 int checks = 0;
                 while (!completed) {
                     checks++;
                     Thread.sleep(CHECK_WAIT);
-                    log.debug("checking");
+                    log.debug("Checking: " + checks);
                     is = HTTPUtils.sendPacket(new URL(wpsCheckPoint), "GET");
                     document = CheckProcessCompletion.parseDocument(is);
                     completed = checkWPSProcess(document);
@@ -450,8 +474,7 @@ class WPSTask extends Thread {
                         sendMaybeEmail(metaObj.getEmail());
                     }
                     if (checks > CHECKS_UNTIL_FAIL) {
-                        sendFailedEmail(new RuntimeException("R Statistics never returned"), metaObj.getEmail());
-                        return null;
+                        throw new IOException("R Statistics never returned");
                     }
                 }
 
@@ -480,8 +503,7 @@ class WPSTask extends Thread {
                         + "/" + uuid + "/" + destinationFileName;
 
                 return webAccessibleFile;
-            }
-            finally {
+            } finally {
                 IOUtils.closeQuietly(is);
                 IOUtils.closeQuietly(resultIs);
             }
