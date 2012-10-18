@@ -371,7 +371,7 @@ class WPSTask extends Thread {
         // The WPS output will be updated once the process succeeds/fails.  The UI
         // will show "Process not yet completed" in the meantime.
         sosEndpoint = repo + metaObj.getTypeString() + "/" + info.filename;
-        wpsOutputMap.put(WPSImpl.stats_compare, "Processing Not Yet Completed");
+        wpsOutputMap.put(WPSImpl.stats_compare, "");
         helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
         compReq = WPSImpl.createCompareStatsRequest(sosEndpoint, info.stations, info.properties);
 
