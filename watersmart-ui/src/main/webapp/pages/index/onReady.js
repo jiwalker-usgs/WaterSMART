@@ -62,9 +62,7 @@ function cswStoreFirstLoad(store) {
 
     var commonAttr = CONFIG.COMMON_ATTR;
 
-    var sosController = new WaterSMART.SOSController({
-        
-    });
+    var sosController = new WaterSMART.SOSController({});
 
     var map = new WaterSMART.Map({
         sosController : sosController,
