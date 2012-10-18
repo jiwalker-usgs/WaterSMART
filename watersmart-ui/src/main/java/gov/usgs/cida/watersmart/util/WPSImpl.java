@@ -373,8 +373,6 @@ class WPSTask extends Thread {
         sosEndpoint = repo + metaObj.getTypeString() + "/" + info.filename;
         wpsOutputMap.put(WPSImpl.stats_compare, "");
         helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
-        compReq = WPSImpl.createCompareStatsRequest(sosEndpoint, info.stations, info.properties);
-
         // 2. Add results from NetCDF creation to CSW record
         try {
             cswResponse = helper.addServiceIdentification();
@@ -401,6 +399,7 @@ class WPSTask extends Thread {
 
         // 4. Run the compare stats using the R-WPS package
         try {
+            compReq = WPSImpl.createCompareStatsRequest(sosEndpoint, info.stations, info.properties);
             String algorithmOutput = runNamedAlgorithm("compare", compReq, uuid, metaObj);
             wpsOutputMap.put(WPSImpl.stats_compare, algorithmOutput);
         } catch (Exception ex) {
