@@ -7,9 +7,7 @@ import gov.usgs.cida.watersmart.iso.ISOServiceIdentification;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamWriter;
@@ -28,17 +26,6 @@ import org.apache.http.impl.NoConnectionReuseStrategy;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
-import org.jdom2.Content;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.Namespace;
-import org.jdom2.filter.ContentFilter;
-import org.jdom2.filter.ElementFilter;
-import org.jdom2.input.DOMBuilder;
-import org.jdom2.output.DOMOutputter;
-import org.jdom2.xpath.XPathBuilder;
-import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -106,52 +93,6 @@ public class CSWTransactionHelper {
         LOG.debug(insertXml);
         return performCSWPost(insertXml);
         // check that it updated alright
-    }
-    
-    public String addCoupledResource() throws IOException, UnsupportedEncodingException, URISyntaxException, ParserConfigurationException, SAXException, TransformerException {
-        Document getRecordsDoc = getRecordsCall();
-        org.jdom2.Document jdomDoc = new DOMBuilder().build(getRecordsDoc);
-        Node updatedServiceIDNode = buildServiceIdentificationNode(getRecordsDoc);
-        Namespace gmdNS = Namespace.getNamespace("gmd", NAMESPACE_GMD);
-        Namespace gcoNS = Namespace.getNamespace("gco", NAMESPACE_GCO);
-        Namespace srvNS = Namespace.getNamespace("srv", NAMESPACE_SRV);
-        DOMOutputter domOutputter = new DOMOutputter();
-        XPathExpression<Element> xpathExpression = XPathFactory.instance().compile(
-                "//gmd:MD_Metadata/" +RunMetadata.updateXPath(metadataBean.getScenario(), metadataBean.getModelVersion(), metadataBean.getRunIdent()) + "/..",
-                new ElementFilter(),
-                null,
-                gmdNS,
-                gcoNS,
-                srvNS);
-        List<Element> contentList = xpathExpression.evaluate(jdomDoc);
-        org.w3c.dom.Element output = null;
-        try {
-            output = domOutputter.output(contentList.get(0));
-        } catch (JDOMException ex) {
-            java.util.logging.Logger.getLogger(CSWTransactionHelper.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        NodeList childNodes = getRecordsDoc.getElementsByTagNameNS(NAMESPACE_GMD, "MD_Metadata");
-//        childNodes.item(0).replaceChild(updatedServiceIDNode, output);
-        childNodes.item(0).removeChild(output);
-        childNodes.item(0).getLastChild();
-        
-//        for (int index = 0;index < childNodes.getLength();index++) {
-//            List<Element> contentList = xpathExpression.evaluate(childNodes.item(index));
-//            if (contentList.size() > 0) {
-//                int a = 1;
-//            }
-//        }
-        
-//        try {
-//            org.w3c.dom.Element output = domOutputter.output(getRecordsDoc, contentList.get(0));
-//            getRecordsDoc.replaceChild(updatedServiceIDNode, output);
-//            getRecordsDoc.removeChild(output);
-//            getRecordsDoc.compareDocumentPosition(output);
-//                    
-//        } catch (JDOMException ex) {
-//            java.util.logging.Logger.getLogger(CSWTransactionHelper.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-        return null;
     }
     
     public String updateRunMetadata(RunMetadata oldInfo) throws IOException, URISyntaxException {
