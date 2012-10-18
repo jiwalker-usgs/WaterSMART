@@ -80,7 +80,7 @@ public class CreateDSGFromZip {
                         break;
                     case WATERFALL:
                         // TODO make sure Waterfall uses SYEParser
-                        dsgParse = new SYEParser(inputStream, entry.getName(), lookerUpper);
+                        dsgParse = new AFINCHParser(inputStream, lookerUpper);
                         break;
                     case STATS:
                         dsgParse = new STATSParser(inputStream, lookerUpper);
@@ -101,6 +101,9 @@ public class CreateDSGFromZip {
                         else {
                             continue;
                         }
+                        break;
+                    case PRMS2:
+                        dsgParse = new STATSParser(inputStream, lookerUpper);
                         break;
                     default:
                         throw new NotImplementedException("Parser not written yet");

@@ -26,7 +26,7 @@ public class STATSParser extends WATERSParser {
     private static final Pattern headerVariablePattern = Pattern.compile("\\s+([^\\s\\(]+)\\s*\\((\\w+)\\)");
     
     // Line looks like 'mm/dd/yyyy\tval1\tval2...'
-    private static final Pattern dataLinePattern = Pattern.compile("^(\\d+/\\d+/\\d{4})((?:\\s+\\S+)+)$");
+    private static final Pattern dataLinePattern = Pattern.compile("^(\\s*\\d+/\\s*\\d+/\\d{4})((?:\\s+\\S+)+)$");
     // Could have split on tabs but using this regex instead
     private static final Pattern dataValuePattern = Pattern.compile("\\s+(\\S+)");
     

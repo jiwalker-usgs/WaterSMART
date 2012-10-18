@@ -97,6 +97,7 @@ public class WATERSParser extends StationPerFileDSGParser {
                 matcher = getDataLinePattern().matcher(line);
                 if (matcher.matches()) {
                     String date = matcher.group(1);
+                    date = date.replaceAll(" ", "");
                     Instant timestep = Instant.parse(date, getInputDateFormatter());
                     this.baseDate = timestep;
 

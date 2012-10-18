@@ -76,6 +76,7 @@ public abstract class StationPerFileDSGParser extends DSGParser {
                     Matcher lineMatcher = getDataLinePattern().matcher(line);
                     if (lineMatcher.matches()) {
                         String date = lineMatcher.group(1);
+                        date = date.replaceAll(" ", "");
                         Instant timestep = Instant.parse(date,
                                                          getInputDateFormatter());
                         int days = calculateTimeOffset(timestep);

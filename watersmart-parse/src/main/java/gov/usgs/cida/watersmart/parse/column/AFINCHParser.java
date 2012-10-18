@@ -32,9 +32,9 @@ public class AFINCHParser extends StationPerColumnDSGParser {
     private static final Logger LOG = LoggerFactory.getLogger(AFINCHParser.class);
     
     private static final Pattern propertyPattern = Pattern.compile("# (\\w+)");
-    private static final Pattern stationLinePattern = Pattern.compile("^\\s+((?:\\d+\\s+)+)$");
+    private static final Pattern stationLinePattern = Pattern.compile("^\\s+((?:\\d+\\s*)+)$");
     private static final Pattern headerLinePattern = Pattern.compile("^TIMESTEP\\s+((?:[^\\s\\(]+\\([^\\)]+\\)\\s*)+)$");
-    private static final Pattern dataLinePattern = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z)\\s+((?:[^\\s]+\\s*)+)$");
+    private static final Pattern dataLinePattern = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2}(?:T\\d{2}:\\d{2}:\\d{2}Z)?)\\s+((?:[^\\s]+\\s*)+)$");
     
     private static final Pattern statisticAndUnitsPattern = Pattern.compile("([^\\(]+)\\(([^\\)]+)\\)");
 
