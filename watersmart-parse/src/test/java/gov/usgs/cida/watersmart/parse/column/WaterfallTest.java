@@ -30,7 +30,7 @@ public class WaterfallTest {
     public static void setupClass() throws IOException {
         FileUtils.forceMkdir(new File(outputDir));
         sampleFile = new File(WaterfallTest.class.getClassLoader()
-                .getResource("gov/usgs/cida/watersmart/netcdf/waterfall-Special-1.1.zip")
+                .getResource("gov/usgs/cida/watersmart/netcdf/WATERFALL_realupload.zip")
                 .getFile());
     }
     
@@ -47,7 +47,7 @@ public class WaterfallTest {
         ReturnInfo info = CreateDSGFromZip.create(sampleFile, runMeta);
         File ncFile = new File("/tmp/waterfall/" + info.filename);
         
-        assertEquals(info.filename, "waterfall-Special-1.1.nc");
+        assertEquals(info.filename, "WATERFALL_realupload.nc");
         assertEquals(FileUtils.sizeOf(ncFile), 3185373L);
         FileUtils.deleteQuietly(ncFile);
     }

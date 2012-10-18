@@ -31,7 +31,7 @@ public class PRMS2ParserTest {
     public static void setupClass() throws IOException {
         FileUtils.forceMkdir(new File(outputDir));
         sampleFile = new File(PRMS2ParserTest.class.getClassLoader()
-                .getResource("gov/usgs/cida/watersmart/netcdf/stats-PRMSbase-99.1.zip")
+                .getResource("gov/usgs/cida/watersmart/netcdf/PRMS_2_realupload.zip")
                 .getFile());
     }
     
@@ -48,7 +48,7 @@ public class PRMS2ParserTest {
         CreateDSGFromZip.ReturnInfo info = CreateDSGFromZip.create(sampleFile, runMeta);
         File ncFile = new File("/tmp/prms2/" + info.filename);
         
-        assertThat(info.filename, is(equalTo("stats-PRMSbase-99.1.nc")));
+        assertThat(info.filename, is(equalTo("PRMS_2_realupload.nc")));
         assertThat(FileUtils.sizeOf(ncFile), is(equalTo(13940901L)));
         FileUtils.deleteQuietly(ncFile);
     }
