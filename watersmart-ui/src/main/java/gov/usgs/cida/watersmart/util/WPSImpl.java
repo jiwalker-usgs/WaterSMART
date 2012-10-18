@@ -378,7 +378,6 @@ class WPSTask extends Thread {
             cswResponse = helper.addServiceIdentification();
             if (cswResponse != null) {
                 cswTransSuccessful = true;
-                sendCompleteEmail(wpsOutputMap, email);
             } else {
                 cswTransSuccessful = false;
                 throw new IOException("Unable to update CSW Record");
@@ -386,6 +385,7 @@ class WPSTask extends Thread {
         } catch (Exception ex) {
             log.error("Failed to perform CSW insert", ex);
             sendFailedEmail(ex, email);
+            return;
         }
 
         // 3. Wait for THREDDS
@@ -405,6 +405,7 @@ class WPSTask extends Thread {
         } catch (Exception ex) {
             log.error("Failed to run WPS algorithm", ex);
             sendFailedEmail(ex, email);
+            return;
         }
 
         // 5. Add results from WPS process to CSW record
