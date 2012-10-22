@@ -72,6 +72,64 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
         
         config = Ext.apply({
             title : this.panelInfo.edition,
+            tools : [{
+                id: 'refresh',
+                handler: function(event, toolEl, panel, tc) {
+                    // User wishes to run or re-run WPS R process on this run
+                    
+//                         String modelerName = request.getParameter("name");
+//                        String originalModelerName = request.getParameter("originalName");
+//                        String modelId = request.getParameter("modelId");
+//                        String modelType = request.getParameter("modeltype");
+//                        String modelVersion = request.getParameter("version");
+//                        String originalModelVersion = request.getParameter("originalModelVersion");
+//                        String runIdent = request.getParameter("runIdent");
+//                        String originalRunIdent = request.getParameter("originalRunIdent");
+//                        String runDate = request.getParameter("creationDate");
+//                        String originalRunDate = request.getParameter("originalCreationDate");
+//                        String scenario = request.getParameter("scenario");
+//                        String originalScenario = request.getParameter("originalScenario");
+//                        String comments = request.getParameter("comments");
+//                        String originalComments = request.getParameter("originalComments");
+//                        String email = request.getParameter("email");
+//                        String wfsUrl = request.getParameter("wfsUrl");
+//                        String layer = request.getParameter("layer");
+//                        String commonAttr = request.getParameter("commonAttr");
+//                        Boolean updateAsBest = "on".equalsIgnoreCase(request.getParameter("markAsBest")) ? Boolean.TRUE : Boolean.FALSE;
+                    var modelerName = panel.panelInfo.citedResponsibleParty;
+                    var fileIdentifier = panel.panelInfo.fileIdentifier;
+                    var operationURL = panel.panelInfo.operationURL; // NCML location
+                    var runVersion = panel.panelInfo.edition;
+                    var title = panel.panelInfo.title;
+                    
+                    Ext.Ajax.request({
+                        url: 'update',
+                        params: {
+                            rerun : 'true',
+                            name : modelerName,
+                            originalName : modelerName,
+                            modelId : fileIdentifier,
+                            modeltype : title,
+                            markAsBest : 'false'
+                        },
+                        success: function(response){
+                            LOG.debug('RunPanel.js:: Rerunning process request has succeeded');
+                            NOTIFY.info({
+                                msg : response.responseText
+                            });
+                        },
+                        failure: function(response){
+                            NOTIFY.warn({
+                                msg : response.responseText
+                            });
+                        }
+                    }, this);
+                },
+                qtip: {
+                    text: 'Run Processing',
+                    defaultAlign: 'bl'
+                }
+            }],
             height : 'auto',
             autoScroll : true,
             width: '100%',

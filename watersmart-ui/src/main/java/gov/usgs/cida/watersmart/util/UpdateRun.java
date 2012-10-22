@@ -54,14 +54,36 @@ public class UpdateRun extends HttpServlet {
         String layer = request.getParameter("layer");
         String commonAttr = request.getParameter("commonAttr");
         Boolean updateAsBest = "on".equalsIgnoreCase(request.getParameter("markAsBest")) ? Boolean.TRUE : Boolean.FALSE;
+        Boolean rerun = Boolean.parseBoolean(request.getParameter("rerun")); // If this is true, we only re-run the R processing 
+        String responseText;
+        RunMetadata newRunMetadata;
+        RunMetadata originalRunMetadata;
         
         ModelType modelTypeEnum = null;
-        if ("prms".equals(modelType.toLowerCase())) modelTypeEnum = ModelType.PRMS;
-        if ("afinch".equals(modelType.toLowerCase())) modelTypeEnum = ModelType.AFINCH;
-        if ("waters".equals(modelType.toLowerCase())) modelTypeEnum = ModelType.WATERS;
-        if ("sye".equals(modelType.toLowerCase())) modelTypeEnum = ModelType.SYE;
-        
-        RunMetadata metaData = new RunMetadata(
+            if ("prms".equals(modelType.toLowerCase())) modelTypeEnum = ModelType.PRMS;
+            if ("afinch".equals(modelType.toLowerCase())) modelTypeEnum = ModelType.AFINCH;
+            if ("waters".equals(modelType.toLowerCase())) modelTypeEnum = ModelType.WATERS;
+            if ("sye".equals(modelType.toLowerCase())) modelTypeEnum = ModelType.SYE;
+            
+        if (rerun) {
+            // shortcut the process for now 
+            if (true) {
+                responseText = "{success: true, msg: 'The run is processing'}";
+                response.setContentType("application/json");
+                response.setCharacterEncoding("utf-8");
+
+                try {
+                    Writer writer = response.getWriter();
+                    writer.write(responseText);
+                    writer.close();
+                } catch (IOException ex) {
+                    // LOG
+                }
+                return;
+            }
+   
+            // TODO- Create the run metadata from the original run
+            originalRunMetadata = new RunMetadata(
                 modelTypeEnum,
                 modelId,
                 modelerName,
@@ -74,39 +96,105 @@ public class UpdateRun extends HttpServlet {
                 wfsUrl,
                 layer,
                 commonAttr,
-                updateAsBest
-        );
+                updateAsBest);
+            
+            
+            // TODO- Re-run R-Process
+                   // 4. Run the compare stats using the R-WPS package
+            try {
+    //            compReq = WPSImpl.createCompareStatsRequest(sosEndpoint, info.stations, info.properties);
+    //            String algorithmOutput = runNamedAlgorithm("compare", compReq, uuid, metaObj);
+    //            wpsOutputMap.put(WPSImpl.stats_compare, algorithmOutput);
+            } catch (Exception ex) {
+//                log.error("Failed to run WPS algorithm", ex);
+//                sendFailedEmail(ex, email);
+//                return;
+            }
+    //
+    //        // 5. Add results from WPS process to CSW record
+    //        if (wpsOutputMap.get(WPSImpl.stats_compare) != null) {
+    //            rStatsSuccessful = true;
+    //            helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
+    //            try {
+    //                cswResponse = helper.updateRunMetadata(metaObj);
+    //                cswTransSuccessful = cswResponse != null;
+    //                sendCompleteEmail(wpsOutputMap, email);
+    //            } catch (IOException ex) {
+    //                log.error("Failed to perform CSW update", ex);
+    //                sendFailedEmail(ex, email);
+    //            } catch (URISyntaxException ex) {
+    //                log.error("Failed to perform CSW update,", ex);
+    //                sendFailedEmail(ex, email);
+    //            }
+    //        } else {
+    //            log.error("Failed to run WPS algorithm");
+    //            sendFailedEmail(new Exception("Failed to run WPS algorithm"), email);
+    //        }
+            
+            // Create the updated model run. Everything should remain the same 
+            // except the date unless there was no R process run previously
+            newRunMetadata = new RunMetadata(
+                    modelTypeEnum,
+                    modelId,
+                    modelerName,
+                    modelVersion,
+                    runIdent,
+                    runDate, // set a new date
+                    scenario,
+                    comments,
+                    email,
+                    wfsUrl,
+                    layer,
+                    commonAttr,
+                    updateAsBest);
+            
+        } else {
+            newRunMetadata = new RunMetadata(
+                    modelTypeEnum,
+                    modelId,
+                    modelerName,
+                    modelVersion,
+                    runIdent,
+                    runDate,
+                    scenario,
+                    comments,
+                    email,
+                    wfsUrl,
+                    layer,
+                    commonAttr,
+                    updateAsBest
+            );
+
+            originalRunMetadata = new RunMetadata(
+                    modelTypeEnum,
+                    modelId,
+                    originalModelerName,
+                    originalModelVersion,
+                    originalRunIdent,
+                    originalRunDate,
+                    originalScenario,
+                    originalComments,
+                    email, 
+                    wfsUrl,
+                    layer,
+                    commonAttr
+            );
+            
+        }
         
-        RunMetadata originalMetaData = new RunMetadata(
-                modelTypeEnum,
-                modelId,
-                originalModelerName,
-                originalModelVersion,
-                originalRunIdent,
-                originalRunDate,
-                originalScenario,
-                originalComments,
-                email, 
-                wfsUrl,
-                layer,
-                commonAttr
-        );
-        
-        String responseText;
-        
-        CSWTransactionHelper helper = new CSWTransactionHelper(metaData);
+        CSWTransactionHelper helper = new CSWTransactionHelper(newRunMetadata);
         try {
-            String results = helper.updateRunMetadata(originalMetaData);
-            // parse xml, make sure stuff happened alright, if so don't say success
+            String results = helper.updateRunMetadata(originalRunMetadata);
+            // TODO- parse xml, make sure stuff happened alright, if so don't say success
             responseText = "{success: true, msg: 'The record has been updated'}";
         }
-        catch (IOException ioe) {
-            responseText = "{success: false, msg: '" + ioe.getMessage() + "'}";
+        catch (IOException ex) {
+            responseText = "{success: false, msg: '" + ex.getMessage() + "'}";
         }
         catch (URISyntaxException ex) {
             responseText = "{success: false, msg: '" + ex.getMessage() + "'}";
         }
-
+        
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
 
