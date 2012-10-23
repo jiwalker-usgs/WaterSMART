@@ -116,19 +116,19 @@
         <jsp:include page="js/sarissa/sarissa.jsp"/>
         <jsp:include page="js/dygraphs/dygraphs.jsp"/>
 
-        <script type="text/javascript" src="pages/index/WPSProcesses/ExampleEmailWPSWrapperProcess.js"></script>
-        <script type="text/javascript" src="pages/index/WPSProcesses/ExampleWPSProcess.js"></script>
-        <script type="text/javascript" src="pages/index/Form/ProcessFormPanel.js"></script>
-        <script type="text/javascript" src="pages/index/Form/IsoFormPanel.js"></script>
-        <script type="text/javascript" src="pages/index/Form/FileUploadPanel.js"></script>
-        <script type="text/javascript" src="pages/index/Form/ModelPanel.js"></script>
-        <script type="text/javascript" src="pages/index/Form/ScenarioPanel.js"></script>
-        <script type="text/javascript" src="pages/index/Form/RunPanel.js"></script>
-        <script type="text/javascript" src="pages/index/Form/ModelRunSelectionPanel.js"></script>
-        <script type="text/javascript" src="pages/index/Plotter/PlotterPanel.js"></script>
-        <script type="text/javascript" src="pages/index/Map/map.js"></script>
-        <script type="text/javascript" src="pages/index/Plotter/SOSController.js"></script>
-        <script type="text/javascript" src="pages/index/onReady.js"></script>
+        <script type="text/javascript" src="js/pages/index/WPSProcesses/ExampleEmailWPSWrapperProcess.js"></script>
+        <script type="text/javascript" src="js/pages/index/WPSProcesses/ExampleWPSProcess.js"></script>
+        <script type="text/javascript" src="js/pages/index/Form/ProcessFormPanel.js"></script>
+        <script type="text/javascript" src="js/pages/index/Form/IsoFormPanel.js"></script>
+        <script type="text/javascript" src="js/pages/index/Form/FileUploadPanel.js"></script>
+        <script type="text/javascript" src="js/pages/index/Form/ModelPanel.js"></script>
+        <script type="text/javascript" src="js/pages/index/Form/ScenarioPanel.js"></script>
+        <script type="text/javascript" src="js/pages/index/Form/RunPanel.js"></script>
+        <script type="text/javascript" src="js/pages/index/Form/ModelRunSelectionPanel.js"></script>
+        <script type="text/javascript" src="js/pages/index/Plotter/PlotterPanel.js"></script>
+        <script type="text/javascript" src="js/pages/index/Map/map.js"></script>
+        <script type="text/javascript" src="js/pages/index/Plotter/SOSController.js"></script>
+        <script type="text/javascript" src="js/pages/index/onReady.js"></script>
         
     </head>
     <body>
