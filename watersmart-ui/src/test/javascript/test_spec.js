@@ -1,3 +1,12 @@
+describe("Jasmine Check", function() {
+    it("Check Ext", function() {
+       expect(Ext.isBoolean(true)).toBeTruthy(); 
+    });
+    
+    it("Check Log4JS", function() {
+       expect(LOG).toBeDefined(); 
+    });
+});
 
 
 describe("A spec", function() {
