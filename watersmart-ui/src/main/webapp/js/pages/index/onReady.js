@@ -145,6 +145,7 @@ function initializeAjax() {
             });
         }
     }, this);
+    
     Ext.Ajax.on('requestcomplete', function (connection, response, options) {
         if (!Ext.Ajax.isLoading()) {
             Ext.Ajax.fireEvent('ajax-requests-complete',
@@ -155,6 +156,7 @@ function initializeAjax() {
             });
         }
     }, this);
+    
     Ext.Ajax.on('requestexception', function (connection, response, options) {
         LOG.error(response);
         if (!Ext.Ajax.isLoading()) {

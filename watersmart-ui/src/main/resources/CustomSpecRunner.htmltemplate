@@ -9,20 +9,236 @@
 </head>
 <body>
 
-    <script type="text/javascript">
-        var LOG = log4javascript.getLogger();
+<script type="text/javascript">
+    var LOG;
+    var CONFIG = {
+        timeout : 0
+    };
+    
+    var initializeLogging = function() {
+        LOG = log4javascript.getLogger();
 
-        // var layout = new log4javascript.PatternLayout(CONFIG.LOG4JS_PATTERN_LAYOUT);
+        var layout = new log4javascript.PatternLayout("%rms - %-5p - %m%n");
 
         var appender = new log4javascript.BrowserConsoleAppender();
 
-        // appender.setLayout(layout);
+        appender.setLayout(layout);
         appender.setThreshold(log4javascript.Level.TRACE);
 
         LOG.addAppender(appender);
-    </script>
+    }
 
-  <script type="text/javascript">
+    var LOADMASK;
+    var initializeLoadMask = function() {
+        LOADMASK = new Ext.LoadMask(Ext.getBody(), {
+            msg: '<div id="cida-load-msg">Loading...</div><img width="300" height="161" src="../js/ext/ux/cida-load/cida-anim.gif" />', 
+            msgCls: 'cida-load'
+        });
+    }
+
+    var NOTIFY;
+    /**
+     * Usage example : 
+     *      NOTIFY.error({
+     *          msg : 'Message here'
+     *      });
+     */
+    function initializeNotification() {
+        var defaultConfig = {
+            msgWidth: 400,
+            hideDelay: 8000
+        };
+    
+        /**
+         * ERROR
+         */
+        var _notifyError = function(args) {
+            var config = args || {};
+	
+            var moreInfo = new Ext.Button({
+                text: 'More Info...'
+            });
+        
+            var buttons = [];
+            if (config.moreInfoAction) {
+                buttons.push(moreInfo);
+            }
+        
+            var notifyError = new Ext.ux.Notify(Ext.applyIf({
+                title: 'Error!',
+                titleIconCls: 'titleicon-error',
+                msgIconCls: 'msgicon-error',
+                msg: config.msg || 'An error has occured.',
+                buttons: buttons
+            }, defaultConfig));
+            
+            this.notificationWindows.push(notifyError);
+            
+            if (config.moreInfoAction) {
+                moreInfo.on('click', function() {
+                    notifyError.hide();
+                    config.moreInfoAction();
+                });
+            }
+		
+            notifyError.show(document);
+        }
+	
+        /**
+         * SUCCESS
+         */
+        var _notifySuccess = function(msg) {
+            new Ext.ux.Notify(Ext.applyIf({
+                title: 'Success!',
+                titleIconCls: 'titleicon-success',
+                msg: msg.msg || 'Data saved successfully.'
+            }, defaultConfig)).show(document);
+        }
+	
+        /**
+         * DEBUG NOTIFY
+         */    
+        var _notifyDebug = function(msg) {
+            this.notificationWindows.push(
+                new Ext.ux.Notify(Ext.applyIf({
+                    title: 'DEBUG',
+                    titleIconCls: 'titleicon-debug',
+                    msg: msg.msg || ''
+                }, defaultConfig)).show(document)
+            )
+        }
+    
+        /**
+         * WARNING
+         */
+        var _notifyWarning = function(msg) {
+            this.notificationWindows.push(
+                new Ext.ux.Notify(Ext.applyIf({
+                    title: 'WARNING',
+                    titleIconCls: 'titleicon-warning',
+                    msg: msg.msg || ''
+                }, defaultConfig)).show(document)
+            )
+        }
+    
+        /**
+         * INFO
+         */
+        var _notifyInfo = function(msg) {
+            this.notificationWindows.push(
+                new Ext.ux.Notify(Ext.applyIf({
+                    title: 'INFO',
+                    titleIconCls: 'titleicon-info',
+                    msg: msg.msg || ''
+                }, defaultConfig)).show(document)
+            )
+        }    
+    
+        /**
+         * Action Required
+         */
+        var _actionRequired = function(msg) {
+            this.notificationWindows.push(
+                new Ext.ux.Notify(Ext.apply({
+                    title: msg.title || 'Export',
+                    titleIconCls: 'titleicon-export',
+                    msg: msg.msg || '',
+                    //hideDelay: 3600000, // Stick around for an hour
+                    isClosable : true,
+                    items : msg.items
+                }, defaultConfig)).show(document)
+            )
+        }    
+    
+        NOTIFY = {
+            debug : _notifyDebug,
+            success : _notifySuccess,
+            error : _notifyError,
+            warn : _notifyWarning,
+            info : _notifyInfo,
+            actionRequired : _actionRequired,
+            notificationWindows : [],
+            removeAllNotificationWindows : function () {
+                while (this.notificationWindows.length > 0) {
+                    var notifyWindow = this.notificationWindows.pop();
+                    if (typeof notifyWindow.close === 'function') {
+                        notifyWindow.close();
+                    }
+                }
+            }
+        };
+    }
+
+    var cswStore = new CIDA.CSWGetRecordsStore({
+        url : "service/geonetwork/csw",
+        storeId : 'parentCswStore',
+        opts : {
+            resultType : 'results',
+            outputSchema : 'http://www.isotc211.org/2005/gmd',
+            Query : {
+                ElementSetName : {
+                    value: 'full'
+                },
+                Constraint : {
+                    Filter : {
+                        type : '==',
+                        property : 'ParentIdentifier',
+                        value : "497cf2db-56d6-4cad-9a56-a14b63fb232a"
+                    },
+                    version : '1.1.0'
+                }
+            }
+        },
+        listeners : {
+            //load : function(store) {
+            //    
+            //},
+            scope : this
+        }
+        
+    });
+
+
+    function initializeAjax() {
+        Ext.Ajax.addEvents(
+            "ajax-request-firing",
+            "ajax-requests-complete",
+            "ajax-request-exception"
+            );
+
+        Ext.Ajax.on('beforerequest', function (connection, options) {
+            if (!Ext.Ajax.isLoading()) {
+                Ext.Ajax.fireEvent('ajax-request-firing',
+                {
+                    connection : connection,
+                    options : options
+                });
+            }
+        }, this);
+
+        Ext.Ajax.on('requestcomplete', function (connection, response, options) {
+            if (!Ext.Ajax.isLoading()) {
+                Ext.Ajax.fireEvent('ajax-requests-complete',
+                {
+                    connection : connection,
+                    response : response,
+                    options : options
+                });
+            }
+        }, this);
+
+        Ext.Ajax.on('requestexception', function (connection, response, options) {
+            LOG.error(response);
+            if (!Ext.Ajax.isLoading()) {
+                Ext.Ajax.fireEvent('ajax-request-exception', 
+                {
+                    connection : connection, 
+                    response : response, 
+                    options : options
+                });
+            }
+        }, this);
+    }
 
     if(window.location.href.indexOf("ManualSpecRunner.html") !== -1) {
         document.body.appendChild(document.createTextNode("Warning: opening this HTML file directly from the file system is deprecated. You should instead try running `mvn jasmine:bdd` from the command line, and then visit `http://localhost:8234` in your browser. "))
@@ -30,6 +246,7 @@
 
     var executeJasmineSpecs = function(){
         window.reporter = new jasmine.$reporter$(); jasmine.getEnv().addReporter(reporter);
+
         jasmine.getEnv().execute();
     };
 

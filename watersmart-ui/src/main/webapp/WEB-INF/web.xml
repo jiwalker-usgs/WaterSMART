@@ -107,10 +107,6 @@
         <url-pattern>/service/geonetwork/csw</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>jsp</servlet-name>
-        <url-pattern>*.jspf</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>ISORecord</servlet-name>
         <url-pattern>/service/isorecord</url-pattern>
     </servlet-mapping>

@@ -188,21 +188,15 @@
                 <executions>
                     <execution>
                         <goals>
-                            <!--<goal>preparePackage</goal>-->
                             <goal>integration-test</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
+                    <browserVersion>INTERNET_EXPLORER_8</browserVersion>
                     <jsSrcDir>${project.build.directory}/watersmart/js</jsSrcDir>
                     <customRunnerTemplate>${project.build.directory}/watersmart/WEB-INF/classes/CustomSpecRunner.htmltemplate</customRunnerTemplate>
-<!--                    <sourceExcludes>
-                        <exclude>
-                            **/dygraphs/lib/**
-                        </exclude>
-                    </sourceExcludes>-->
                     <sourceIncludes>
-                        <!--<include>**/ext/ext-all-debug.js</include>-->
                         <include>**/openlayers/OpenLayers.js</include>
                         <include>**/ext/adapter/ext/ext-base.js</include>
                         <include>**/ext/ext-all.js</include>
@@ -224,6 +218,24 @@
                         <include>**/geoext/ux/CSW/CSWGetRecordsReader.js</include>
                         <include>**/geoext/ux/CSW/CSWGetRecordsStore.js</include>
                         <include>**/log4javascript/log4javascript.js</include>
+                        <include>**/ext/ux/notify/notify.js</include>
+                        <include>**/ext/ux/fileuploadfield/FileUploadField.js</include>
+                        <include>**/sarissa/sarissa.js</include>
+                        <include>**/sarissa/sarissa_ieemu_xpath.js</include>
+                        <include>**/dygraphs/lib/dygraph-dev.js</include>
+                        <include>**/pages/index/WPSProcesses/ExampleEmailWPSWrapperProcess.js</include>
+                        <include>**/pages/index/WPSProcesses/ExampleWPSProcess.js</include>
+                        <include>**/pages/index/Form/ProcessFormPanel.js</include>
+                        <include>**/pages/index/Form/IsoFormPanel.js</include>
+                        <include>**/pages/index/Form/FileUploadPanel.js</include>
+                        <include>**/pages/index/Form/ModelPanel.js</include>
+                        <include>**/pages/index/Form/ScenarioPanel.js</include>
+                        <include>**/pages/index/Form/RunPanel.js</include>
+                        <include>**/pages/index/Form/ModelRunSelectionPanel.js</include>
+                        <include>**/pages/index/Plotter/PlotterPanel.js</include>
+                        <include>**/pages/index/Map/map.js</include>
+                        <include>**/pages/index/Plotter/SOSController.js</include>
+                        <!--<include>**/pages/index/onReady.js</include>-->
                     </sourceIncludes>
                 </configuration>
             </plugin>
