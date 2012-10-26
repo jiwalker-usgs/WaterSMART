@@ -48,7 +48,9 @@ Ext.onReady(function () {
         listeners : {
             load : this.cswStoreFirstLoad,
             exception : function() {
-                NOTIFY.warn({msg : 'An error has occured - Application may not work properly.'})
+                NOTIFY.warn({
+                    msg : 'An error has occured - Application may not work properly.'
+                })
             }, 
             scope : this
         }
@@ -184,10 +186,17 @@ function initializeQuickTips() {
     LOG.info('onReady.js::initializeQuickTips(): Initialized Quicktips');
 }
 
+function logout() {
+    window.location.href = "?LOGOUT_HOOK=true";
+}
+
+
 function initializeSessionTimeout() {
+    var timeout = (CONFIG.TIMEOUT - 60) * 1000;
     var confirmLogout = function() {
-        Ext.MessageBox.confirm('Session Expiration',
-            'Your session is about to expire, would you like to stay logged into this application',
+        var el = Ext.Msg.confirm(
+            'Session Expiration',
+            '<span style="font-size:14px">Your session is about to expire, would you like to stay logged into this application?</span>',
             function (choice) {
                 if (choice == 'yes') {
                     Ext.Ajax.request({
@@ -195,13 +204,36 @@ function initializeSessionTimeout() {
                     });
                 }
                 else {
-                    window.location.href = "?LOGOUT_HOOK=true";
+                    logout();
                 }
             }
-        );
+            )
+        .setIcon(Ext.MessageBox.WARNING)
+
+        el.getDialog().add(
+            new Ext.ProgressBar({
+                listeners : {
+                    update : function(pb){
+                        if (pb.text) {
+                            var seconds = parseInt(pb.text);
+                            if (seconds > 0) {
+                                pb.suspendEvents(false);
+                                pb.updateText((seconds - 1).toString())
+                                pb.resumeEvents();
+                            } else {
+                                logout();
+                            }
+                        }
+                    }
+                }
+            }).wait({
+                duration : 61000,
+                increment : 59,
+                animate : true,
+                text : '61'
+            })
+        )
     }
-    
-    var timeout = (CONFIG.TIMEOUT - 60) * 1000;
     
     Ext.Ajax.on(
         "ajax-requests-complete",
@@ -209,7 +241,7 @@ function initializeSessionTimeout() {
             window.clearTimeout(CONFIG.TIMEOUT_ID);
             CONFIG.TIMEOUT_ID = confirmLogout.defer(timeout);
         }
-    );
+        );
     
     LOG.debug('Session timeout updated');
 }

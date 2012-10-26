@@ -235,7 +235,6 @@
                         <include>**/pages/index/Plotter/PlotterPanel.js</include>
                         <include>**/pages/index/Map/map.js</include>
                         <include>**/pages/index/Plotter/SOSController.js</include>
-                        <!--<include>**/pages/index/onReady.js</include>-->
                     </sourceIncludes>
                 </configuration>
             </plugin>
