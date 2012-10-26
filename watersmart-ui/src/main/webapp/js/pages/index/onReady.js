@@ -209,7 +209,7 @@ function initializeSessionTimeout() {
             }
             )
         .setIcon(Ext.MessageBox.WARNING)
-
+        
         el.getDialog().add(
             new Ext.ProgressBar({
                 listeners : {
@@ -233,6 +233,10 @@ function initializeSessionTimeout() {
                 text : '61'
             })
         )
+            
+        el.getDialog().addListener('hide', function(me) {
+            me.removeAll(true);
+        })
     }
     
     Ext.Ajax.on(
