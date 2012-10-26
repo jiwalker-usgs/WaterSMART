@@ -169,36 +169,6 @@
         };
     }
 
-    var cswStore = new CIDA.CSWGetRecordsStore({
-        url : "service/geonetwork/csw",
-        storeId : 'parentCswStore',
-        opts : {
-            resultType : 'results',
-            outputSchema : 'http://www.isotc211.org/2005/gmd',
-            Query : {
-                ElementSetName : {
-                    value: 'full'
-                },
-                Constraint : {
-                    Filter : {
-                        type : '==',
-                        property : 'ParentIdentifier',
-                        value : "497cf2db-56d6-4cad-9a56-a14b63fb232a"
-                    },
-                    version : '1.1.0'
-                }
-            }
-        },
-        listeners : {
-            //load : function(store) {
-            //    
-            //},
-            scope : this
-        }
-        
-    });
-
-
     function initializeAjax() {
         Ext.Ajax.addEvents(
             "ajax-request-firing",
