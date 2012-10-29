@@ -220,7 +220,7 @@ class WPSTask extends Thread {
         return false;
     }
     
-    public void sendMaybeEmail(String to) {
+    private void sendMaybeEmail(String to) {
         String subject = "Processing is taking a long time";
         StringBuilder content = new StringBuilder();
         content.append("Your process is taking longer than expected.");
@@ -247,7 +247,7 @@ class WPSTask extends Thread {
         }
     }
 
-    public void sendCompleteEmail(Map<String, String> outputs, String to) {
+    private void sendCompleteEmail(Map<String, String> outputs, String to) {
         String subject = "Processing Complete";
         StringBuilder content = new StringBuilder();
         content.append("Your upload has finished conversion and processing,")
@@ -290,7 +290,7 @@ class WPSTask extends Thread {
         }
     }
     
-    public void sendFailedEmail(Exception ex, String to) {
+    private void sendFailedEmail(Exception ex, String to) {
         String subject = "WaterSMART processing failed";
         StringBuilder content = new StringBuilder();
         content.append("Your request unfortunately failed, we are looking into it.");
