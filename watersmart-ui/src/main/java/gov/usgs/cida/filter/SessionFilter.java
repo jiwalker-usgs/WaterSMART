@@ -1,9 +1,9 @@
 package gov.usgs.cida.filter;
 
+import gov.usgs.cida.watersmart.common.JNDISingleton;
 import gov.usgs.cida.watersmart.ldap.LDAPConnect;
 import gov.usgs.cida.watersmart.ldap.LoginMessage;
 import gov.usgs.cida.watersmart.ldap.User;
-import gov.usgs.cida.watersmart.common.JNDISingleton;
 import java.io.IOException;
 import javax.servlet.*;
 import javax.servlet.http.HttpServlet;
@@ -35,22 +35,38 @@ public class SessionFilter extends HttpServlet implements Filter {
     public static String dataSource;
     private static final String DEVELOPMENT = "watersmart.development";
     private static final String REDIRECT_PAGE = "redirect_page";
+    
+    @Override
+    public void init(FilterConfig conf) throws ServletException {
+        String dev = JNDISingleton.getInstance().getProperty(DEVELOPMENT, "false");
+
+        if ("true".equals(dev)) {
+            //Set Development true
+            developmentMode = true;
+            developmentUser = User.devUser();
+        }
+        else {
+            //Production Mode
+            developmentMode = false;
+        }
+
+        redirectOnFail = "true".equalsIgnoreCase(conf.getInitParameter(REDIRECT_ON_FAIL));
+
+        redirectPage = conf.getInitParameter(REDIRECT_PAGE);
+    }
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse resp,
-                         FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpreq = (HttpServletRequest) req;
         HttpServletResponse httpresp = (HttpServletResponse) resp;
         HttpSession session = httpreq.getSession();
         String redirectPath = httpreq.getContextPath() + redirectPage;
 
-//		String serverAuth = req.getHeader(SERVER_AUTH);
-        User sessionUser = (developmentMode && null != developmentUser) ? developmentUser : (User)session.getAttribute(APP_AUTH);
+        User sessionUser = (developmentMode && null != developmentUser) ? developmentUser : (User) session.getAttribute(APP_AUTH);
         if (developmentMode && session.getAttribute(APP_AUTH) == null) {
             session.setAttribute(APP_AUTH, developmentUser);
         }
-//		Integer appAuthId = (Integer) session.getAttribute(APP_AUTH_ID);
-
+        
         if (null != httpreq.getParameter(LOGOUT)) {
             log.trace("logout: " + sessionUser.uid);
             session.invalidate();
@@ -63,16 +79,16 @@ public class SessionFilter extends HttpServlet implements Filter {
             return;
         }
 
-//		log.debug(httpreq.getRequestURI() + " || SA:" + serverAuth + " AA:" + appAuth + " ID:" + appAuthId + " || SECURE:" + req.isSecure() + " DEV:" + developmentMode);
+        // log.debug(httpreq.getRequestURI() + " || SA:" + serverAuth + " AA:" + appAuth + " ID:" + appAuthId + " || SECURE:" + req.isSecure() + " DEV:" + developmentMode);
+        
+        //HTTPS or dev mode
         if (req.isSecure() || developmentMode) {
-            //HTTPS or dev mode
 
             if (null != sessionUser && sessionUser.isAuthenticated()) {
                 log.trace(sessionUser.uid + " already logged in");
             }
             else {
                 // special case for the redirect page
-                //String redirectServletPath = "/" + redirectPage;
                 if (null != redirectPath && redirectPath.equals(
                         httpreq.getServletPath())) {
                     chain.doFilter(req, resp);
@@ -139,24 +155,4 @@ public class SessionFilter extends HttpServlet implements Filter {
         return userObj;
     }
 
-    @Override
-    public void init(FilterConfig conf) throws ServletException {
-        String dev = JNDISingleton.getInstance().getProperty(DEVELOPMENT,
-                                                             "false");
-
-        if ("true".equals(dev)) {
-            //Set Development true
-            developmentMode = true;
-            developmentUser = User.devUser();
-        }
-        else {
-            //Production Mode
-            developmentMode = false;
-        }
-
-        redirectOnFail = "true".equals(conf.getInitParameter(REDIRECT_ON_FAIL));
-
-        redirectPage = conf.getInitParameter(REDIRECT_PAGE);
-
-    }
 }
