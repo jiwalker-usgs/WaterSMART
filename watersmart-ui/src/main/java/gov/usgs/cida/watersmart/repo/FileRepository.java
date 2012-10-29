@@ -38,12 +38,14 @@ public class FileRepository extends HttpServlet {
         response.setContentType("text/plain;charset=UTF-8");
         String file = request.getPathInfo();
         File repoFile = new File(filePath + file);
+        
         if (!repoFile.exists() || !repoFile.canRead()) {
+            LOG.info("User requested file which does not exist. File: " + repoFile.getPath());
             response.sendError(404);
             return;
         }
         
-        
+        LOG.debug("User is requesting file: " + repoFile.getPath());
         PrintWriter out = response.getWriter();
         BufferedReader bufIn = new BufferedReader(new FileReader(repoFile));
         String line = null;
