@@ -1,11 +1,6 @@
 # wps.des: id=test_stats, title = test stats, abstract = Finds the mean daily flow median daily flow and skewness of daily flow in the input dataset;
 # wps.in: model_url, string, SOS Endpoint, A fully formed SOS GetObservations request that will return a SWE common CSV block holding date and flow;
-# wps.in: modsites, string, list of sites, A list of sites;
 # wps.in: modprop, string, Observed Property, The SOS observed property to request;
-# wps.in: sos_url, string, SOS Endpoint, A fully formed SOS GetObservations request that will return a SWE common CSV block holding date and flow;
-# wps.in: sites, string, list of sites, A list of sites;
-# wps.in: offering, string, Observed Offering, The SOS observed offering to request;
-# wps.in: property, string, Observed Property, the SOS observed property to request;
 
 
 library(XML)
