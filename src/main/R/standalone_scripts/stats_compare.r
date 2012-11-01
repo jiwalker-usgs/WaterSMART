@@ -1,11 +1,6 @@
 # wps.des: id=test_stats, title = test stats, abstract = Finds the mean daily flow median daily flow and skewness of daily flow in the input dataset;
 # wps.in: model_url, string, SOS Endpoint, A fully formed SOS GetObservations request that will return a SWE common CSV block holding date and flow;
-# wps.in: modsites, string, list of sites, A list of sites;
 # wps.in: modprop, string, Observed Property, The SOS observed property to request;
-# wps.in: sos_url, string, SOS Endpoint, A fully formed SOS GetObservations request that will return a SWE common CSV block holding date and flow;
-# wps.in: sites, string, list of sites, A list of sites;
-# wps.in: offering, string, Observed Offering, The SOS observed offering to request;
-# wps.in: property, string, Observed Property, the SOS observed property to request;
 
 library(XML)
 library(zoo)
@@ -14,22 +9,10 @@ library(doBy)
 library(hydroGOF)
 #library(dataRetrieval)
 
-sos_url="http://nwisvaws02.er.usgs.gov/ogc-swie/wml2/dv/sos?request=GetObservation&featureID="
-#sites='"02177000","02178400","021770005"'
-#sites="02177000"
-offering="Mean"
-property="Discharge"
-#startdate="1970-01-01"
-#enddate="1970-12-31"
-interval=''
-latest=''
-statCd='00003'
-parameterCd='00060'
-
 #model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/afinch/afinch-Special-0.3.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
 #model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/stats/stats-Special-0.3.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
 #model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/waters/waters-Special-1.2.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
-model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/stats/stats-Dense1-0.11.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
+model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/stats/stats-Dense1-1.10.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
 #model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/waters/waters-Special-0.3.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
 #modsites='"02177000","02178400","021770005"'
 #modsites="02177000"
@@ -38,9 +21,11 @@ modprop="Streamflow"
 #modprop="streamflow"
 #modprop="MEAN"
 
-obs_url="http://waterservices.usgs.gov/nwis/dv/?format=waterml,1.1&sites="
+sos_url_temp="http://waterservices.usgs.gov/nwis/dv/?format=waterml,1.1&sites="
+offering_temp='00003'
+property_temp='00060'
+
 scenario_url=paste(substr(model_url,1,regexpr("Get",model_url)-1),"GetCapabilities&service=SOS&version=1.0.0",sep="")
-site_url="http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=nwc:se_sites"
 
 SWE_CSV_IHA <- function(input) {
   cat(paste("Retrieving data from: \n", input, "\n", 
@@ -1133,7 +1118,7 @@ enddate<-max(x_mod$date)
 interval<-''
 latest<-''
 sites=a[i]
-url2<-paste(obs_url,sites,'&startDT=',startdate,'&endDT=',enddate,'&statCd=',statCd,'&parameterCd=',parameterCd,'&access=3',sep='')
+url2<-paste(sos_url_temp,sites,'&startDT=',startdate,'&endDT=',enddate,'&statCd=',offering_temp,'&parameterCd=',property_temp,'&access=3',sep='')
 x_obs <- getXMLWML1.1Data(url2)
 #x_obs <- getXMLDV2Data(sos_url,sites,property,offering,startdate,enddate,interval,latest)
 if (nrow(x_obs)>2) {
