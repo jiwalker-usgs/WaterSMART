@@ -478,6 +478,7 @@ class WPSTask extends Thread {
                 int checks = 0;
                 while (!completed) {
                     checks++;
+                    // TODO- http://stackoverflow.com/questions/3535754/netbeans-java-new-hint-thread-sleep-called-in-loop
                     Thread.sleep(CHECK_WAIT);
                     log.debug("Checking: " + checks);
                     is = HTTPUtils.sendPacket(new URL(wpsCheckPoint), "GET");

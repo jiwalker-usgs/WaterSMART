@@ -6,6 +6,7 @@ import gov.usgs.cida.watersmart.csw.CSWTransactionHelper;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -34,12 +35,13 @@ public class UpdateRun extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         LOG.debug("Received new update request");
-        
+
         String modelerName = request.getParameter("name");
         String originalModelerName = request.getParameter("originalName");
         String modelId = request.getParameter("modelId");
         String modelType = request.getParameter("modeltype");
-        String modelVersion = request.getParameter("version");
+        // Currently not being used since we don't update the modelVersion 
+//        String modelVersion = request.getParameter("version");
         String originalModelVersion = request.getParameter("originalModelVersion");
         String runIdent = request.getParameter("runIdent");
         String originalRunIdent = request.getParameter("originalRunIdent");
@@ -58,13 +60,21 @@ public class UpdateRun extends HttpServlet {
         String responseText;
         RunMetadata newRunMetadata;
         RunMetadata originalRunMetadata;
-        
+
         ModelType modelTypeEnum = null;
-            if ("prms".equals(modelType.toLowerCase())) modelTypeEnum = ModelType.PRMS;
-            if ("afinch".equals(modelType.toLowerCase())) modelTypeEnum = ModelType.AFINCH;
-            if ("waters".equals(modelType.toLowerCase())) modelTypeEnum = ModelType.WATERS;
-            if ("sye".equals(modelType.toLowerCase())) modelTypeEnum = ModelType.SYE;
-            
+        if ("prms".equals(modelType.toLowerCase())) {
+            modelTypeEnum = ModelType.PRMS;
+        }
+        if ("afinch".equals(modelType.toLowerCase())) {
+            modelTypeEnum = ModelType.AFINCH;
+        }
+        if ("waters".equals(modelType.toLowerCase())) {
+            modelTypeEnum = ModelType.WATERS;
+        }
+        if ("sye".equals(modelType.toLowerCase())) {
+            modelTypeEnum = ModelType.SYE;
+        }
+
         if (rerun) {
             // shortcut the process for now 
             if (true) {
@@ -81,63 +91,63 @@ public class UpdateRun extends HttpServlet {
                 }
                 return;
             }
-   
+
             // TODO- Create the run metadata from the original run
             originalRunMetadata = new RunMetadata(
-                modelTypeEnum,
-                modelId,
-                modelerName,
-                modelVersion,
-                runIdent,
-                runDate,
-                scenario,
-                comments,
-                email,
-                wfsUrl,
-                layer,
-                commonAttr,
-                updateAsBest);
-            
-            
+                    modelTypeEnum,
+                    modelId,
+                    originalModelerName,
+                    originalModelVersion,
+                    originalRunIdent,
+                    originalRunDate,
+                    originalScenario,
+                    originalComments,
+                    email,
+                    wfsUrl,
+                    layer,
+                    commonAttr,
+                    updateAsBest);
+
+
             // TODO- Re-run R-Process
-                   // 4. Run the compare stats using the R-WPS package
+            // 4. Run the compare stats using the R-WPS package
             try {
-    //            compReq = WPSImpl.createCompareStatsRequest(sosEndpoint, info.stations, info.properties);
-    //            String algorithmOutput = runNamedAlgorithm("compare", compReq, uuid, metaObj);
-    //            wpsOutputMap.put(WPSImpl.stats_compare, algorithmOutput);
+                //            compReq = WPSImpl.createCompareStatsRequest(sosEndpoint, info.stations, info.properties);
+                //            String algorithmOutput = runNamedAlgorithm("compare", compReq, uuid, metaObj);
+                //            wpsOutputMap.put(WPSImpl.stats_compare, algorithmOutput);
             } catch (Exception ex) {
 //                log.error("Failed to run WPS algorithm", ex);
 //                sendFailedEmail(ex, email);
 //                return;
             }
-    //
-    //        // 5. Add results from WPS process to CSW record
-    //        if (wpsOutputMap.get(WPSImpl.stats_compare) != null) {
-    //            rStatsSuccessful = true;
-    //            helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
-    //            try {
-    //                cswResponse = helper.updateRunMetadata(metaObj);
-    //                cswTransSuccessful = cswResponse != null;
-    //                sendCompleteEmail(wpsOutputMap, email);
-    //            } catch (IOException ex) {
-    //                log.error("Failed to perform CSW update", ex);
-    //                sendFailedEmail(ex, email);
-    //            } catch (URISyntaxException ex) {
-    //                log.error("Failed to perform CSW update,", ex);
-    //                sendFailedEmail(ex, email);
-    //            }
-    //        } else {
-    //            log.error("Failed to run WPS algorithm");
-    //            sendFailedEmail(new Exception("Failed to run WPS algorithm"), email);
-    //        }
-            
+            //
+            //        // 5. Add results from WPS process to CSW record
+            //        if (wpsOutputMap.get(WPSImpl.stats_compare) != null) {
+            //            rStatsSuccessful = true;
+            //            helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
+            //            try {
+            //                cswResponse = helper.updateRunMetadata(metaObj);
+            //                cswTransSuccessful = cswResponse != null;
+            //                sendCompleteEmail(wpsOutputMap, email);
+            //            } catch (IOException ex) {
+            //                log.error("Failed to perform CSW update", ex);
+            //                sendFailedEmail(ex, email);
+            //            } catch (URISyntaxException ex) {
+            //                log.error("Failed to perform CSW update,", ex);
+            //                sendFailedEmail(ex, email);
+            //            }
+            //        } else {
+            //            log.error("Failed to run WPS algorithm");
+            //            sendFailedEmail(new Exception("Failed to run WPS algorithm"), email);
+            //        }
+
             // Create the updated model run. Everything should remain the same 
             // except the date unless there was no R process run previously
             newRunMetadata = new RunMetadata(
                     modelTypeEnum,
                     modelId,
                     modelerName,
-                    modelVersion,
+                    originalModelVersion,
                     runIdent,
                     runDate, // set a new date
                     scenario,
@@ -147,13 +157,13 @@ public class UpdateRun extends HttpServlet {
                     layer,
                     commonAttr,
                     updateAsBest);
-            
+
         } else {
             newRunMetadata = new RunMetadata(
                     modelTypeEnum,
                     modelId,
                     modelerName,
-                    modelVersion,
+                    originalModelVersion,
                     runIdent,
                     runDate,
                     scenario,
@@ -162,8 +172,7 @@ public class UpdateRun extends HttpServlet {
                     wfsUrl,
                     layer,
                     commonAttr,
-                    updateAsBest
-            );
+                    updateAsBest);
 
             originalRunMetadata = new RunMetadata(
                     modelTypeEnum,
@@ -174,27 +183,23 @@ public class UpdateRun extends HttpServlet {
                     originalRunDate,
                     originalScenario,
                     originalComments,
-                    email, 
+                    email,
                     wfsUrl,
                     layer,
-                    commonAttr
-            );
-            
+                    commonAttr);
+
         }
-        
-        CSWTransactionHelper helper = new CSWTransactionHelper(newRunMetadata);
+        CSWTransactionHelper helper = new CSWTransactionHelper(newRunMetadata, null, new HashMap<String, String>());
         try {
             String results = helper.updateRunMetadata(originalRunMetadata);
             // TODO- parse xml, make sure stuff happened alright, if so don't say success
             responseText = "{success: true, msg: 'The record has been updated'}";
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
+            responseText = "{success: false, msg: '" + ex.getMessage() + "'}";
+        } catch (URISyntaxException ex) {
             responseText = "{success: false, msg: '" + ex.getMessage() + "'}";
         }
-        catch (URISyntaxException ex) {
-            responseText = "{success: false, msg: '" + ex.getMessage() + "'}";
-        }
-        
+
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
 
@@ -221,7 +226,7 @@ public class UpdateRun extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-            processRequest(request, response);
+        processRequest(request, response);
     }
 
     /**
@@ -236,7 +241,7 @@ public class UpdateRun extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-            processRequest(request, response);
+        processRequest(request, response);
     }
 
     /**
