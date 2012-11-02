@@ -247,6 +247,10 @@ class WPSTask extends Thread {
         }
     }
 
+    private void sendCompleteEmail(Map<String,String> outputs) {
+        sendCompleteEmail(outputs, RunMetadata.getInstance(metadata).getEmail());
+    }
+    
     private void sendCompleteEmail(Map<String, String> outputs, String to) {
         String subject = "Processing Complete";
         StringBuilder content = new StringBuilder();
@@ -290,6 +294,10 @@ class WPSTask extends Thread {
         }
     }
     
+    private void sendFailedEmail(Exception ex) {
+        sendFailedEmail(ex,RunMetadata.getInstance(metadata).getEmail());
+    }
+    
     private void sendFailedEmail(Exception ex, String to) {
         String subject = "WaterSMART processing failed";
         StringBuilder content = new StringBuilder();
@@ -330,14 +338,13 @@ class WPSTask extends Thread {
     public void run() {
         CSWTransactionHelper helper;
         Map<String, String> wpsOutputMap = Maps.newHashMap();
-        ReturnInfo info = null;
+        ReturnInfo info;
         RunMetadata metaObj = RunMetadata.getInstance(metadata);
         String compReq;
         String repo = props.getProperty("watersmart.sos.model.repo");
         String netCDFFailMessage = "NetCDF failed unexpectedly ";
         String cswResponse;
         String sosEndpoint;
-        String email = metaObj.getEmail();
         UUID uuid = UUID.randomUUID();
 
         // 1. Create NetCDF file
@@ -359,16 +366,16 @@ class WPSTask extends Thread {
                 throw new IOException("Output from NetCDF creation process was null");
             }
         } catch (IOException ex) {
-            log.error("Failed to create NetCDF file: " + netCDFFailMessage, ex);
-            sendFailedEmail(new RuntimeException(netCDFFailMessage), email);
+            log.error(netCDFFailMessage, ex);
+            sendFailedEmail(new RuntimeException(netCDFFailMessage));
             return;
         } catch (XMLStreamException ex) {
-            log.error("Failed to create NetCDF file: " + netCDFFailMessage, ex);
-            sendFailedEmail(new RuntimeException(netCDFFailMessage), email);
+            log.error(netCDFFailMessage, ex);
+            sendFailedEmail(new RuntimeException(netCDFFailMessage));
             return;
         } catch (RuntimeException ex) {
-            log.error("Failed to create NetCDF file: " + netCDFFailMessage, ex);
-            sendFailedEmail(new RuntimeException(netCDFFailMessage), email);
+            log.error(netCDFFailMessage, ex);
+            sendFailedEmail(new RuntimeException(netCDFFailMessage));
             return;
         }
 
@@ -390,7 +397,7 @@ class WPSTask extends Thread {
             }
         } catch (Exception ex) {
             log.error("Failed to perform CSW insert", ex);
-            sendFailedEmail(ex, email);
+            sendFailedEmail(ex);
             return;
         }
 
@@ -410,7 +417,7 @@ class WPSTask extends Thread {
             wpsOutputMap.put(WPSImpl.stats_compare, algorithmOutput);
         } catch (Exception ex) {
             log.error("Failed to run WPS algorithm", ex);
-            sendFailedEmail(ex, email);
+            sendFailedEmail(ex);
             return;
         }
 
@@ -421,17 +428,17 @@ class WPSTask extends Thread {
             try {
                 cswResponse = helper.updateRunMetadata(metaObj);
                 cswTransSuccessful = cswResponse != null;
-                sendCompleteEmail(wpsOutputMap, email);
+                sendCompleteEmail(wpsOutputMap);
             } catch (IOException ex) {
                 log.error("Failed to perform CSW update", ex);
-                sendFailedEmail(ex, email);
+                sendFailedEmail(ex);
             } catch (URISyntaxException ex) {
                 log.error("Failed to perform CSW update,", ex);
-                sendFailedEmail(ex, email);
+                sendFailedEmail(ex);
             }
         } else {
             log.error("Failed to run WPS algorithm");
-            sendFailedEmail(new Exception("Failed to run WPS algorithm"), email);
+            sendFailedEmail(new Exception("Failed to run WPS algorithm"));
         }
     }
     
