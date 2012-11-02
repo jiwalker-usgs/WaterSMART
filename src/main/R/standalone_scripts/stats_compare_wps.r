@@ -1,6 +1,5 @@
 # wps.des: id=test_stats, title = test stats, abstract = Finds the mean daily flow median daily flow and skewness of daily flow in the input dataset;
 # wps.in: model_url, string, SOS Endpoint, A fully formed SOS GetObservations request that will return a SWE common CSV block holding date and flow;
-# wps.in: modprop, string, Observed Property, The SOS observed property to request;
 
 
 library(XML)
@@ -105,7 +104,9 @@ getScenarioSites <- function(scenario_url){
   sites<-xpathSApply(doc, "//@gml:id")
   scenario_sites<-vector(length=length(sites))
   scenario_sites<-unname(sites)
-  return (scenario_sites)
+  modprop<-xpathSApply(doc, "//*[local-name() = 'observedProperty']/@xlink:href")[["href"]]
+  getcap<-list(scenario_sites=scenario_sites,modprop=modprop)
+  return (getcap)
 }
 
 # This function computes the Nash-Sutcliffe value between two data series
@@ -759,7 +760,9 @@ return_10 <- function(qfiletempf) {
 #setwd('/Users/jlthomps/Documents/R/')
 #a<-read.csv(header=F,colClasses=c("character"),text=sites)
 #a2<-read.csv(header=F,colClasses=c("character"),text=sites)
-a<-t(getScenarioSites(scenario_url))
+getcap<-getScenarioSites(scenario_url)
+modprop<-getcap$modprop
+a<-t(getcap$scenario_sites)
 a2<-a
 al<-length(a)
 nsev<-vector(length=al)
