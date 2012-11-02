@@ -1,6 +1,5 @@
 # wps.des: id=test_stats, title = test stats, abstract = Finds the mean daily flow median daily flow and skewness of daily flow in the input dataset;
 # wps.in: model_url, string, SOS Endpoint, A fully formed SOS GetObservations request that will return a SWE common CSV block holding date and flow;
-# wps.in: modprop, string, Observed Property, The SOS observed property to request;
 
 library(XML)
 library(zoo)
@@ -14,12 +13,7 @@ library(hydroGOF)
 #model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/waters/waters-Special-1.2.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
 model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/stats/stats-Dense1-1.10.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
 #model_url="http://cida.usgs.gov/gdp/proxy/http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/waters/waters-Special-0.3.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
-#modsites='"02177000","02178400","021770005"'
-#modsites="02177000"
-#modprop="Discharge"
-modprop="Streamflow"
-#modprop="streamflow"
-#modprop="MEAN"
+
 
 sos_url_temp="http://waterservices.usgs.gov/nwis/dv/?format=waterml,1.1&sites="
 offering_temp='00003'
@@ -117,7 +111,9 @@ getScenarioSites <- function(scenario_url){
   sites<-xpathSApply(doc, "//@gml:id")
   scenario_sites<-vector(length=length(sites))
   scenario_sites<-unname(sites)
-  return (scenario_sites)
+  modprop<-xpathSApply(doc, "//*[local-name() = 'observedProperty']/@xlink:href")[["href"]]
+  getcap<-list(scenario_sites=scenario_sites,modprop=modprop)
+  return (getcap)
 }
 
 # This function computes the Nash-Sutcliffe value between two data series
@@ -775,7 +771,9 @@ system("del graph*png")
 #a<-read.csv("sites_waters_stat.txt",header=F,colClasses=c("character"))
 #a2<-read.csv("sites_waters_stat.txt",header=F,colClasses=c("character"))
 #a<-t(getAllSites(site_url))
-a<-t(getScenarioSites(scenario_url))
+getcap<-getScenarioSites(scenario_url)
+modprop<-getcap$modprop
+a<-t(getcap$scenario_sites)
 a2<-a
 al<-length(a)
 nsev<-vector(length=al)
