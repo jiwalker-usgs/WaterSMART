@@ -330,7 +330,7 @@ class WPSTask extends Thread {
     public void run() {
         CSWTransactionHelper helper;
         Map<String, String> wpsOutputMap = Maps.newHashMap();
-        ReturnInfo info;
+        ReturnInfo info = null;
         RunMetadata metaObj = RunMetadata.getInstance(metadata);
         String compReq;
         String repo = props.getProperty("watersmart.sos.model.repo");
@@ -363,6 +363,10 @@ class WPSTask extends Thread {
             sendFailedEmail(new RuntimeException(netCDFFailMessage), email);
             return;
         } catch (XMLStreamException ex) {
+            log.error("Failed to create NetCDF file: " + netCDFFailMessage, ex);
+            sendFailedEmail(new RuntimeException(netCDFFailMessage), email);
+            return;
+        } catch (RuntimeException ex) {
             log.error("Failed to create NetCDF file: " + netCDFFailMessage, ex);
             sendFailedEmail(new RuntimeException(netCDFFailMessage), email);
             return;
