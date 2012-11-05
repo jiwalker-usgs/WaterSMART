@@ -260,6 +260,12 @@ mamax12.23 <- function(qfiletempf) {
   mamax12.23 <- data.frame(maxmon)
 }
 
+monthly.mean.ts <- function(qfiletempf,modsite) {
+  meanmonts <- aggregate(qfiletempf$discharge, list(qfiletempf$year_val,qfiletempf$month_val), FUN = mean, na.rm=TRUE)
+  colnames(meanmonts) <- c("Year","Month","Mean_disch")
+  return(meanmonts)
+}
+
 ma24.35 <- function(qfiletempf, pref = "mean") {
   sdmonbyyr <- aggregate(qfiletempf$discharge, list(qfiletempf$year_val, 
                                                     qfiletempf$month_val), FUN = sd, na.rm=TRUE)
@@ -766,6 +772,7 @@ return_10 <- function(qfiletempf) {
 }
 setwd('/Users/jlthomps/Documents/R/')
 system("del graph*png")
+system("del monthly*txt")
 #a<-read.csv(header=F,colClasses=c("character"),text=sites)
 #a2<-read.csv(header=F,colClasses=c("character"),text=modsites)
 #a<-read.csv("sites_waters_stat.txt",header=F,colClasses=c("character"))
@@ -1143,7 +1150,7 @@ qfiletempf<-data.frame(tempdatafr$date,tempdatafr$discharge,month_val,year_val,d
 colnames(qfiletempf)<-c('date','discharge','month_val','year_val','day_val','jul_val','wy_val')
 qfiletempf$month_val<-substr(x_obs$date,6,7)
 as.numeric(qfiletempf$month_val)
-qfiletempf$year_val<-substr(x_obs$date,3,4)
+qfiletempf$year_val<-substr(x_obs$date,1,4)
 as.numeric(qfiletempf$year_val)
 qfiletempf$day_val<-substr(x_obs$date,9,10)
 as.numeric(qfiletempf$day_val)
@@ -1165,7 +1172,7 @@ qfiletempf2<-data.frame(tempdatafr2$date,tempdatafr2$discharge,month_val,year_va
 colnames(qfiletempf2)<-c('date','discharge','month_val','year_val','day_val','jul_val','wy_val')
 qfiletempf2$month_val<-substr(x_mod$date,6,7)
 as.numeric(qfiletempf2$month_val)
-qfiletempf2$year_val<-substr(x_mod$date,3,4)
+qfiletempf2$year_val<-substr(x_mod$date,1,4)
 as.numeric(qfiletempf2$year_val)
 qfiletempf2$day_val<-substr(x_mod$date,9,10)
 as.numeric(qfiletempf2$day_val)
@@ -1200,6 +1207,12 @@ file<-paste("graph",toString(sites),".png",sep="")
 ggof(x_modz,x_obsz,na.rm=FALSE,dates,main=modsites)
 dev.copy(png,file)
 dev.off()
+file<-paste("monthly_mean_ts_obs",toString(sites),".txt",sep="")
+monthly_mean<-monthly.mean.ts(obs_data,sites)
+write.table(monthly_mean,file=file,col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
+file<-paste("monthly_mean_ts_mod",toString(sites),".txt",sep="")
+monthly_mean<-monthly.mean.ts(mod_data,sites)
+write.table(monthly_mean,file=file,col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
 
 #flowdatal<-data.frame(qfiletempf2$date,qfiletempf2$discharge,qfiletempf2$month_val,qfiletempf2$year_val,qfiletempf2$day_val,qfiletempf2$jul_val)  
 #colnames(flowdatal)<-c('date','discharge','month_val','year_val','day_val','jul_val')
@@ -1683,6 +1696,7 @@ if (i==length(a2)) {
 write.table(statsout,file="output.txt",col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
 system("del output.zip")
 system("zip -r output graph*png")
+system("zip -r output monthly*txt")
 system("zip -r output output*")
 } else { 
   output="output.zip" 
