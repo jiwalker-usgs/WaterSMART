@@ -219,6 +219,12 @@ mamax12.23 <- function(qfiletempf) {
   mamax12.23 <- data.frame(maxmon)
 }
 
+monthly.mean.ts <- function(qfiletempf,modsite) {
+  meanmonts <- aggregate(qfiletempf$discharge, list(qfiletempf$year_val,qfiletempf$month_val), FUN = mean, na.rm=TRUE)
+  colnames(meanmonts) <- c("Year","Month","Mean_disch")
+  return(meanmonts)
+}
+
 ma24.35 <- function(qfiletempf, pref = "mean") {
   sdmonbyyr <- aggregate(qfiletempf$discharge, list(qfiletempf$year_val, 
                                                     qfiletempf$month_val), FUN = sd, na.rm=TRUE)
@@ -724,6 +730,7 @@ return_10 <- function(qfiletempf) {
   return_10 <- sort_annual_max[rank_10]
 }
 setwd('/Users/jlthomps/Documents/R/')
+system("del monthly*txt")
 #a<-read.csv(header=F,colClasses=c("character"),text=sites)
 a<-read.csv("sites_waters_stat.txt",header=F,colClasses=c("character"))
 #a<-t(getAllSites(site_url))
@@ -882,6 +889,9 @@ yv[i]<-as.character(min(obs_data$date))
 ymaxv[i]<-as.character(max(obs_data$date))
 x_obsz<-obs_data$discharge
 dates<-as.Date(obs_data$date)
+file<-paste("monthly_mean_ts_obs",toString(sites),".txt",sep="")
+monthly_mean<-monthly.mean.ts(obs_data,sites)
+write.table(monthly_mean,file=file,col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
 sdbyyr <- aggregate(obs_data$discharge, list(obs_data$year_val), 
                     sd)
 colnames(sdbyyr) <- c("Year", "sdq")
