@@ -11,6 +11,7 @@
         <module>watersmart-ui</module>
         <module>watersmart-parse</module>
         <module>watersmart-common</module>
+        <module>watersmart-geonetwork</module>
     </modules>
     
     <properties>
@@ -70,6 +71,11 @@
             <id>cida-snapshots</id>
             <name>CIDA Nexus Snapshots</name>
             <url>${cida.maven.url}/content/groups/public-snapshots/</url>
+        </repository>
+        <repository>
+            <id>cida-thirdparty</id>
+            <name>CIDA 3rd Party</name>
+            <url>${cida.maven.url}/content/repositories/cida-thirdparty/</url>
         </repository>
         <repository>
             <id>n52-releases</id>
@@ -317,6 +323,11 @@
                         <source>1.6</source>
                         <target>1.6</target>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>2.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.gmaven</groupId>

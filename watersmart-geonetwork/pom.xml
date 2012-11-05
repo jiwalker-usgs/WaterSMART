@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>gov.usgs.cida.watersmart</groupId>
+        <artifactId>watersmart</artifactId>
+        <version>007-SNAPSHOT</version>
+    </parent>
+    <groupId>gov.usgs.cida.watersmart</groupId>
+    <artifactId>watersmart-geonetwork</artifactId>
+    <name>WaterSMART Geonetwork</name>
+    <packaging>war</packaging>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.geonetwork-opensource</groupId>
+            <artifactId>geonetwork-main</artifactId>
+            <version>2.8.0RC1-1</version>
+            <type>war</type>
+        </dependency>
+    </dependencies>
+    <build>
+        <finalName>geonetwork</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <overlays>
+                        <overlay>
+                            <groupId>org.geonetwork-opensource</groupId>
+                            <artifactId>geonetwork-main</artifactId>
+                        </overlay>
+                    </overlays>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <properties>
+        <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
+    </properties>
+</project>
