@@ -247,6 +247,10 @@ class WPSTask extends Thread {
         }
     }
 
+    private void sendCompleteEmail(Map<String,String> outputs) {
+        sendCompleteEmail(outputs, RunMetadata.getInstance(metadata).getEmail());
+    }
+    
     private void sendCompleteEmail(Map<String, String> outputs, String to) {
         String subject = "Processing Complete";
         StringBuilder content = new StringBuilder();
@@ -288,6 +292,10 @@ class WPSTask extends Thread {
         } catch (MessagingException ex) {
             log.error("Unable to send completed e-mail:\n" + message, ex);
         }
+    }
+    
+    private void sendFailedEmail(Exception ex) {
+        sendFailedEmail(ex,RunMetadata.getInstance(metadata).getEmail());
     }
     
     private void sendFailedEmail(Exception ex, String to) {
@@ -337,7 +345,6 @@ class WPSTask extends Thread {
         String netCDFFailMessage = "NetCDF failed unexpectedly ";
         String cswResponse;
         String sosEndpoint;
-        String email = metaObj.getEmail();
         UUID uuid = UUID.randomUUID();
 
         // 1. Create NetCDF file
@@ -359,12 +366,16 @@ class WPSTask extends Thread {
                 throw new IOException("Output from NetCDF creation process was null");
             }
         } catch (IOException ex) {
-            log.error("Failed to create NetCDF file: " + netCDFFailMessage, ex);
-            sendFailedEmail(new RuntimeException(netCDFFailMessage), email);
+            log.error(netCDFFailMessage, ex);
+            sendFailedEmail(new RuntimeException(netCDFFailMessage));
             return;
         } catch (XMLStreamException ex) {
-            log.error("Failed to create NetCDF file: " + netCDFFailMessage, ex);
-            sendFailedEmail(new RuntimeException(netCDFFailMessage), email);
+            log.error(netCDFFailMessage, ex);
+            sendFailedEmail(new RuntimeException(netCDFFailMessage));
+            return;
+        } catch (RuntimeException ex) {
+            log.error(netCDFFailMessage, ex);
+            sendFailedEmail(new RuntimeException(netCDFFailMessage));
             return;
         }
 
@@ -386,7 +397,7 @@ class WPSTask extends Thread {
             }
         } catch (Exception ex) {
             log.error("Failed to perform CSW insert", ex);
-            sendFailedEmail(ex, email);
+            sendFailedEmail(ex);
             return;
         }
 
@@ -406,7 +417,7 @@ class WPSTask extends Thread {
             wpsOutputMap.put(WPSImpl.stats_compare, algorithmOutput);
         } catch (Exception ex) {
             log.error("Failed to run WPS algorithm", ex);
-            sendFailedEmail(ex, email);
+            sendFailedEmail(ex);
             return;
         }
 
@@ -417,17 +428,17 @@ class WPSTask extends Thread {
             try {
                 cswResponse = helper.updateRunMetadata(metaObj);
                 cswTransSuccessful = cswResponse != null;
-                sendCompleteEmail(wpsOutputMap, email);
+                sendCompleteEmail(wpsOutputMap);
             } catch (IOException ex) {
                 log.error("Failed to perform CSW update", ex);
-                sendFailedEmail(ex, email);
+                sendFailedEmail(ex);
             } catch (URISyntaxException ex) {
                 log.error("Failed to perform CSW update,", ex);
-                sendFailedEmail(ex, email);
+                sendFailedEmail(ex);
             }
         } else {
             log.error("Failed to run WPS algorithm");
-            sendFailedEmail(new Exception("Failed to run WPS algorithm"), email);
+            sendFailedEmail(new Exception("Failed to run WPS algorithm"));
         }
     }
     
@@ -467,6 +478,7 @@ class WPSTask extends Thread {
                 int checks = 0;
                 while (!completed) {
                     checks++;
+                    // TODO- http://stackoverflow.com/questions/3535754/netbeans-java-new-hint-thread-sleep-called-in-loop
                     Thread.sleep(CHECK_WAIT);
                     log.debug("Checking: " + checks);
                     is = HTTPUtils.sendPacket(new URL(wpsCheckPoint), "GET");

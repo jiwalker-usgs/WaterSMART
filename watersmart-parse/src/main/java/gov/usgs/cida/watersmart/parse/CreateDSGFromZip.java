@@ -21,8 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import javax.xml.stream.XMLStreamException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.slf4j.Logger;
@@ -45,12 +47,13 @@ public class CreateDSGFromZip {
     public static ReturnInfo create(File srcZip, RunMetadata runMeta) throws IOException, XMLStreamException {
         // Need to put the resulting NetCDF file somewhere that ncSOS knows about
         String sosPath = JNDISingleton.getInstance().getProperty("watersmart.sos.location", System.getProperty("java.io.tmpdir"));
-        String filename = srcZip.getName().replace(".zip", ".nc");
+        File verifiedSrcZip = verifyZip(srcZip);
+        String filename = verifiedSrcZip.getName().replace(".zip", ".nc");
         
         File ncFile = new File(sosPath + File.separator + runMeta.getTypeString() +
                                File.separator + filename);
         LOG.debug(ncFile.getName() + " will be saved to " + sosPath);
-        ZipFile zip = new ZipFile(srcZip);
+        ZipFile zip = new ZipFile(verifiedSrcZip);
         Enumeration<? extends ZipEntry> entries = zip.entries();
         StationTimeSeriesNetCDFFile nc = null;
         
@@ -135,6 +138,15 @@ public class CreateDSGFromZip {
         }
         IOUtils.closeQuietly(nc);
         return info;
+    }
+    
+    static File verifyZip(File zipFile) throws ZipException, IOException {
+//        File workDirectory = new File(System.getProperty("java.io.tmpdir") + File.separatorChar + );
+//        File tempFile = File.createTempFile("verifyZip-DeleteMe", "zip");
+//        FileUtils.copyFile(zipFile, tempFile);
+//        ZipFile zip = new ZipFile(tempFile);
+        
+        return zipFile;
     }
     
     private static Map<String, String> applyBusinessRulesToMeta(RunMetadata meta) {
