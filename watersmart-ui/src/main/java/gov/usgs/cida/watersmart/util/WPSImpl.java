@@ -70,10 +70,6 @@ class WPSImpl implements WPSInterface {
     }
     
     static String createCompareStatsRequest(String sosEndpoint, Collection<Station> sites, List<String> properties) {
-        List<String> siteList = Lists.newLinkedList();
-        for (Station station : sites) {
-            siteList.add("\\\"" + station.station_id + "\\\"");                    
-        }
         
         return new String(
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -87,61 +83,11 @@ class WPSImpl implements WPSInterface {
                 "<ows:Identifier>" + stats_compare + "</ows:Identifier>" +
                 "<wps:DataInputs>" +
                     "<wps:Input>" +
-                        "<ows:Identifier>sos_url</ows:Identifier>" +
-                        "<wps:Data>" +
-                            //"<wps:LiteralData>http://nwisvaws02.er.usgs.gov/ogc-swie/wml2/dv/sos?request=GetObservation&amp;featureID=</wps:LiteralData>" +
-                            "<wps:LiteralData>http://waterservices.usgs.gov/nwis/dv/?format=waterml,1.1&amp;sites=</wps:LiteralData>" +
-                        "</wps:Data>" +
-                    "</wps:Input>" +
-                    "<wps:Input>" +
-                        "<ows:Identifier>sites</ows:Identifier>" +
-                        "<wps:Data>" +
-                            "<wps:LiteralData>" +
-                                StringEscapeUtils.escapeXml(StringUtils.join(siteList, ",")) +
-                                //"deprecated" +
-                            "</wps:LiteralData>" +
-                        "</wps:Data>" +
-                    "</wps:Input>" +
-                    "<wps:Input>" +
-                        "<ows:Identifier>offering</ows:Identifier>" +
-                        "<wps:Data>" +
-                            "<wps:LiteralData>" +
-                                "Mean" +
-                            "</wps:LiteralData>" +
-                        "</wps:Data>" +
-                    "</wps:Input>" +
-                    "<wps:Input>" +
-                        "<ows:Identifier>property</ows:Identifier>" +
-                        "<wps:Data>" +
-                            "<wps:LiteralData>" +
-                                "Discharge" +
-                            "</wps:LiteralData>" +
-                        "</wps:Data>" +
-                    "</wps:Input>" +
-                    "<wps:Input>" +
                         "<ows:Identifier>model_url</ows:Identifier>" +
                         "<wps:Data>" +
                             "<wps:LiteralData>" +
                                 StringEscapeUtils.escapeXml(sosEndpoint + 
                                     "?request=GetObservation&service=SOS&version=1.0.0&offering") +
-                            "</wps:LiteralData>" +
-                        "</wps:Data>" +
-                    "</wps:Input>" +
-                    "<wps:Input>" +
-                        "<ows:Identifier>modsites</ows:Identifier>" +
-                        "<wps:Data>" +
-                            "<wps:LiteralData>" +
-                                //"deprecated" +
-                                StringEscapeUtils.escapeXml(StringUtils.join(siteList, ",")) +
-                                //"\\\"02177000\\\",\\\"02178400\\\",\\\"02184500\\\",\\\"02186000\\\"" +
-                            "</wps:LiteralData>" +
-                        "</wps:Data>" +
-                    "</wps:Input>" +
-                    "<wps:Input>" +
-                        "<ows:Identifier>modprop</ows:Identifier>" +
-                        "<wps:Data>" +
-                            "<wps:LiteralData>" +
-                                StringEscapeUtils.escapeXml(properties.get(0)) +
                             "</wps:LiteralData>" +
                         "</wps:Data>" +
                     "</wps:Input>" +
@@ -363,6 +309,8 @@ class WPSTask extends Thread {
             if (info != null && info.properties != null) {
                 netcdfSuccessful = true;
             } else {
+                log.error(netCDFFailMessage);
+                sendFailedEmail(new RuntimeException(netCDFFailMessage));
                 throw new IOException("Output from NetCDF creation process was null");
             }
         } catch (IOException ex) {
