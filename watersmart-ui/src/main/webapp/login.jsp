@@ -116,7 +116,13 @@
                             id : 'description-panel',
                             columnWidth: .38,
                             html : '<img src="images/watersmart-graphic-small.jpg" id="watersmart-title-image" />'+
-                                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vehicula interdum orci, ac pellentesque purus fermentum eu. Nulla facilisi. Morbi id dui diam. Nulla facilisi. Etiam vitae nunc dui, et suscipit justo. Vivamus mauris lorem, facilisis et dignissim et, ornare iaculis nunc. Suspendisse potenti. Curabitur orci ante, posuere in accumsan at, vestibulum in nibh. In hendrerit mollis lacinia. Sed quam ligula, dapibus nec facilisis quis, sollicitudin a ligula. Nullam pulvinar auctor turpis, ut semper urna facilisis vitae. Duis neque urna, adipiscing sed accumsan id, vestibulum at lorem. Pellentesque sit amet purus imperdiet risus suscipit pharetra at id massa.<br /><br />',
+                                'The model intercomparison portal provides three primary capabilities.<br /><br />' +
+'<ol class="ipsum"><li>Upload hydrologic model results into a database and publish services to serve the uploaded data</li>' +
+'<li>Provide centralized processing services to perform comparative statistics</li>' +
+'<li>Present model results and comparative statistics in a web user interface</li></ol><br />' +
+'Ultimately, this application will allow a modeler to insert their modeling project outcomes ' +
+'into a system that can automatically add their results into a portal that will allow the ' +
+'modeler (or others) to evaluate the model in comparison to observations or other model outcomes.<br /><br />',
                             style : {
                                 'margin-top':'7%',
                                 'color' : '#616161'

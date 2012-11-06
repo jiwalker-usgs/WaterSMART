@@ -46,3 +46,7 @@
     height: 30px;
     padding-left: 100px;
 }
+
+ol.ipsum {
+    list-style: decimal inside none;
+}
