@@ -108,7 +108,7 @@ class WPSTask extends Thread {
     static org.slf4j.Logger log = LoggerFactory.getLogger(WPSTask.class);
     private static final DynamicReadOnlyProperties props = JNDISingleton.getInstance();
     
-    public static final int CHECKS_UNTIL_NOTIFY = 28;
+    public static final int CHECKS_UNTIL_NOTIFY = 48;
     public static final int CHECKS_UNTIL_FAIL = 4 * 60 * 24; // currently 24 hours
     public static final int CHECK_WAIT = 15000;
     
