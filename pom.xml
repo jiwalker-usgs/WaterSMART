@@ -12,6 +12,7 @@
         <module>watersmart-parse</module>
         <module>watersmart-common</module>
         <module>watersmart-geonetwork</module>
+        <module>watersmart-wps</module>
     </modules>
     
     <properties>
@@ -81,6 +82,11 @@
             <id>n52-releases</id>
             <name>52-north Releases</name>
             <url>http://52north.org/maven/repo/releases/</url>
+        </repository>
+        <repository>
+            <id>ucar-releases</id>
+            <name>Unidata Releases</name>
+            <url>https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases</url>
         </repository>
     </repositories>
 
@@ -238,12 +244,45 @@
                 <artifactId>jmx-log4j</artifactId>
                 <version>1.0</version>
             </dependency>
+            
+            <!-- 52n -->
+            <dependency>
+                <groupId>com.sun.xml.fastinfoset</groupId>
+                <artifactId>FastInfoset</artifactId>
+                <version>1.2.12</version>
+            </dependency>
+            <dependency>
+                <groupId>org.n52.wps</groupId>
+                <artifactId>52n-wps-commons</artifactId>
+                <version>3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.n52.wps</groupId>
+                <artifactId>52n-wps-io</artifactId>
+                <version>3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.n52.wps</groupId>
+                <artifactId>52n-wps-server</artifactId>
+                <version>3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.n52.wps</groupId>
+                <artifactId>52n-wps-transactional</artifactId>
+                <version>3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.n52.wps</groupId>
+                <artifactId>52n-wps-r</artifactId>
+                <version>3.0</version>
+            </dependency>
+            
         <!-- LOGGING START-->
         <!-- needed for patch 52n code -->
             <dependency>
                 <artifactId>log4j</artifactId>
                 <groupId>log4j</groupId>
-                <version>1.2.16</version>
+                <version>1.2.17</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
@@ -308,7 +347,6 @@
                 <version>1.2</version>
                 <scope>test</scope>
             </dependency>
-        
         </dependencies>
     </dependencyManagement>
         

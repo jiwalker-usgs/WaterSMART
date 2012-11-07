@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WPSConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://n52.org/wps schema_v2.xsd" xmlns="http://n52.org/wps">
+    <Datahandlers>
+        <ParserList>
+            <Parser name="GenericFileParser" className="org.n52.wps.io.datahandler.parser.GenericFileParser" active="true">
+                <Format mimetype="application/x-zipped-shp"/>
+                <Format mimetype="application/img"/>
+                <Format mimetype="image/tiff"/>
+                <Format mimetype="application/geotiff"/>
+                <Format mimetype="application/dbase"/>
+                <Format mimetype="application/remap"/>
+                <Format mimetype="application/x-erdas-hfa"/>
+                <Format mimetype="application/x-netcdf"/>
+                <Format mimetype="application/dgn"/>
+                <Format mimetype="image/jpeg"/>
+                <Format mimetype="image/png"/>
+                <Format mimetype="application/x-geotiff"/>
+                <Format mimetype="application/hdf4-eos"/>
+                <Format mimetype="text/plain"/>
+                <Format mimetype="application/x-zipped-shp" encoding="base64"/>
+                <Format mimetype="application/img" encoding="base64"/>
+                <Format mimetype="image/tiff" encoding="base64"/>
+                <Format mimetype="application/geotiff" encoding="base64"/>
+                <Format mimetype="application/dbase" encoding="base64"/>
+                <Format mimetype="application/remap" encoding="base64"/>
+                <Format mimetype="application/x-erdas-hfa" encoding="base64"/>
+                <Format mimetype="application/x-netcdf" encoding="base64"/>
+                <Format mimetype="application/dgn" encoding="base64"/>
+                <Format mimetype="image/jpeg" encoding="base64"/>
+                <Format mimetype="image/png" encoding="base64"/>
+                <Format mimetype="application/x-geotiff" encoding="base64"/>
+                <Format mimetype="application/hdf4-eos" encoding="base64"/>
+                <Format mimetype="text/plain" encoding="base64"/>
+            </Parser>
+        </ParserList>
+        <GeneratorList>
+            <Generator name="GenericFileGenerator" className="org.n52.wps.io.datahandler.generator.GenericFileGenerator" active="true">
+                <Format mimetype="application/dbase"/>
+                <Format mimetype="application/shp" encoding="base64"/>
+                <Format mimetype="application/dgn"/>
+                <Format mimetype="image/tiff" encoding="base64"/>
+                <Format mimetype="image/geotiff"/>
+                <Format mimetype="text/plain" encoding="base64"/>
+                <Format mimetype="application/img"/>
+                <Format mimetype="application/shp"/>
+                <Format mimetype="application/x-zipped-shp"/>
+                <Format mimetype="image/geotiff" encoding="base64"/>
+                <Format mimetype="application/dgn" encoding="base64"/>
+                <Format mimetype="image/png"/>
+                <Format mimetype="image/png" encoding="base64"/>
+                <Format mimetype="application/x-zipped-shp" encoding="base64"/>
+                <Format mimetype="application/x-erdas-hfa"/>
+                <Format mimetype="application/remap"/>
+                <Format mimetype="text/plain"/>
+                <Format mimetype="application/x-netcdf"/>
+                <Format mimetype="image/tiff"/>
+                <Format mimetype="application/img" encoding="base64"/>
+                <Format mimetype="application/geotiff"/>
+                <Format mimetype="image/jpeg" encoding="base64"/>
+                <Format mimetype="application/x-erdas-hfa" encoding="base64"/>
+                <Format mimetype="application/geotiff" encoding="base64"/>
+                <Format mimetype="application/dbase" encoding="base64"/>
+                <Format mimetype="application/x-netcdf" encoding="base64"/>
+                <Format mimetype="image/jpeg"/>
+                <Format mimetype="application/x-geotiff" encoding="base64"/>
+                <Format mimetype="application/x-geotiff"/>
+                <Format mimetype="application/remap" encoding="base64"/>
+            </Generator>
+            <Generator name="ZipGenerator" className="gov.usgs.cida.gdp.wps.generator.ZipGenerator" active="true">
+                <Format mimetype="application/zip"/>
+                <Format mimetype="application/zip" encoding="base64"/>
+            </Generator>
+        </GeneratorList>
+    </Datahandlers>
+    <AlgorithmRepositoryList>
+        <Repository name="LocalAlgorithmRepository" className="org.n52.wps.server.LocalAlgorithmRepository" active="true"/>
+        <Repository name="UploadedAlgorithmRepository" className="org.n52.wps.server.UploadedAlgorithmRepository" active="true"/>
+        <Repository name="LocalRAlgorithmRepository" className="org.n52.wps.server.r.LocalRAlgorithmRepository" active="true">
+            <Property name="Algorithm" active="true">org.n52.wps.server.r.stats_compare_wps</Property>
+            <Property name="Rserve_Host" active="true">localhost</Property>
+            <Property name="Rserve_Port" active="true">6311</Property>
+        </Repository>
+    </AlgorithmRepositoryList>
+    <!-- @hostname@, @hostport@ and @webappPath@ are filtered and replaced by values derived from
+         HttpServelRequest instance of getRequestURL() in response using a Filter -->
+    <Server hostname="@hostname@" hostport="@hostport@" webappPath="@webappPath@" includeDataInputsInResponse="true" computationTimeoutMilliSeconds="5" cacheCapabilites="false">
+        <Database>
+            <Property name="databaseClass" active="true">gov.usgs.cida.n52.wps.database.ResultsDatabase</Property>
+        </Database>
+    </Server>
+</WPSConfiguration>
