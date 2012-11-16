@@ -73,12 +73,10 @@
         </GeneratorList>
     </Datahandlers>
     <AlgorithmRepositoryList>
-        <Repository name="LocalAlgorithmRepository" className="org.n52.wps.server.LocalAlgorithmRepository" active="true"/>
-        <Repository name="UploadedAlgorithmRepository" className="org.n52.wps.server.UploadedAlgorithmRepository" active="true"/>
         <Repository name="LocalRAlgorithmRepository" className="org.n52.wps.server.r.LocalRAlgorithmRepository" active="true">
-            <Property name="Algorithm" active="true">org.n52.wps.server.r.stats_compare_wps</Property>
             <Property name="Rserve_Host" active="true">localhost</Property>
             <Property name="Rserve_Port" active="true">6311</Property>
+            <Property name="Algorithm" active="true">org.n52.wps.server.r.stats_compare_wps</Property>
         </Repository>
     </AlgorithmRepositoryList>
     <!-- @hostname@, @hostport@ and @webappPath@ are filtered and replaced by values derived from

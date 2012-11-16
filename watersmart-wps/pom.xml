@@ -13,7 +13,7 @@
     
     <properties>
         <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
-        <gdp.version>19.1</gdp.version>
+        <gdp.version>19.2-SNAPSHOT</gdp.version>
     </properties>
     
     <dependencies>
@@ -109,7 +109,7 @@
                                 <artifactItem>
                                     <groupId>gov.usgs.cida.gdp</groupId>
                                     <artifactId>gdp-52n-wps-patches</artifactId>
-                                    <version>19.1</version>
+                                    <version>${gdp.version}</version>
                                     <type>jar</type>
                                 </artifactItem>
                             </artifactItems>
