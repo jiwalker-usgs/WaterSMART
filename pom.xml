@@ -13,6 +13,8 @@
         <module>watersmart-common</module>
         <module>watersmart-geonetwork</module>
         <module>watersmart-wps</module>
+        <module>watersmart-geoserver</module>
+        <module>watersmart-thredds</module>
     </modules>
     
     <properties>
