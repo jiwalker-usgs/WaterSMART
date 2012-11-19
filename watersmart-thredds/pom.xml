@@ -30,6 +30,11 @@
                         <overlay>
                             <groupId>gov.usgs.cida.ncsos</groupId>
                             <artifactId>ncsosx-thredds</artifactId>
+                            <excludes>
+								<exclude>WEB-INF/altContent/startup/public/**</exclude>
+								<exclude>WEB-INF/altContent/motherlode/**</exclude>
+								<exclude>WEB-INF/altContent/idd/**</exclude>
+							</excludes>
                         </overlay>
                     </overlays>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
