@@ -25,9 +25,12 @@ Ext.onReady(function () {
 
     LOG.debug('onReady.js::Getting ready to load CSW Record Store');
 
-    var parentCswStore = new CIDA.CSWGetRecordsStore({
+    // First load the parent CSW store. When the return comes from there, 
+    // set that store into the global config and load all children of that store 
+    // and when loading that completes, begin loading the application using the 
+    // data retrieved
+    new CIDA.CSWGetRecordsStore({
         url : "service/geonetwork/csw",
-        storeId : 'parentCswStore',
         opts : {
             resultType : 'results',
             outputSchema : 'http://www.isotc211.org/2005/gmd',
@@ -38,7 +41,7 @@ Ext.onReady(function () {
                 Constraint : {
                     Filter : {
                         type : '==',
-                        property : 'ParentIdentifier',
+                        property : 'Identifier',
                         value : CONFIG.CSW_PARENT_IDENTIFIER
                     },
                     version : '1.1.0'
@@ -46,21 +49,64 @@ Ext.onReady(function () {
             }
         },
         listeners : {
-            load : this.cswStoreFirstLoad,
+            load : function(store) {
+                // Parent store loaded
+                LOG.debug('onReady.js:: Parent CSW Record Store loaded ' + store.totalLength + ' record(s)');
+                
+                CONFIG.parentStore = store;
+                
+                // Load children stores that have the same identifier as the parent
+                new CIDA.CSWGetRecordsStore({
+                    url : "service/geonetwork/csw",
+                    parentStore : store,
+                    opts : {
+                        resultType : 'results',
+                        outputSchema : 'http://www.isotc211.org/2005/gmd',
+                        Query : {
+                            ElementSetName : {
+                                value: 'full'
+                            },
+                            Constraint : {
+                                Filter : {
+                                    type : '==',
+                                    property : 'ParentIdentifier',
+                                    // We can use the constant or the FileIdentifier of the parent store here
+                                    value : CONFIG.CSW_PARENT_IDENTIFIER 
+                                },
+                                version : '1.1.0'
+                            }
+                        }
+                    },
+                    listeners : {
+                        load : function(store) {
+                            LOG.debug('onReady.js:: Child CSW Record Store loaded ' + store.totalLength + ' record(s)');
+                            this.cswStoreFirstLoad(CONFIG.parentStore, store);
+                            // We don't want to load the application every time this store loads
+                            store.un('load');
+                        },
+                        exception : function() {
+                            NOTIFY.warn({
+                                msg : 'An error has occured during initialization- Application may not contain full functionality.'
+                            })
+                        }, 
+                        scope : this
+                    }
+        
+                }).load()
+                
+            },
             exception : function() {
                 NOTIFY.warn({
-                    msg : 'An error has occured - Application may not work properly.'
+                    msg : 'An error has occured during initialization- Application may not contain full functionality.'
                 })
             }, 
             scope : this
         }
         
-    });
-    parentCswStore.load();
+    }).load();
 });
 
-function cswStoreFirstLoad(store) {
-    LOG.debug('onReady.js::CSW Record Store loaded ' + store.totalLength + ' record(s)');
+function cswStoreFirstLoad(parentStore, childStore) {
 
     var commonAttr = CONFIG.COMMON_ATTR;
 
@@ -74,7 +120,8 @@ function cswStoreFirstLoad(store) {
     var modelRunSelPanel = new WaterSMART.ModelRunSelectionPanel({
         sosController : sosController,
         commonAttr : commonAttr,
-        cswStore : store,
+        cswStore : childStore,
+        parentStore : parentStore,
         mapPanel : map
     });
         
@@ -127,7 +174,6 @@ function cswStoreFirstLoad(store) {
     });
     LOADMASK.hide();
 
-    store.un('load', this.cswStoreFirstLoad, this);
 }
 
 function initializeAjax() {
@@ -232,7 +278,7 @@ function initializeSessionTimeout() {
                 animate : true,
                 text : '61'
             })
-        )
+            )
             
         el.getDialog().addListener('hide', function(me) {
             me.removeAll(true);
