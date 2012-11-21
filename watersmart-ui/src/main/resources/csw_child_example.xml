@@ -1,0 +1,538 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gmd:MD_Metadata xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://www.isotc211.org/2005/gmd/gmd.xsd http://www.isotc211.org/2005/srv http://schemas.opengis.net/iso/19139/20060504/srv/srv.xsd">
+
+    <gmd:fileIdentifier>
+
+        <gco:CharacterString>936f4cd1-28ce-4701-ad6e-d84824e3f99d</gco:CharacterString>
+
+    </gmd:fileIdentifier>
+    <gmd:language>
+
+        <gco:CharacterString>eng</gco:CharacterString>
+
+    </gmd:language>
+    <gmd:characterSet>
+
+        <gmd:MD_CharacterSetCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8"/>
+
+    </gmd:characterSet>
+    <gmd:parentIdentifier xmlns:gmx="http://www.isotc211.org/2005/gmx">
+
+        <gco:CharacterString>497cf2db-56d6-4cad-9a56-a14b63fb232a</gco:CharacterString>
+
+    </gmd:parentIdentifier>
+    <gmd:contact>
+
+        <gmd:CI_ResponsibleParty>
+
+            <gmd:individualName>
+
+                <gco:CharacterString>Project Lead</gco:CharacterString>
+
+            </gmd:individualName>
+            <gmd:organisationName gco:nilReason="missing">
+
+                <gco:CharacterString/>
+
+            </gmd:organisationName>
+            <gmd:positionName gco:nilReason="missing">
+
+                <gco:CharacterString/>
+
+            </gmd:positionName>
+            <gmd:contactInfo>
+
+                <gmd:CI_Contact>
+
+                    <gmd:phone>
+
+                        <gmd:CI_Telephone>
+
+                            <gmd:voice gco:nilReason="missing">
+
+                                <gco:CharacterString/>
+
+                            </gmd:voice>
+                            <gmd:facsimile gco:nilReason="missing">
+
+                                <gco:CharacterString/>
+
+                            </gmd:facsimile>
+
+                        </gmd:CI_Telephone>
+
+                    </gmd:phone>
+                    <gmd:address>
+
+                        <gmd:CI_Address>
+
+                            <gmd:deliveryPoint gco:nilReason="missing">
+
+                                <gco:CharacterString/>
+
+                            </gmd:deliveryPoint>
+                            <gmd:city gco:nilReason="missing">
+
+                                <gco:CharacterString/>
+
+                            </gmd:city>
+                            <gmd:administrativeArea gco:nilReason="missing">
+
+                                <gco:CharacterString/>
+
+                            </gmd:administrativeArea>
+                            <gmd:postalCode gco:nilReason="missing">
+
+                                <gco:CharacterString/>
+
+                            </gmd:postalCode>
+                            <gmd:country gco:nilReason="missing">
+
+                                <gco:CharacterString/>
+
+                            </gmd:country>
+                            <gmd:electronicMailAddress>
+
+                                <gco:CharacterString>login-email@usgs.gov</gco:CharacterString>
+
+                            </gmd:electronicMailAddress>
+
+                        </gmd:CI_Address>
+
+                    </gmd:address>
+
+                </gmd:CI_Contact>
+
+            </gmd:contactInfo>
+            <gmd:role>
+
+                <gmd:CI_RoleCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#CI_RoleCode" codeListValue=""/>
+
+            </gmd:role>
+
+        </gmd:CI_ResponsibleParty>
+
+    </gmd:contact>
+    <gmd:dateStamp>
+
+        <gco:DateTime>2012-11-21T06:49:15</gco:DateTime>
+
+    </gmd:dateStamp>
+    <gmd:metadataStandardName>
+
+        <gco:CharacterString>ISO 19115:2003/19139</gco:CharacterString>
+
+    </gmd:metadataStandardName>
+    <gmd:metadataStandardVersion>
+
+        <gco:CharacterString>1.0</gco:CharacterString>
+
+    </gmd:metadataStandardVersion>
+    <gmd:identificationInfo>
+
+        <gmd:MD_DataIdentification>
+
+            <gmd:citation>
+
+                <gmd:CI_Citation>
+
+                    <gmd:title>
+
+                        <gco:CharacterString>AFINCH</gco:CharacterString>
+
+                    </gmd:title>
+                    <gmd:date>
+
+                        <gmd:CI_Date>
+
+                            <gmd:date>
+
+                                <gco:DateTime>2012-03-13T08:50:00</gco:DateTime>
+
+                            </gmd:date>
+                            <gmd:dateType>
+
+                                <gmd:CI_DateTypeCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#CI_DateTypeCode" codeListValue="revision"/>
+
+                            </gmd:dateType>
+
+                        </gmd:CI_Date>
+
+                    </gmd:date>
+
+                </gmd:CI_Citation>
+
+            </gmd:citation>
+            <gmd:abstract gco:nilReason="missing">
+
+                <gco:CharacterString/>
+
+            </gmd:abstract>
+            <gmd:graphicOverview>
+
+                <gmd:MD_BrowseGraphic>
+
+                    <gmd:fileName gco:nilReason="missing">
+
+                        <gco:CharacterString/>
+
+                    </gmd:fileName>
+                    <gmd:fileDescription>
+
+                        <gco:CharacterString>thumbnail</gco:CharacterString>
+
+                    </gmd:fileDescription>
+
+                </gmd:MD_BrowseGraphic>
+
+            </gmd:graphicOverview>
+            <gmd:graphicOverview>
+
+                <gmd:MD_BrowseGraphic>
+
+                    <gmd:fileName gco:nilReason="missing">
+
+                        <gco:CharacterString/>
+
+                    </gmd:fileName>
+                    <gmd:fileDescription>
+
+                        <gco:CharacterString>large_thumbnail</gco:CharacterString>
+
+                    </gmd:fileDescription>
+
+                </gmd:MD_BrowseGraphic>
+
+            </gmd:graphicOverview>
+            <gmd:language>
+
+                <gco:CharacterString>eng</gco:CharacterString>
+
+            </gmd:language>
+            <gmd:characterSet>
+
+                <gmd:MD_CharacterSetCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8"/>
+
+            </gmd:characterSet>
+
+        </gmd:MD_DataIdentification>
+
+    </gmd:identificationInfo>
+    <gmd:identificationInfo>
+
+        <srv:SV_ServiceIdentification id="ncSOS">
+
+            <gmd:citation>
+
+                <gmd:CI_Citation>
+
+                    <gmd:title>
+
+                        <gco:CharacterString>SE-SPARSE1</gco:CharacterString>
+
+                    </gmd:title>
+                    <gmd:date>
+
+                        <gmd:CI_Date>
+
+                            <gmd:date>
+
+                                <gco:DateTime>1970-01-01T00:00:00</gco:DateTime>
+
+                            </gmd:date>
+                            <gmd:dateType>
+
+                                <gmd:CI_DateTypeCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#CI_DateTypeCode" codeListValue="revision"/>
+
+                            </gmd:dateType>
+
+                        </gmd:CI_Date>
+
+                    </gmd:date>
+                    <gmd:edition>
+
+                        <gco:CharacterString>0.2</gco:CharacterString>
+
+                    </gmd:edition>
+                    <gmd:citedResponsibleParty>
+
+                        <gmd:CI_ResponsibleParty>
+
+                            <gmd:individualName>
+
+                                <gco:CharacterString>David Blodgett</gco:CharacterString>
+
+                            </gmd:individualName>
+                            <gmd:contactInfo>
+
+                                <gmd:CI_Contact>
+
+                                    <gmd:address>
+
+                                        <gmd:CI_Address>
+
+                                            <gmd:electronicMailAddress>
+
+                                                <gco:CharacterString>dblodgett@usgs.gov</gco:CharacterString>
+
+                                            </gmd:electronicMailAddress>
+
+                                        </gmd:CI_Address>
+
+                                    </gmd:address>
+
+                                </gmd:CI_Contact>
+
+                            </gmd:contactInfo>
+                            <gmd:role>
+
+                                <gmd:CI_RoleCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#CI_RoleCode" codeListValue="processor"/>
+
+                            </gmd:role>
+
+                        </gmd:CI_ResponsibleParty>
+
+                    </gmd:citedResponsibleParty>
+                    <gmd:presentationForm>
+
+                        <gmd:CI_PresentationFormCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#CI_PresentationFormCode" codeListValue="modelDigital"/>
+
+                    </gmd:presentationForm>
+                    <gmd:otherCitationDetails gco:nilReason="missing">
+
+                        <gco:CharacterString/>
+
+                    </gmd:otherCitationDetails>
+
+                </gmd:CI_Citation>
+
+            </gmd:citation>
+            <gmd:abstract>
+
+                <gco:CharacterString>reupload of dense1calib.dailyflow_poor_reform.txt with fixed header line.</gco:CharacterString>
+
+            </gmd:abstract>
+            <srv:serviceType>
+
+                <gco:LocalName>OGC:SOS</gco:LocalName>
+
+            </srv:serviceType>
+            <srv:coupledResource>
+
+                <srv:SV_CoupledResource>
+
+                    <srv:operationName>
+
+                        <gco:CharacterString>org.n52.wps.server.r.stats_compare_wps</gco:CharacterString>
+
+                    </srv:operationName>
+                    <srv:identifier>
+
+                        <gco:CharacterString>https://cida.usgs.gov/qa/watersmart/files/7fadd8a5-fb50-45a3-8050-58ff7723c5f8/afinch-Dense1-0.2-compare.txt</gco:CharacterString>
+
+                    </srv:identifier>
+
+                </srv:SV_CoupledResource>
+
+            </srv:coupledResource>
+            <srv:couplingType>
+
+                <srv:SV_CouplingType codeList="http://www.isotc211.org/2005/iso19119/resources/Codelist/gmxCodelists.xml#SV_CouplingType" codeListValue="mixed"/>
+
+            </srv:couplingType>
+            <srv:containsOperations>
+
+                <srv:SV_OperationMetadata>
+
+                    <srv:operationName>
+
+                        <gco:CharacterString>GetOperation</gco:CharacterString>
+
+                    </srv:operationName>
+                    <srv:connectPoint>
+
+                        <gmd:CI_OnlineResource>
+
+                            <gmd:linkage>
+
+                                <gmd:URL>http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/afinch/afinch-Dense1-0.2.nc</gmd:URL>
+
+                            </gmd:linkage>
+                            <gmd:name>
+
+                                <gco:CharacterString>afinch-Dense1-0.2</gco:CharacterString>
+
+                            </gmd:name>
+
+                        </gmd:CI_OnlineResource>
+
+                    </srv:connectPoint>
+
+                </srv:SV_OperationMetadata>
+
+            </srv:containsOperations>
+            <srv:operatesOn xlink:href="#DataIdentification"/>
+
+        </srv:SV_ServiceIdentification>
+
+    </gmd:identificationInfo>
+    <gmd:identificationInfo>
+
+        <srv:SV_ServiceIdentification id="ncSOS">
+
+            <gmd:citation>
+
+                <gmd:CI_Citation>
+
+                    <gmd:title>
+
+                        <gco:CharacterString>SE-SPARSE1</gco:CharacterString>
+
+                    </gmd:title>
+                    <gmd:date>
+
+                        <gmd:CI_Date>
+
+                            <gmd:date>
+
+                                <gco:DateTime>1970-01-01T00:00:00</gco:DateTime>
+
+                            </gmd:date>
+                            <gmd:dateType>
+
+                                <gmd:CI_DateTypeCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#CI_DateTypeCode" codeListValue="revision"/>
+
+                            </gmd:dateType>
+
+                        </gmd:CI_Date>
+
+                    </gmd:date>
+                    <gmd:edition>
+
+                        <gco:CharacterString>0.4</gco:CharacterString>
+
+                    </gmd:edition>
+                    <gmd:citedResponsibleParty>
+
+                        <gmd:CI_ResponsibleParty>
+
+                            <gmd:individualName>
+
+                                <gco:CharacterString>Jordan Walker</gco:CharacterString>
+
+                            </gmd:individualName>
+                            <gmd:contactInfo>
+
+                                <gmd:CI_Contact>
+
+                                    <gmd:address>
+
+                                        <gmd:CI_Address>
+
+                                            <gmd:electronicMailAddress>
+
+                                                <gco:CharacterString>jiwalker@usgs.gov</gco:CharacterString>
+
+                                            </gmd:electronicMailAddress>
+
+                                        </gmd:CI_Address>
+
+                                    </gmd:address>
+
+                                </gmd:CI_Contact>
+
+                            </gmd:contactInfo>
+                            <gmd:role>
+
+                                <gmd:CI_RoleCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#CI_RoleCode" codeListValue="processor"/>
+
+                            </gmd:role>
+
+                        </gmd:CI_ResponsibleParty>
+
+                    </gmd:citedResponsibleParty>
+                    <gmd:presentationForm>
+
+                        <gmd:CI_PresentationFormCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#CI_PresentationFormCode" codeListValue="modelDigital"/>
+
+                    </gmd:presentationForm>
+                    <gmd:otherCitationDetails gco:nilReason="missing">
+
+                        <gco:CharacterString/>
+
+                    </gmd:otherCitationDetails>
+
+                </gmd:CI_Citation>
+
+            </gmd:citation>
+            <gmd:abstract>
+
+                <gco:CharacterString>test</gco:CharacterString>
+
+            </gmd:abstract>
+            <srv:serviceType>
+
+                <gco:LocalName>OGC:SOS</gco:LocalName>
+
+            </srv:serviceType>
+            <srv:coupledResource>
+
+                <srv:SV_CoupledResource>
+
+                    <srv:operationName>
+
+                        <gco:CharacterString>org.n52.wps.server.r.stats_compare_wps</gco:CharacterString>
+
+                    </srv:operationName>
+                    <srv:identifier>
+
+                        <gco:CharacterString>https://cida.usgs.gov/qa/watersmart/files/35d3e9c2-ce00-4dc7-af5b-b9d9107a7186/afinch-Dense1-0.4-compare.txt</gco:CharacterString>
+
+                    </srv:identifier>
+
+                </srv:SV_CoupledResource>
+
+            </srv:coupledResource>
+            <srv:couplingType>
+
+                <srv:SV_CouplingType codeList="http://www.isotc211.org/2005/iso19119/resources/Codelist/gmxCodelists.xml#SV_CouplingType" codeListValue="mixed"/>
+
+            </srv:couplingType>
+            <srv:containsOperations>
+
+                <srv:SV_OperationMetadata>
+
+                    <srv:operationName>
+
+                        <gco:CharacterString>GetOperation</gco:CharacterString>
+
+                    </srv:operationName>
+                    <srv:connectPoint>
+
+                        <gmd:CI_OnlineResource>
+
+                            <gmd:linkage>
+
+                                <gmd:URL>http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/afinch/afinch-Dense1-0.4.nc</gmd:URL>
+
+                            </gmd:linkage>
+                            <gmd:name>
+
+                                <gco:CharacterString>afinch-Dense1-0.4</gco:CharacterString>
+
+                            </gmd:name>
+
+                        </gmd:CI_OnlineResource>
+
+                    </srv:connectPoint>
+
+                </srv:SV_OperationMetadata>
+
+            </srv:containsOperations>
+            <srv:operatesOn xlink:href="#DataIdentification"/>
+
+        </srv:SV_ServiceIdentification>
+
+    </gmd:identificationInfo>
+
+</gmd:MD_Metadata>
