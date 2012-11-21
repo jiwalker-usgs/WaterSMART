@@ -15,6 +15,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         this.commonAttr = config.commonAttr;
         this.cswStore = config.cswStore;
         this.mapPanel = config.mapPanel;
+        this.parentCswStore = config.parentCswStore;
 
         this.updateModelStore();
 
@@ -25,134 +26,157 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
             region: 'center',
             layout : 'border',
             buttons : [
-                {
-                    xtype : 'button',
-                    text : 'logout',
-                    listeners : {
-                        click : function () {
-                            window.location.href = "?LOGOUT_HOOK=true";
-                        }
+            {
+                xtype : 'button',
+                text : 'logout',
+                listeners : {
+                    click : function () {
+                        window.location.href = "?LOGOUT_HOOK=true";
                     }
                 }
+            }
             ],
             tbar : [
-                {
-                    xtype: 'tbtext',
-                    text: 'Models:'
-                },
-                {
-                    xtype: 'combo',
-                    id : 'model-combobox',
-                    store: this.modelStore,
-                    autoWidth: true,
-                    triggerAction : 'all',
-                    mode : 'local',
-                    editable : false,
-                    emptyText: 'Select A Model',
-                    displayField : 'title',
-                    listeners : {
-                        select : function (combo, record) {
-                            LOG.debug('ModelRunSelectionPanel.js::User selected a model');
-                            var panelInfo = {};
-                            var storeItem = record.get('rec');
+            {
+                xtype: 'tbtext',
+                text: 'Models:'
+            },
+            {
+                xtype: 'combo',
+                id : 'model-combobox',
+                store: this.modelStore,
+                autoWidth: true,
+                triggerAction : 'all',
+                mode : 'local',
+                editable : false,
+                emptyText: 'Select A Model',
+                displayField : 'title',
+                listeners : {
+                    select : function (combo, record) {
+                        LOG.debug('ModelRunSelectionPanel.js::User selected a model');
+                        var panelInfo = {};
+                        var storeItem = record.get('rec');
+                        
+                        panelInfo.fileIdentifier = storeItem.get('fileIdentifier');
+                        panelInfo.metadataStandardName = storeItem.get('metadataStandardName') || '';
+                        panelInfo.metadataStandardVersion = storeItem.get('metadataStandardVersion') || '';
+                        panelInfo.dateStamp = storeItem.get('dateStamp') || '';
+                        panelInfo.language = storeItem.get('language') || '';
+                        panelInfo.scenarioPanels = {};
+                        panelInfo.metadataStandardName = storeItem.get('metadataStandardName');
+                        panelInfo.metadataStandardVersion = storeItem.get('metadataStandardVersion');
+                        panelInfo.isBestScenario = false;
 
-                            panelInfo.fileIdentifier = storeItem.get('fileIdentifier');
-                            panelInfo.metadataStandardName = storeItem.get('metadataStandardName') || '';
-                            panelInfo.metadataStandardVersion = storeItem.get('metadataStandardVersion') || '';
-                            panelInfo.dateStamp = storeItem.get('dateStamp') || '';
-                            panelInfo.language = storeItem.get('language') || '';
-                            panelInfo.scenarioPanels = {};
-                            panelInfo.metadataStandardName = storeItem.get('metadataStandardName');
-                            panelInfo.metadataStandardVersion = storeItem.get('metadataStandardVersion');
-                            panelInfo.isBestScenario = false;
+                        // TODO This needs refactoring. We have a lot of loops within loops here. This gets confusing really quickly
+                        Ext.each(storeItem.get('identificationInfo'), function (idItem) {
 
-                            Ext.each(storeItem.get('identificationInfo'), function (idItem) {
+                            // We have a citation identification block
+                            if (idItem.citation !== undefined) {
+                                LOG.trace('ModelPanel.js::Citation Identification block found. Parsing out citation information');
+                                this.panelInfo.title = idItem.citation.title.CharacterString.value;
+                                this.panelInfo['abstract'] = idItem['abstract'].CharacterString.value || '';
 
-                                // We have a citation identification block
-                                if (idItem.citation !== undefined) {
-                                    LOG.trace('ModelPanel.js::Citation Identification block found. Parsing out citation information');
-                                    this.title = idItem.citation.title.CharacterString.value;
-                                    this['abstract'] = idItem['abstract'].CharacterString.value || '';
-
-                                    if (idItem.citation.date !== undefined && idItem.citation.date.length > 0) {
-                                        Ext.each(idItem.citation.date, function(dateItem) {
-                                            if (dateItem.dateType.codeListValue.toLowerCase() === 'revision') this.lastRevisedDate = dateItem.date[dateItem.date.length - 1].DateTime.value;
-                                        }, this);
-                                    }
-
-                                    if (idItem.graphicOverview !== undefined && idItem.graphicOverview.length > 0) {
-                                        this.graphicOverview = [];
-                                        Ext.each(idItem.graphicOverview, function (goItem) {
-                                            this.graphicOverview.push(goItem);
-                                        }, this);
-                                    }
+                                if (idItem.citation.date !== undefined && idItem.citation.date.length > 0) {
+                                    Ext.each(idItem.citation.date, function(dateItem) {
+                                        if (dateItem.dateType.codeListValue.toLowerCase() === 'revision') this.lastRevisedDate = dateItem.date[dateItem.date.length - 1].DateTime.value;
+                                    }, this.panelInfo);
                                 }
 
-                                // We have a service identification block. We create run panels here
-                                if (idItem.serviceIdentification !== undefined) {
-                                    LOG.trace('ModelPanel.js::Service Identification block found. Parsing out service information');
-                                    if (idItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
-                                        var scenario = idItem.serviceIdentification.citation.title.CharacterString.value;
-                                        var scenarioPanel;
-                                        if (this.scenarioPanels[scenario]) {
-                                            scenarioPanel = this.scenarioPanels[scenario];
-                                        } else {
-                                            scenarioPanel = new WaterSMART.ScenarioPanel({
-                                                title : scenario
-                                            });
-                                            this.scenarioPanels[scenario] = scenarioPanel;
+                                if (idItem.graphicOverview !== undefined && idItem.graphicOverview.length > 0) {
+                                    this.panelInfo.graphicOverview = [];
+                                    Ext.each(idItem.graphicOverview, function (goItem) {
+                                        this.graphicOverview.push(goItem);
+                                    }, this.panelInfo);
+                                }
+                            }
+
+                            // We have a service identification block. We create run panels here
+                            if (idItem.serviceIdentification !== undefined) {
+                                LOG.trace('ModelPanel.js::Service Identification block found. Parsing out service information');
+                                if (idItem.serviceIdentification.id.toLowerCase() === 'ncsos') {
+                                    var scenario = idItem.serviceIdentification.citation.title.CharacterString.value;
+                                    var scenarioPanel;
+                                    if (this.panelInfo.scenarioPanels[scenario]) {
+                                        scenarioPanel = this.panelInfo.scenarioPanels[scenario];
+                                    } else {
+                                        scenarioPanel = new WaterSMART.ScenarioPanel({
+                                            title : scenario
+                                        });
+                                        this.panelInfo.scenarioPanels[scenario] = scenarioPanel;
+                                    }
+                                        
+                                    scenarioPanel.add(new WaterSMART.RunPanel({
+                                        serviceIdentification : idItem.serviceIdentification
+                                    }));
+                                }
+                            }
+
+                        }, {
+                            panelInfo : panelInfo,
+                            parentStore : this.parentStore
+                        });
+
+                        var scenarioPanelsClone = [];
+                        Ext.iterate(panelInfo.scenarioPanels, function (key, scenario) {
+                            var scenarioPanelClone = scenario.cloneConfig();
+                            Ext.each(scenario.items.items, function (panel) {
+                                var clonePanel = panel.cloneConfig();
+                                
+                                clonePanel.panelInfo.fileIdentifier = this.panelInfo.fileIdentifier;
+                                clonePanel.panelInfo.metadataStandardName = this.panelInfo.metadataStandardName;
+                                clonePanel.panelInfo.metadataStandardVersion = this.panelInfo.metadataStandardVersion;
+                                
+                                Ext.each(this.parentStore.getAt(0).get('identificationInfo'), function(item) {
+                                    if (item.serviceIdentification && item.serviceIdentification.id.toLowerCase() === 'ows') {
+                                        // Find the correct operationMetadata node
+                                        for (var omdIndex = 0;omdIndex < item.serviceIdentification.operationMetadata.length;omdIndex++){
+                                            var omd = item.serviceIdentification.operationMetadata[omdIndex];
+                                            if (omd.operationName.CharacterString.value.toLowerCase() === 'getmap') {
+                                                // Find the correct connectPoint
+                                                for (var cpIndex = 0;cpIndex < omd.connectPoint.length;cpIndex++){
+                                                    var connectPoint = omd.connectPoint[cpIndex];
+                                                    if (this.scenario.toLowerCase() === connectPoint.ciOnlineResource.description.CharacterString.value.toLowerCase()) {
+                                                        this.clonePanel.panelInfo.owsEndpoint = connectPoint.ciOnlineResource.linkage.URL;
+                                                        this.clonePanel.panelInfo.owsResourceName = connectPoint.ciOnlineResource.name.CharacterString.value;
+                                                    }
+                                                }
+                                            }
                                         }
-                                        scenarioPanel.add(new WaterSMART.RunPanel({
-                                            serviceIdentification : idItem.serviceIdentification
-                                        }));
                                     }
-                                }
-
-                                if (idItem.serviceIdentification !== undefined) {
-                                    LOG.trace('ModelPanel.js::Service Identification block found. Parsing out service information');
-                                    if (idItem.serviceIdentification.id.toLowerCase() === 'ows') {
-                                        this.owsEndpoint = idItem.serviceIdentification.operationMetadata.linkage.URL;
-                                        this.owsResourceName = idItem.serviceIdentification.operationMetadata.name.CharacterString.value;
-                                    }
-                                }
-
-                            }, panelInfo);
-
-                            var scenarioPanelsClone = [];
-                            Ext.iterate(panelInfo.scenarioPanels, function (key, scenario) {
-                                var scenarioPanelClone = scenario.cloneConfig();
-                                Ext.each(scenario.items.items, function (panel) {
-                                    var clonePanel = panel.cloneConfig();
-                                    clonePanel.panelInfo.owsEndpoint = this.panelInfo.owsEndpoint;
-                                    clonePanel.panelInfo.owsResourceName = this.panelInfo.owsResourceName;
-                                    clonePanel.panelInfo.fileIdentifier = this.panelInfo.fileIdentifier;
-                                    clonePanel.panelInfo.metadataStandardName = this.panelInfo.metadataStandardName;
-                                    clonePanel.panelInfo.metadataStandardVersion = this.panelInfo.metadataStandardVersion;
-                                    this.scenarioPanelClone.add(clonePanel);
-                                }, {
+                                }, { // These each loops add a lot of unecessary variable passing
                                     panelInfo : panelInfo,
-                                    scenarioPanelClone : scenarioPanelClone
-                                });
-
-                                this.scenarioPanelsClone.push(scenarioPanelClone);
+                                    scenario : this.scenarioPanelClone.title,
+                                    parentStore : this.parentStore,
+                                    clonePanel : clonePanel
+                                })
+                                
+                                this.scenarioPanelClone.add(clonePanel);
                             }, {
                                 panelInfo : panelInfo,
-                                scenarioPanelsClone : scenarioPanelsClone
+                                scenarioPanelClone : scenarioPanelClone,
+                                parentStore : this.parentStore
                             });
 
-                            this.modelSelected({
-                                scenarioPanels : scenarioPanelsClone,
-                                panelInfo : panelInfo
-                            });
+                            this.scenarioPanelsClone.push(scenarioPanelClone);
+                        }, {
+                            panelInfo : panelInfo,
+                            scenarioPanelsClone : scenarioPanelsClone,
+                            parentStore : this.parentStore
+                        });
 
-                            this.mapPanel.removeLayers(null, false);
-                        },
-                        scope : this
-                    }
+                        this.modelSelected({
+                            scenarioPanels : scenarioPanelsClone,
+                            panelInfo : panelInfo
+                        });
+
+                        this.mapPanel.removeLayers(null, false);
+                    },
+                    scope : this
                 }
+            }
             ],
             items : [
-                this.scenarioPanel
+            this.scenarioPanel
             ]
         }, config);
         WaterSMART.ModelRunSelectionPanel.superclass.constructor.call(this, config);
@@ -341,7 +365,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                             modal : true,
                             items : isoFormPanel,
                             buttons : [
-                                this.submitButton
+                            this.submitButton
                             ]
                         })
 
@@ -411,7 +435,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                             modal : true,
                             items : [ isoFormPanel, new WaterSMART.FileUploadPanel() ],
                             buttons: [
-                                this.submitButton
+                            this.submitButton
                             ]
                         })
                     
@@ -464,13 +488,16 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
     runSelected : function(panel) {
         LOG.debug('ModelRunSelectionpanel.js:: A run has been selected with the SOS endpoint of: ' + panel.panelInfo.operationURL);
         
+        // Load SOS store
         this.controller.getCaps(panel.panelInfo.operationURL);
         
         this.scenarioPanel.currentlySelectedRun = panel;
         this.scenarioPanel.getTopToolbar().get('edit-selected-run-button').setDisabled(false);
 
         // Close any current plotter windows
-        if (Ext.getCmp('plotter-window')) Ext.getCmp('plotter-window').hide();
+        if (Ext.getCmp('plotter-window')) {
+            Ext.getCmp('plotter-window').hide();
+        }
 
         Ext.each(this.scenarioPanel.items.getRange(), function(accordPanel) {
             Ext.each(accordPanel.items.getRange(), function (runPanel) {
