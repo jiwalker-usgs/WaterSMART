@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gmd:MD_Metadata xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://www.isotc211.org/2005/gmd/gmd.xsd">
+	<gmd:fileIdentifier>
+		<gco:CharacterString>497cf2db-56d6-4cad-9a56-a14b63fb232a</gco:CharacterString>
+	</gmd:fileIdentifier>
+	<gmd:language>
+		<gco:CharacterString>eng</gco:CharacterString>
+	</gmd:language>
+	<gmd:characterSet>
+		<gmd:MD_CharacterSetCode codeListValue="utf8" codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#MD_CharacterSetCode"/>
+	</gmd:characterSet>
+	<gmd:contact>
+		<gmd:CI_ResponsibleParty>
+			<gmd:individualName>
+				<gco:CharacterString>David Blodgett</gco:CharacterString>
+			</gmd:individualName>
+			<gmd:organisationName>
+				<gco:CharacterString>CIDA</gco:CharacterString>
+			</gmd:organisationName>
+			<gmd:positionName gco:nilReason="missing">
+				<gco:CharacterString/>
+			</gmd:positionName>
+			<gmd:contactInfo>
+				<gmd:CI_Contact>
+					<gmd:phone>
+						<gmd:CI_Telephone>
+							<gmd:voice gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:voice>
+							<gmd:facsimile gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:facsimile>
+						</gmd:CI_Telephone>
+					</gmd:phone>
+					<gmd:address>
+						<gmd:CI_Address>
+							<gmd:deliveryPoint gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:deliveryPoint>
+							<gmd:city>
+								<gco:CharacterString>Middleton</gco:CharacterString>
+							</gmd:city>
+							<gmd:administrativeArea gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:administrativeArea>
+							<gmd:postalCode gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:postalCode>
+							<gmd:country>
+								<gco:CharacterString>United States of America</gco:CharacterString>
+							</gmd:country>
+							<gmd:electronicMailAddress>
+								<gco:CharacterString>dblodgett@usgs.gov</gco:CharacterString>
+							</gmd:electronicMailAddress>
+						</gmd:CI_Address>
+					</gmd:address>
+				</gmd:CI_Contact>
+			</gmd:contactInfo>
+			<gmd:role>
+				<gmd:CI_RoleCode codeListValue="custodian" codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#CI_RoleCode"/>
+			</gmd:role>
+		</gmd:CI_ResponsibleParty>
+	</gmd:contact>
+	<gmd:dateStamp>
+		<gco:DateTime>2012-11-21T07:24:48</gco:DateTime>
+	</gmd:dateStamp>
+	<gmd:metadataStandardName>
+		<gco:CharacterString>ISO 19115:2003/19139</gco:CharacterString>
+	</gmd:metadataStandardName>
+	<gmd:metadataStandardVersion>
+		<gco:CharacterString>1.0</gco:CharacterString>
+	</gmd:metadataStandardVersion>
+	<gmd:identificationInfo>
+		<gmd:MD_DataIdentification>
+			<gmd:citation>
+				<gmd:CI_Citation>
+					<gmd:title>
+						<gco:CharacterString>WaterSmart Intercomparison Portal</gco:CharacterString>
+					</gmd:title>
+					<gmd:date>
+						<gmd:CI_Date>
+							<gmd:date>
+								<gco:DateTime>2012-03-13T08:45:00</gco:DateTime>
+							</gmd:date>
+							<gmd:dateType>
+								<gmd:CI_DateTypeCode codeListValue="publication" codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#CI_DateTypeCode"/>
+							</gmd:dateType>
+						</gmd:CI_Date>
+					</gmd:date>
+					<gmd:presentationForm>
+						<gmd:CI_PresentationFormCode codeListValue="" codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#CI_PresentationFormCode"/>
+					</gmd:presentationForm>
+				</gmd:CI_Citation>
+			</gmd:citation>
+			<gmd:abstract>
+				<gco:CharacterString>{&apos;quicktips&apos; : { 
+  &apos;test&apos; : {
+    &apos;inner-test&apos; : &apos;&apos;
+  }
+}</gco:CharacterString>
+			</gmd:abstract>
+			<gmd:graphicOverview>
+				<gmd:MD_BrowseGraphic>
+					<gmd:fileName gco:nilReason="missing">
+						<gco:CharacterString/>
+					</gmd:fileName>
+					<gmd:fileDescription>
+						<gco:CharacterString>thumbnail</gco:CharacterString>
+					</gmd:fileDescription>
+				</gmd:MD_BrowseGraphic>
+			</gmd:graphicOverview>
+			<gmd:graphicOverview>
+				<gmd:MD_BrowseGraphic>
+					<gmd:fileName gco:nilReason="missing">
+						<gco:CharacterString/>
+					</gmd:fileName>
+					<gmd:fileDescription>
+						<gco:CharacterString>large_thumbnail</gco:CharacterString>
+					</gmd:fileDescription>
+				</gmd:MD_BrowseGraphic>
+			</gmd:graphicOverview>
+			<gmd:descriptiveKeywords>
+				<gmd:MD_Keywords>
+					<gmd:keyword>
+						<gco:CharacterString>AFINCH</gco:CharacterString>
+					</gmd:keyword>
+					<gmd:keyword>
+						<gco:CharacterString>SYE</gco:CharacterString>
+					</gmd:keyword>
+					<gmd:keyword>
+						<gco:CharacterString>PRMS</gco:CharacterString>
+					</gmd:keyword>
+					<gmd:keyword>
+						<gco:CharacterString>WATERS</gco:CharacterString>
+					</gmd:keyword>
+					<gmd:type>
+						<gmd:MD_KeywordTypeCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#MD_KeywordTypeCode" codeListValue=""/>
+					</gmd:type>
+				</gmd:MD_Keywords>
+			</gmd:descriptiveKeywords>
+			<gmd:spatialRepresentationType>
+				<gmd:MD_SpatialRepresentationTypeCode codeListValue="" codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#MD_SpatialRepresentationTypeCode"/>
+			</gmd:spatialRepresentationType>
+			<gmd:language>
+				<gco:CharacterString>eng</gco:CharacterString>
+			</gmd:language>
+			<gmd:characterSet>
+				<gmd:MD_CharacterSetCode codeListValue="utf8" codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#MD_CharacterSetCode"/>
+			</gmd:characterSet>
+			<gmd:supplementalInformation gco:nilReason="missing">
+				<gco:CharacterString/>
+			</gmd:supplementalInformation>
+		</gmd:MD_DataIdentification>
+	</gmd:identificationInfo>
+	<gmd:identificationInfo>
+		<srv:SV_ServiceIdentification id="OWS">
+			<gmd:citation>
+				<gmd:CI_Citation>
+					<gmd:title>
+						<gco:CharacterString>Region - South East</gco:CharacterString>
+					</gmd:title>
+					<gmd:date>
+						<gmd:CI_Date>
+							<gmd:date>
+								<gco:DateTime/>
+							</gmd:date>
+							<gmd:dateType>
+								<gmd:CI_DateTypeCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication"/>
+							</gmd:dateType>
+						</gmd:CI_Date>
+					</gmd:date>
+					<gmd:presentationForm>
+						<gmd:CI_PresentationFormCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#CI_PresentationFormCode" codeListValue=""/>
+					</gmd:presentationForm>
+				</gmd:CI_Citation>
+			</gmd:citation>
+			<gmd:abstract>
+				<gco:CharacterString>.</gco:CharacterString>
+			</gmd:abstract>
+			<srv:serviceType>
+				<gco:LocalName>OGC:OWS</gco:LocalName>
+			</srv:serviceType>
+			<srv:couplingType>
+				<srv:SV_CouplingType codeList="http://www.isotc211.org/2005/iso19119/resources/Codelist/gmxCodelists.xml#SV_CouplingType" codeListValue="tight"/>
+			</srv:couplingType>
+			<srv:containsOperations>
+				<srv:SV_OperationMetadata>
+					<srv:operationName>
+						<gco:CharacterString>GetFeature</gco:CharacterString>
+					</srv:operationName>
+					<srv:DCP/>
+					<srv:parameters>
+						<srv:SV_Parameter>
+							<srv:name>
+								<gco:aName>
+									<gco:CharacterString>primary_attribute</gco:CharacterString>
+								</gco:aName>
+								<gco:attributeType>
+									<gco:TypeName>
+										<gco:aName>
+											<gco:CharacterString>site_no</gco:CharacterString>
+										</gco:aName>
+									</gco:TypeName>
+								</gco:attributeType>
+							</srv:name>
+						</srv:SV_Parameter>
+					</srv:parameters>
+					<srv:connectPoint>
+						<gmd:CI_OnlineResource>
+							<gmd:linkage>
+								<gmd:URL>http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows</gmd:URL>
+							</gmd:linkage>
+							<gmd:protocol gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:protocol>
+							<gmd:name>
+								<gco:CharacterString>nwc:PRMSBase</gco:CharacterString>
+							</gmd:name>
+							<gmd:description>
+								<gco:CharacterString>SE-PRMSBase</gco:CharacterString>
+							</gmd:description>
+						</gmd:CI_OnlineResource>
+					</srv:connectPoint>
+					<srv:connectPoint>
+						<gmd:CI_OnlineResource>
+							<gmd:linkage>
+								<gmd:URL>http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows</gmd:URL>
+							</gmd:linkage>
+							<gmd:protocol gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:protocol>
+							<gmd:name>
+								<gco:CharacterString>nwc:Dense1</gco:CharacterString>
+							</gmd:name>
+							<gmd:description>
+								<gco:CharacterString>SE-DENSE1</gco:CharacterString>
+							</gmd:description>
+						</gmd:CI_OnlineResource>
+					</srv:connectPoint>
+					<srv:connectPoint>
+						<gmd:CI_OnlineResource>
+							<gmd:linkage>
+								<gmd:URL>http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows</gmd:URL>
+							</gmd:linkage>
+							<gmd:protocol gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:protocol>
+							<gmd:name>
+								<gco:CharacterString>nwc:Dense2</gco:CharacterString>
+							</gmd:name>
+							<gmd:description>
+								<gco:CharacterString>SE-DENSE2</gco:CharacterString>
+							</gmd:description>
+						</gmd:CI_OnlineResource>
+					</srv:connectPoint>
+					<srv:connectPoint>
+						<gmd:CI_OnlineResource>
+							<gmd:linkage>
+								<gmd:URL>http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows</gmd:URL>
+							</gmd:linkage>
+							<gmd:protocol gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:protocol>
+							<gmd:name>
+								<gco:CharacterString>nwc:Dense3</gco:CharacterString>
+							</gmd:name>
+							<gmd:description>
+								<gco:CharacterString>SE-DENSE3</gco:CharacterString>
+							</gmd:description>
+						</gmd:CI_OnlineResource>
+					</srv:connectPoint>
+					<srv:connectPoint>
+						<gmd:CI_OnlineResource>
+							<gmd:linkage>
+								<gmd:URL>http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows</gmd:URL>
+							</gmd:linkage>
+							<gmd:protocol gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:protocol>
+							<gmd:name>
+								<gco:CharacterString>nwc:Sparse1</gco:CharacterString>
+							</gmd:name>
+							<gmd:description>
+								<gco:CharacterString>SE-SPARSE1</gco:CharacterString>
+							</gmd:description>
+						</gmd:CI_OnlineResource>
+					</srv:connectPoint>
+					<srv:connectPoint>
+						<gmd:CI_OnlineResource>
+							<gmd:linkage>
+								<gmd:URL>http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows</gmd:URL>
+							</gmd:linkage>
+							<gmd:protocol gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:protocol>
+							<gmd:name>
+								<gco:CharacterString>nwc:Sparse2</gco:CharacterString>
+							</gmd:name>
+							<gmd:description>
+								<gco:CharacterString>SE-SPARSE2</gco:CharacterString>
+							</gmd:description>
+						</gmd:CI_OnlineResource>
+					</srv:connectPoint>
+					<srv:connectPoint>
+						<gmd:CI_OnlineResource>
+							<gmd:linkage>
+								<gmd:URL>http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows</gmd:URL>
+							</gmd:linkage>
+							<gmd:protocol gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:protocol>
+							<gmd:name>
+								<gco:CharacterString>nwc:Sparse3</gco:CharacterString>
+							</gmd:name>
+							<gmd:description>
+								<gco:CharacterString>SE-SPARSE3</gco:CharacterString>
+							</gmd:description>
+						</gmd:CI_OnlineResource>
+					</srv:connectPoint>
+					<srv:dependsOn/>
+				</srv:SV_OperationMetadata>
+				<srv:SV_OperationMetadata>
+					<srv:operationName>
+						<gco:CharacterString>GetMap</gco:CharacterString>
+					</srv:operationName>
+					<srv:DCP/>
+					<srv:connectPoint>
+						<gmd:CI_OnlineResource>
+							<gmd:linkage>
+								<gmd:URL>http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows</gmd:URL>
+							</gmd:linkage>
+							<gmd:protocol gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:protocol>
+							<gmd:name>
+								<gco:CharacterString>nwc:PRMSBase</gco:CharacterString>
+							</gmd:name>
+							<gmd:description>
+								<gco:CharacterString>SE-PRMSBase</gco:CharacterString>
+							</gmd:description>
+						</gmd:CI_OnlineResource>
+					</srv:connectPoint>
+					<srv:connectPoint>
+						<gmd:CI_OnlineResource>
+							<gmd:linkage>
+								<gmd:URL>http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows</gmd:URL>
+							</gmd:linkage>
+							<gmd:protocol gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:protocol>
+							<gmd:name>
+								<gco:CharacterString>nwc:Dense1</gco:CharacterString>
+							</gmd:name>
+							<gmd:description>
+								<gco:CharacterString>SE-DENSE1</gco:CharacterString>
+							</gmd:description>
+						</gmd:CI_OnlineResource>
+					</srv:connectPoint>
+					<srv:connectPoint>
+						<gmd:CI_OnlineResource>
+							<gmd:linkage>
+								<gmd:URL>http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows</gmd:URL>
+							</gmd:linkage>
+							<gmd:protocol gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:protocol>
+							<gmd:name>
+								<gco:CharacterString>nwc:Dense2</gco:CharacterString>
+							</gmd:name>
+							<gmd:description>
+								<gco:CharacterString>SE-DENSE2</gco:CharacterString>
+							</gmd:description>
+						</gmd:CI_OnlineResource>
+					</srv:connectPoint>
+					<srv:connectPoint>
+						<gmd:CI_OnlineResource>
+							<gmd:linkage>
+								<gmd:URL>http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows</gmd:URL>
+							</gmd:linkage>
+							<gmd:protocol gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:protocol>
+							<gmd:name>
+								<gco:CharacterString>nwc:Dense3</gco:CharacterString>
+							</gmd:name>
+							<gmd:description>
+								<gco:CharacterString>SE-DENSE3</gco:CharacterString>
+							</gmd:description>
+						</gmd:CI_OnlineResource>
+					</srv:connectPoint>
+					<srv:connectPoint>
+						<gmd:CI_OnlineResource>
+							<gmd:linkage>
+								<gmd:URL>http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows</gmd:URL>
+							</gmd:linkage>
+							<gmd:protocol gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:protocol>
+							<gmd:name>
+								<gco:CharacterString>nwc:Sparse1</gco:CharacterString>
+							</gmd:name>
+							<gmd:description>
+								<gco:CharacterString>SE-SPARSE1</gco:CharacterString>
+							</gmd:description>
+						</gmd:CI_OnlineResource>
+					</srv:connectPoint>
+					<srv:connectPoint>
+						<gmd:CI_OnlineResource>
+							<gmd:linkage>
+								<gmd:URL>http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows</gmd:URL>
+							</gmd:linkage>
+							<gmd:protocol gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:protocol>
+							<gmd:name>
+								<gco:CharacterString>nwc:Sparse2</gco:CharacterString>
+							</gmd:name>
+							<gmd:description>
+								<gco:CharacterString>SE-SPARSE2</gco:CharacterString>
+							</gmd:description>
+						</gmd:CI_OnlineResource>
+					</srv:connectPoint>
+					<srv:connectPoint>
+						<gmd:CI_OnlineResource>
+							<gmd:linkage>
+								<gmd:URL>http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows</gmd:URL>
+							</gmd:linkage>
+							<gmd:protocol gco:nilReason="missing">
+								<gco:CharacterString/>
+							</gmd:protocol>
+							<gmd:name>
+								<gco:CharacterString>nwc:Sparse3</gco:CharacterString>
+							</gmd:name>
+							<gmd:description>
+								<gco:CharacterString>SE-SPARSE3</gco:CharacterString>
+							</gmd:description>
+						</gmd:CI_OnlineResource>
+					</srv:connectPoint>
+					<srv:dependsOn/>
+				</srv:SV_OperationMetadata>
+			</srv:containsOperations>
+			<srv:operatesOn xlink:href="#DataIdentification"/>
+		</srv:SV_ServiceIdentification>
+	</gmd:identificationInfo>
+	<gmd:distributionInfo>
+		<gmd:MD_Distribution/>
+	</gmd:distributionInfo>
+</gmd:MD_Metadata>
