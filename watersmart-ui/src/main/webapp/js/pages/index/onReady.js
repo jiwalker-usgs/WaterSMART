@@ -31,6 +31,7 @@ Ext.onReady(function () {
     // data retrieved
     new CIDA.CSWGetRecordsStore({
         url : "service/geonetwork/csw",
+        scenarioOptions : [],
         opts : {
             resultType : 'results',
             outputSchema : 'http://www.isotc211.org/2005/gmd',
@@ -52,6 +53,27 @@ Ext.onReady(function () {
             load : function(store) {
                 // Parent store loaded
                 LOG.debug('onReady.js:: Parent CSW Record Store loaded ' + store.totalLength + ' record(s)');
+                
+                store.scenarioOptions = function(store) {
+                    var serviceIds = store.data.items[0].data.identificationInfo;
+                    var serviceDescriptions = [];
+                    for (var serviceIdIdx = 0;serviceIdIdx < serviceIds.length;serviceIdIdx++)
+                    {
+                        var serviceId = serviceIds[serviceIdIdx].serviceIdentification;
+                        if (serviceId && serviceId.id && serviceId.id.toLowerCase() == 'ows') 
+                        {
+                            Ext.each(serviceId.operationMetadata[0].connectPoint, function(cp) 
+                            {
+                                this.serviceDescriptions.push(cp.ciOnlineResource.description.CharacterString.value);
+
+                            }, {
+                                serviceDescriptions : serviceDescriptions
+                            })
+        
+                        }
+                    }
+                    return serviceDescriptions;
+                }(store)
                 
                 CONFIG.parentStore = store;
                 
