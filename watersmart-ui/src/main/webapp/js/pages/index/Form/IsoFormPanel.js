@@ -1,24 +1,11 @@
 Ext.ns("WaterSMART");
 
-WaterSMART.ScenarioOptions = [
-                                'PRMSbase',
-                                'Dense1',
-                                'Dense2',
-                                'Dense3',
-                                'Sparse1',
-                                'Sparse2',
-                                'Sparse3',
-                                'ACF_CG1',
-                                'ACF_CG2',
-                                'ACF_CG3',
-                                'Special'
-                             ];
-
 WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
     commonAttr : undefined,
     create : undefined,
     htmlTransform : undefined,
     isBestScenario : undefined,
+    scenarioOptions : [],
     layer : undefined,
     modelId : undefined,
     modelName : undefined,
@@ -31,7 +18,6 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
     wfsUrl : undefined,
     xmlTransform : undefined,
     'abstract' : undefined,
-
     originalAbstract : undefined,
     originalModelerName : undefined,
     originalModelName : undefined,
@@ -57,7 +43,8 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
         this.wfsUrl = config.wfsUrl || '';
         this.create = config.create;
         this.isBestScenario = config.isBestScenario || false;
-
+        this.scenarioOptions = config.scenarioOptions;
+        
         this['abstract'] = this.originalAbstract = config['abstract'] || '';
 
         config = Ext.apply({
@@ -73,7 +60,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                     fieldLabel: 'Calibration/ Validation Scenario',
                     xtype: 'combo',
                     mode: 'local',
-                    store: WaterSMART.ScenarioOptions,
+                    store: this.scenarioOptions,
                     hiddenName: 'scenario',
                     name: 'scenario',
                     ref: 'scenarioField',

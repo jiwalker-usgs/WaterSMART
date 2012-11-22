@@ -425,7 +425,29 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                             existingVersions : scenarioVersions,
                             scenario : '',
                             region : 'center',
-                            wfsUrl : wfsUrl
+                            wfsUrl : wfsUrl,
+                            // TODO- Refactor this to only require this function once on loading the ModelRunSelectionPanel
+                            // and once every time ModelRunSelectionPanel's parent CSW store is updated
+                            scenarioOptions : function(cswStore) {
+                                var serviceIds = cswStore.data.items[0].data.identificationInfo;
+                                var serviceDescriptions = [];
+                                for (var serviceIdIdx = 0;serviceIdIdx < serviceIds.length;serviceIdIdx++)
+                                {
+                                    var serviceId = serviceIds[serviceIdIdx].serviceIdentification;
+                                    if (serviceId && serviceId.id && serviceId.id.toLowerCase() == 'ows') 
+                                    {
+                                        Ext.each(serviceId.operationMetadata[0].connectPoint, function(cp) 
+                                        {
+                                            this.serviceDescriptions.push(cp.ciOnlineResource.description.CharacterString.value);
+
+                                        }, {
+                                            serviceDescriptions : serviceDescriptions
+                                        })
+        
+                                    }
+                                }
+                                return serviceDescriptions;
+                            }(this.parentStore)
                         });
                     
                         var modalRunWindow = new Ext.Window({
