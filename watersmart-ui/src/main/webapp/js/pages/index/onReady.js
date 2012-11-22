@@ -100,12 +100,7 @@ Ext.onReady(function () {
                         }
                     },
                     listeners : {
-                        load : function(store) {
-                            LOG.debug('onReady.js:: Child CSW Record Store loaded ' + store.totalLength + ' record(s)');
-                            this.cswStoreFirstLoad(CONFIG.parentStore, store);
-                            // We don't want to load the application every time this store loads
-                            store.un('load');
-                        },
+                        load : this.cswStoreFirstLoad,
                         exception : function() {
                             NOTIFY.warn({
                                 msg : 'An error has occured during initialization- Application may not contain full functionality.'
@@ -128,8 +123,9 @@ Ext.onReady(function () {
     }).load();
 });
 
-function cswStoreFirstLoad(parentStore, childStore) {
-
+function cswStoreFirstLoad(childStore) {
+    LOG.debug('onReady.js:: Child CSW Record Store loaded ' + childStore.totalLength + ' record(s)');
+    var parentStore = CONFIG.parentStore;
     var commonAttr = CONFIG.COMMON_ATTR;
 
     var sosController = new WaterSMART.SOSController({});
@@ -195,7 +191,7 @@ function cswStoreFirstLoad(parentStore, childStore) {
         ]
     });
     LOADMASK.hide();
-
+    childStore.un('load', this.cswStoreFirstLoad, this);
 }
 
 function initializeAjax() {
