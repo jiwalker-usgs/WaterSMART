@@ -21,7 +21,8 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
         this.panelInfo.presentationForm = this.serviceIdentification.citation.presentationForm; // Array
         this.panelInfo.isBestScenario = false;
         this.panelInfo.coupledResource = this.serviceIdentification.coupledResource;
-
+        this.panelInfo.modelName = config.modelName;
+            
         if (this.serviceIdentification.citation.otherCitationDetails && this.serviceIdentification.citation.otherCitationDetails.CharacterString.value.toLowerCase() === 'best') {
             this.panelInfo.isBestScenario = true;
             this.panelInfo.edition += ' -- (Best Available)';
@@ -76,47 +77,53 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
                 id: 'refresh',
                 handler: function(event, toolEl, panel, tc) {
                     // User wishes to run or re-run WPS R process on this run
-                    
-//                         String modelerName = request.getParameter("name");
-//                        String originalModelerName = request.getParameter("originalName");
-//                        String modelId = request.getParameter("modelId");
-//                        String modelType = request.getParameter("modeltype");
-//                        String modelVersion = request.getParameter("version");
-//                        String originalModelVersion = request.getParameter("originalModelVersion");
-//                        String runIdent = request.getParameter("runIdent");
-//                        String originalRunIdent = request.getParameter("originalRunIdent");
-//                        String runDate = request.getParameter("creationDate");
-//                        String originalRunDate = request.getParameter("originalCreationDate");
-//                        String scenario = request.getParameter("scenario");
-//                        String originalScenario = request.getParameter("originalScenario");
-//                        String comments = request.getParameter("comments");
-//                        String originalComments = request.getParameter("originalComments");
-//                        String email = request.getParameter("email");
-//                        String wfsUrl = request.getParameter("wfsUrl");
-//                        String layer = request.getParameter("layer");
-//                        String commonAttr = request.getParameter("commonAttr");
-//                        Boolean updateAsBest = "on".equalsIgnoreCase(request.getParameter("markAsBest")) ? Boolean.TRUE : Boolean.FALSE;
-                    var modelerName = panel.panelInfo.citedResponsibleParty;
-                    var fileIdentifier = panel.panelInfo.fileIdentifier;
-                    var operationURL = panel.panelInfo.operationURL; // NCML location
-                    var runVersion = panel.panelInfo.edition;
-                    var title = panel.panelInfo.title;
+                    var panelInfo = panel.panelInfo;
+                    var modelType = panelInfo.modelName;
+                    var modelerName = panelInfo.citedResponsibleParty[0].individualName.CharacterString.value;
+                    var fileIdentifier = panelInfo.fileIdentifier;
+                    var originalModelVersion = panelInfo.edition.split('.')[0];
+                    var originalRunIdent = panelInfo.edition.split('.')[1];
+                    var originalCreationDate = Date.parseDate(panelInfo.date[0].date[0].DateTime.value.split('T')[0], 'Y-m-d').format('m/d/Y');
+                    var originalScenario = panelInfo.title;
+                    var originalComments = panelInfo['abstract'];
+                    var email = panelInfo.citedResponsibleParty[0].contactInfo.address.electronicMailAddress[0].CharacterString.value;
+                    var wfsUrl = panelInfo.owsEndpoint;
+                    var layer = panelInfo.owsResourceName;
+                    var commonAttr = CONFIG.COMMON_ATTR; //TODO - get this from CSW instead
+                    var markAsBest = panelInfo.isBestScenario;
                     
                     Ext.Ajax.request({
                         url: 'update',
                         params: {
+                            markAsBest : markAsBest,
                             rerun : 'true',
-                            name : modelerName,
+                            modeltype : modelType,
                             originalName : modelerName,
                             modelId : fileIdentifier,
-                            modeltype : title,
-                            markAsBest : 'false'
+                            originalModelVersion : originalModelVersion,
+                            originalRunIdent : originalRunIdent,
+                            originalCreationDate : originalCreationDate,
+                            originalScenario : originalScenario,
+                            originalComments : originalComments,
+                            email : email,
+                            wfsUrl : wfsUrl,
+                            layer : layer,
+                            commonAttr : commonAttr
                         },
                         success: function(response){
                             LOG.debug('RunPanel.js:: Rerunning process request has succeeded');
-                            NOTIFY.info({
-                                msg : response.responseText
-                            });
+                            if (response.responseText.toLowerCase().contains('success: true')) {
+                                NOTIFY.info({
+                                    msg : "Your request is being processed. Due to the possibility "
+                                    + "that your request may take some time, you will be sent an e-mail "
+                                    + "when the process has completed. You may continue to use the application or close it."
+                                })
+                            } else {
+                                NOTIFY.warn({
+                                    msg : response.responseText
+                                })
+                            }
+                            
                         },
                         failure: function(response){
                             NOTIFY.warn({
@@ -142,10 +149,6 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
                     
                     me.body.on('mouseout', function() {
                         this.body.removeClass('run-panel-mouseover')
-                    }, me)
-                    
-                    me.body.on('click', function(){
-                        me.ownerCt.ownerCt.ownerCt.runSelected(me);
                     }, me)
                 },
                 scope : this

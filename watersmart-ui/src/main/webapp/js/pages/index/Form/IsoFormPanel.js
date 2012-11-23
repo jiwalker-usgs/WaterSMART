@@ -41,7 +41,7 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
         this.runDate = this.originalRunDate = config.runDate || new Date();
         this.scenario = this.originalScenario = config.scenario;
         this.wfsUrl = config.wfsUrl || '';
-        this.create = config.create;
+        this.create = config.create; // Is user uploading?
         this.isBestScenario = config.isBestScenario || false;
         this.scenarioOptions = config.scenarioOptions;
         
