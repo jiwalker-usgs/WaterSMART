@@ -109,7 +109,7 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
         this.addEvents(
             "layer-load-start",
             "layer-load-end"
-        );
+            );
 
         //TODO- $.extend(true...) performs a deep copy of a JSON object.
         //Get another way of doing a deep copy of a JSON object so we can
@@ -189,7 +189,9 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
             }, this).delay(1000);
         }
         else if (tries >= 10) {
-            NOTIFY.error({msg : "SOS took too long to respond"});
+            NOTIFY.error({
+                msg : "SOS took too long to respond"
+            });
         }
         else {
             if(!this.popup) {
@@ -219,13 +221,21 @@ WaterSMART.Map = Ext.extend(GeoExt.MapPanel, {
             } else {
                 this.popup.setTitle(event.features[0].attributes.station_nm);
             }
+            
             var offering = event.features[0].attributes[this.commonAttr];
-            new WaterSMART.Plotter({
-                url : this.sosEndpoint,
-                vars : this.sosController.getOffering(offering).observedProperties,
-                offering : offering,
-                ownerWindow : this.popup
-            })
+            var sosOffering = this.sosController.getOffering(offering);
+            if (!sosOffering) {
+                NOTIFY.info({
+                    msg : "Could not get data for this point from server"
+                });
+            } else {
+                new WaterSMART.Plotter({
+                    url : this.sosEndpoint,
+                    vars : sosOffering.observedProperties,
+                    offering : offering,
+                    ownerWindow : this.popup
+                })
+            }
         }
     },
     processMapConfigObject : function(mco) {
