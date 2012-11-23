@@ -10,6 +10,7 @@ import java.util.Map;
  */
 interface WPSInterface {
     
+    public String executeProcess(String sosEndpoint, RunMetadata metadata);  
     public String executeProcess(File zipLocation, RunMetadata metadata);    
     public String executeProcess(File zipLocation, Map<String, String> metadata);
 }

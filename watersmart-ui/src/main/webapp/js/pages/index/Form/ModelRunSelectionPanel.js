@@ -106,7 +106,8 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                                     }
                                         
                                     scenarioPanel.add(new WaterSMART.RunPanel({
-                                        serviceIdentification : idItem.serviceIdentification
+                                        serviceIdentification : idItem.serviceIdentification,
+                                        modelName : this.panelInfo.title
                                     }));
                                 }
                             }
