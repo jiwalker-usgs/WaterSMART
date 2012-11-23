@@ -32,6 +32,7 @@ Ext.onReady(function () {
     new CIDA.CSWGetRecordsStore({
         url : "service/geonetwork/csw",
         scenarioOptions : [],
+        owsServiceDescriptions : {},
         opts : {
             resultType : 'results',
             outputSchema : 'http://www.isotc211.org/2005/gmd',
@@ -54,9 +55,9 @@ Ext.onReady(function () {
                 // Parent store loaded
                 LOG.debug('onReady.js:: Parent CSW Record Store loaded ' + store.totalLength + ' record(s)');
                 
-                store.scenarioOptions = function(store) {
+                store.owsServiceDescriptions = function(store) {
                     var serviceIds = store.data.items[0].data.identificationInfo;
-                    var serviceDescriptions = [];
+                    var owsServiceDescriptions = {};
                     for (var serviceIdIdx = 0;serviceIdIdx < serviceIds.length;serviceIdIdx++)
                     {
                         var serviceId = serviceIds[serviceIdIdx].serviceIdentification;
@@ -64,16 +65,25 @@ Ext.onReady(function () {
                         {
                             Ext.each(serviceId.operationMetadata[0].connectPoint, function(cp) 
                             {
-                                this.serviceDescriptions.push(cp.ciOnlineResource.description.CharacterString.value);
-
+                                this.owsServiceDescriptions[cp.ciOnlineResource.description.CharacterString.value] = {
+                                    linkage : cp.ciOnlineResource.linkage.URL,
+                                    layer : cp.ciOnlineResource.name.CharacterString.value
+                                }
                             }, {
-                                serviceDescriptions : serviceDescriptions
+                                owsServiceDescriptions : owsServiceDescriptions
                             })
-        
                         }
                     }
-                    return serviceDescriptions;
+                    return owsServiceDescriptions;
                 }(store)
+                
+                store.scenarioOptions = function(owsServiceDescriptions) {
+                    var scenarioOptions = [];
+                    for (var key in owsServiceDescriptions) {
+                        scenarioOptions.push(key);
+                    }
+                    return scenarioOptions;
+                }(store.owsServiceDescriptions)
                 
                 CONFIG.parentStore = store;
                 

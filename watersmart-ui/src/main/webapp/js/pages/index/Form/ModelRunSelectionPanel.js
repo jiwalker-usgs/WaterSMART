@@ -191,9 +191,8 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
             var isoFormPanel = Ext.getCmp('metadata-form');
             var metadataForm = isoFormPanel.getForm().getValues();
 
-            LOG.debug('isoFormPanel.js::Preparing to upload file.');
-
             if (isoFormPanel.create) {
+                LOG.debug('isoFormPanel.js::Preparing to upload file.');
                 uploadPanel.getForm().submit({
                     url: uploadPanel.url,
                     scope : this,
@@ -339,7 +338,10 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                                 layer = iiItem.serviceIdentification.operationMetadata.name.CharacterString.value;
                             }
                         }
-
+                        
+                        wfsUrl = this.parentStore.owsServiceDescriptions[scenario].linkage;
+                        layer = this.parentStore.owsServiceDescriptions[scenario].layer;
+                        
                         var isoFormPanel = new WaterSMART.ISOFormPanel({
                             title : selectedRun.title,
                             modelId : modelId,
@@ -411,6 +413,10 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                                 layer = iiItem.serviceIdentification.operationMetadata.name.CharacterString.value;
                             }
                         }
+                        
+                        wfsUrl = this.parentStore.owsServiceDescriptions[scenario].linkage;
+                        layer = this.parentStore.owsServiceDescriptions[scenario].layer;
+                        
                         runIdentifier++;
                         
                         var isoFormPanel = new WaterSMART.ISOFormPanel({
