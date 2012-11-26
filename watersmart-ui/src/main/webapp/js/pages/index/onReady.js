@@ -63,6 +63,19 @@ Ext.onReady(function () {
                         var serviceId = serviceIds[serviceIdIdx].serviceIdentification;
                         if (serviceId && serviceId.id && serviceId.id.toLowerCase() == 'ows') 
                         {
+                            // Retrieve the common attribute from CSW records and put it into the global CONFIG
+                            Ext.each(serviceId.operationMetadata, function() {
+                                if (this.operationName.CharacterString.value.toLowerCase() === 'getfeature') {
+                                    Ext.each(this.parameter, function() {
+                                        var paramName = this.svParameter.name;
+                                        if (paramName.aName.CharacterString.value.toLowerCase() === 'primary_attribute') {
+                                            CONFIG.COMMON_ATTR = paramName.attributeType.typeName.aName.CharacterString.value;
+                                            LOG.debug('onReady.js:: "common attribute set to ' + CONFIG.COMMON_ATTR);
+                                        }
+                                    })
+                                }
+                            })
+                            
                             Ext.each(serviceId.operationMetadata[0].connectPoint, function(cp) 
                             {
                                 this.owsServiceDescriptions[cp.ciOnlineResource.description.CharacterString.value] = {
