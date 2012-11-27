@@ -214,7 +214,7 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                             email : WATERSMART.USER_EMAIL,
                             modeltype : isoFormPanel.modelName,
                             wfsUrl : isoFormPanel.wfsUrl,
-                            layer : isoFormPanel.layer,
+                            layer : CONFIG.parentStore.owsServiceDescriptions[metadataForm.scenario].layer,
                             commonAttr : isoFormPanel.commonAttr
                         },
                         waitMsg: 'Saving...',
