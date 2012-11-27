@@ -415,15 +415,17 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
                                 }
                                 scenarioVersions[scenario].push(edition);
                             }
-                            
-                            if (!wfsUrl && iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ows') {
-                                wfsUrl = iiItem.serviceIdentification.operationMetadata.linkage.URL;
-                                layer = iiItem.serviceIdentification.operationMetadata.name.CharacterString.value;
-                            }
+//                            
+//                            if (!wfsUrl && iiItem.serviceIdentification && iiItem.serviceIdentification.id.toLowerCase() === 'ows') {
+//                                wfsUrl = iiItem.serviceIdentification.operationMetadata.linkage.URL;
+//                                layer = iiItem.serviceIdentification.operationMetadata.name.CharacterString.value;
+//                            }
                         }
                         
-                        wfsUrl = this.parentStore.owsServiceDescriptions[scenario].linkage;
-                        layer = this.parentStore.owsServiceDescriptions[scenario].layer;
+                        if (scenario) {
+                            wfsUrl = this.parentStore.owsServiceDescriptions[scenario].linkage;
+                            layer = this.parentStore.owsServiceDescriptions[scenario].layer;
+                        }
                         
                         runIdentifier++;
                         

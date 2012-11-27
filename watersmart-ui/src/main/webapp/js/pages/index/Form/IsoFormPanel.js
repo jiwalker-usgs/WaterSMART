@@ -75,8 +75,14 @@ WaterSMART.ISOFormPanel = Ext.extend(Ext.form.FormPanel, {
                     select : function (combo, record, index) {
                         LOG.debug("got record: " + record.json);
                         var scenario = record.get(record.fields.first().name);
+                        var layerName = CONFIG.parentStore.owsServiceDescriptions[scenario].layer;
+                        var linkage = CONFIG.parentStore.owsServiceDescriptions[scenario].linkage
                         var maxModelVer = 0;
                         var maxRunIdent = 0;
+                        
+                        combo.ownerCt.layer = layerName;
+                        combo.ownerCt.wfsUrl = linkage;
+                        
                         Ext.each(this.existingVersions[scenario], function (version) {
                             if (version.split(".")[0] == maxModelVer) {
                                 maxRunIdent = (version.split(".")[1] > maxRunIdent) ? version.split(".")[1] : maxRunIdent;
