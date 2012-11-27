@@ -47,6 +47,10 @@ public class CreateDSGFromZip {
     public static ReturnInfo create(File srcZip, RunMetadata runMeta) throws IOException, XMLStreamException {
         // Need to put the resulting NetCDF file somewhere that ncSOS knows about
         String sosPath = JNDISingleton.getInstance().getProperty("watersmart.sos.location", System.getProperty("java.io.tmpdir"));
+        
+        // Make sure the directory gets created if it doesn't exist
+        FileUtils.forceMkdir(new File(sosPath));
+        
         File verifiedSrcZip = verifyZip(srcZip);
         String filename = verifiedSrcZip.getName().replace(".zip", ".nc");
         
@@ -140,6 +144,7 @@ public class CreateDSGFromZip {
         return info;
     }
     
+    // TODO - Currently doing nothing. Ideally we want to make sure zip will get unzipped
     static File verifyZip(File zipFile) throws ZipException, IOException {
 //        File workDirectory = new File(System.getProperty("java.io.tmpdir") + File.separatorChar + );
 //        File tempFile = File.createTempFile("verifyZip-DeleteMe", "zip");
