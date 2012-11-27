@@ -48,7 +48,6 @@ public class CreateDSGFromZip {
         // Need to put the resulting NetCDF file somewhere that ncSOS knows about
         String sosPath = JNDISingleton.getInstance().getProperty("watersmart.sos.location", System.getProperty("java.io.tmpdir"));
         
-        // Make sure the directory gets created if it doesn't exist
         FileUtils.forceMkdir(new File(sosPath));
         
         File verifiedSrcZip = verifyZip(srcZip);
@@ -56,7 +55,11 @@ public class CreateDSGFromZip {
         
         File ncFile = new File(sosPath + File.separator + runMeta.getTypeString() +
                                File.separator + filename);
+        
+        // Make sure the directory gets created if it doesn't exist
+        FileUtils.forceMkdir(new File(ncFile.getParent()));
         LOG.debug(ncFile.getName() + " will be saved to " + sosPath);
+        
         ZipFile zip = new ZipFile(verifiedSrcZip);
         Enumeration<? extends ZipEntry> entries = zip.entries();
         StationTimeSeriesNetCDFFile nc = null;
