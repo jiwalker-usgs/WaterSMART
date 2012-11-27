@@ -473,6 +473,8 @@ class WPSTask extends Thread {
         content.append("\n\tComments: ").append(metaObj.getComments());
         content.append("\n\tDate: ").append(metaObj.getCreationDate());
 
+        content.append("\n\nthe application failed with message: ").append(ex.getMessage());
+        
         content.append("\n\nhere is the stack trace for troubleshooting:\n\n");
         for (StackTraceElement el : ex.getStackTrace()) {
             content.append(el.toString()).append("\n");
