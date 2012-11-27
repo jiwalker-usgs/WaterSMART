@@ -22,6 +22,9 @@ WaterSMART.SOSController = Ext.extend(Ext.util.Observable, {
         LOG.debug("SOS GetCapabilites store loaded");
     },
     getOffering : function (offering) {
+        if (!this.sosGetCaps.contents) {
+            return undefined;
+        }
         return this.sosGetCaps.contents.offeringList[offering];
     }
 });
