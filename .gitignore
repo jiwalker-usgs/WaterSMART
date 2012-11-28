@@ -1,9 +1,6 @@
 /target/
-/watersmart-ui/target/
-/watersmart-common/target/
-/watersmart-parse/target/
-/watersmart-ui/src/main/webapp/META-INF/context.xml
-
+/**/target/
+/**/src/main/webapp/META-INF/context.xml
 .DS_Store
 /watersmart-geonetwork/target/
 /watersmart-wps/target/
