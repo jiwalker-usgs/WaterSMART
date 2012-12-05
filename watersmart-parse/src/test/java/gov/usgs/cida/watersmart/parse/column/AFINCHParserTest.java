@@ -44,13 +44,13 @@ public class AFINCHParserTest {
     @Test
     public void testNetCDFFromAfinch() throws IOException, XMLStreamException {
         RunMetadata runMeta = new RunMetadata(ModelType.AFINCH, "1", "test", "1", "1", "2012-07-10T00:00:00Z", 
-            "Special", "comments", "jiwalker@usgs.gov", "http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows", 
-            "nwc:se_sites", "site_no");
+            "Special", "comments", "jiwalker@usgs.gov", "http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/NWC/ows", 
+            "NWC:Dense1", "site_no");
         ReturnInfo info = CreateDSGFromZip.create(sampleFile, runMeta);
         File ncFile = new File("/tmp/afinch/" + info.filename);
         
         assertThat(info.filename, is(equalTo("afinch.nc")));
-        assertThat(FileUtils.sizeOf(ncFile), is(equalTo(2791005L)));
+        assertThat(FileUtils.sizeOf(ncFile), is(equalTo(1118897L)));
         FileUtils.deleteQuietly(ncFile);
     }
 

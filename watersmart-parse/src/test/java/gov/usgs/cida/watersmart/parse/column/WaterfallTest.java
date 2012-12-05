@@ -42,13 +42,13 @@ public class WaterfallTest {
     @Test
     public void testNetCDFFromWaterfall() throws IOException, XMLStreamException {
         RunMetadata runMeta = new RunMetadata(ModelType.WATERFALL, "1", "test", "1", "1", "2012-07-10T00:00:00Z", 
-            "Special", "comments", "jiwalker@usgs.gov", "http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows", 
-            "nwc:se_sites", "site_no");
+            "Special", "comments", "jiwalker@usgs.gov", "http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/NWC/ows", 
+            "NWC:Dense1", "site_no");
         ReturnInfo info = CreateDSGFromZip.create(sampleFile, runMeta);
         File ncFile = new File("/tmp/waterfall/" + info.filename);
         
         assertEquals(info.filename, "WATERFALL_realupload.nc");
-        assertEquals(FileUtils.sizeOf(ncFile), 3185373L);
+        assertEquals(FileUtils.sizeOf(ncFile), 3179793L);
         FileUtils.deleteQuietly(ncFile);
     }
 
