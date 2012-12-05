@@ -5,11 +5,11 @@ import gov.usgs.cida.watersmart.parse.StationLookup
 
 class StationLookupSpec extends Specification {
     
-    def stations = new WFSPointStationLookup("http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows", "nwc:se_sites", "site_no")
+    def stations = new WFSPointStationLookup("http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/NWC/ows", "NWC:Dense1", "site_no")
     
-	def "there should be 509 stations"() {
+	def "there should be 199 stations"() {
         expect:
-        stations.getStations().size() == 509
+        stations.getStations().size() == 199
     }
     
     @Unroll
@@ -20,8 +20,8 @@ class StationLookupSpec extends Specification {
         where:
         stationId  | index
         "02177000" | 0
-        "02186000" | 7
-        "02204130" | 15
+        "02186000" | 3
+        "02204130" | -1
         "blah"     | -1
     }
 }
