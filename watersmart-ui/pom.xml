@@ -178,7 +178,7 @@
         </dependency>
     </dependencies>
     <build>
-        <finalName>watersmart</finalName>
+        <finalName>nwcip</finalName>
         <plugins>
             <plugin>
                 <groupId>com.github.searls</groupId>
