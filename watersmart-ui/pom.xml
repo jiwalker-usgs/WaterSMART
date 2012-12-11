@@ -137,25 +137,25 @@
         <dependency>
             <groupId>gov.usgs.cida.jslibs</groupId>
             <artifactId>geoext</artifactId>
-            <version>1.1-6</version>
+            <version>1.1-7</version>
             <type>war</type>
         </dependency>
         <dependency>
             <groupId>gov.usgs.cida.jslibs</groupId>
             <artifactId>geoext-sos-ux</artifactId>
-            <version>1.1-6</version>
+            <version>1.1-7</version>
             <type>war</type>
         </dependency>
         <dependency>
             <groupId>gov.usgs.cida.jslibs</groupId>
             <artifactId>geoext-csw-ux</artifactId>
-            <version>1.1-7-SNAPSHOT</version>
+            <version>1.1-7</version>
             <type>war</type>
         </dependency>
         <dependency>
             <groupId>gov.usgs.cida.jslibs</groupId>
             <artifactId>geoext-wps-ux</artifactId>
-            <version>1.1-6</version>
+            <version>1.1-7</version>
             <type>war</type>
         </dependency>
         <dependency>
@@ -194,8 +194,8 @@
                 </executions>
                 <configuration>
                     <browserVersion>INTERNET_EXPLORER_8</browserVersion>
-                    <jsSrcDir>${project.build.directory}/watersmart/js</jsSrcDir>
-                    <customRunnerTemplate>${project.build.directory}/watersmart/WEB-INF/classes/CustomSpecRunner.htmltemplate</customRunnerTemplate>
+                    <jsSrcDir>${project.build.directory}/${project.build.finalName}/js</jsSrcDir>
+                    <customRunnerTemplate>${project.build.directory}/${project.build.finalName}/WEB-INF/classes/CustomSpecRunner.htmltemplate</customRunnerTemplate>
                     <sourceIncludes>
                         <include>**/openlayers/OpenLayers.js</include>
                         <include>**/ext/adapter/ext/ext-base.js</include>
