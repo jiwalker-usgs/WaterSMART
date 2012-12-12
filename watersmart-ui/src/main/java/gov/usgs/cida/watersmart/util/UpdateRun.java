@@ -69,14 +69,26 @@ public class UpdateRun extends HttpServlet {
         if ("prms".equals(modelType.toLowerCase())) {
             modelTypeEnum = ModelType.PRMS;
         }
-        if ("afinch".equals(modelType.toLowerCase())) {
+        else if ("afinch".equals(modelType.toLowerCase())) {
             modelTypeEnum = ModelType.AFINCH;
         }
-        if ("waters".equals(modelType.toLowerCase())) {
+        else if ("waters".equals(modelType.toLowerCase())) {
             modelTypeEnum = ModelType.WATERS;
         }
-        if ("sye".equals(modelType.toLowerCase())) {
+        else if ("sye".equals(modelType.toLowerCase())) {
             modelTypeEnum = ModelType.SYE;
+        }
+        else if ("stats".equals(modelType.toLowerCase())) {
+            modelTypeEnum = ModelType.STATS;
+        }
+        else if ("prms2".equals(modelType.toLowerCase())) {
+            modelTypeEnum = ModelType.PRMS2;
+        }
+        else if ("waterfall".equals(modelType.toLowerCase())) {
+            modelTypeEnum = ModelType.WATERFALL;
+        }
+        else {
+            throw new IllegalArgumentException("Model Type does not exist!!");
         }
 
         RunMetadata originalRunMetadata = new RunMetadata(
@@ -95,7 +107,7 @@ public class UpdateRun extends HttpServlet {
                 updateAsBest);
 
         if (rerun) {
-            String sosEndpoint = props.getProperty("watersmart.sos.model.repo") + originalRunMetadata.getTypeString() + "/" + originalRunMetadata.getFileName();
+            String sosEndpoint = props.getProperty("watersmart.sos.model.repo") + originalRunMetadata.getTypeString() + "/" + originalRunMetadata.getFileName() + ".nc";
             WPSImpl impl = new WPSImpl();
             String implResponse = impl.executeProcess(sosEndpoint, originalRunMetadata);
             Boolean processStarted = implResponse.toLowerCase().equals("ok");
