@@ -11,7 +11,7 @@ library(hydroGOF)
 sos_url_temp="http://waterservices.usgs.gov/nwis/dv/?format=waterml,1.1&sites="
 offering_temp='00003'
 property_temp='00060'
-
+drainage_url="http://waterdata.usgs.gov/nwis/nwisman/?site_no="
 site_url="http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=nwc:se_sites"
 
 getXMLDV2Data <- function(sos_url,sites,property,offering,startdate,enddate,interval,latest){
@@ -73,6 +73,14 @@ getXMLWML1.1Data <- function(obs_url){
   if (length(dateSet)>2) {
     Daily$date<-dateSet}
   return (Daily)
+}
+
+getDrainageArea <- function(drain_url){
+  cat(paste("Retrieving data from: \n", drain_url, "\n", sep=" "))
+  doc<-readLines(drain_url)
+  doc2<-htmlParse(drain_url)
+  doc3<-readHTMLTable(drain_url)
+  txt<-xpathSApply(doc2,"//dd")
 }
 
 # This function computes the Nash-Sutcliffe value between two data series
@@ -190,10 +198,10 @@ ma3 <- function(qfiletempf, pref = "mean") {
   return(ma3)
 }
 
-ma4<-function(x) {
+ma4.11<-function(x) {
   isolateq <- x$discharge
   sortq <- sort(isolateq)
-  percentiles<-vector(length==19)
+  percentiles<-vector(length=19)
   percentiles[1] <- floor(findrank(length(sortq), 0.05))  
   percentiles[2] <- floor(findrank(length(sortq), 0.1))
   percentiles[3] <- floor(findrank(length(sortq), 0.15))
@@ -213,8 +221,8 @@ ma4<-function(x) {
   percentiles[17] <- floor(findrank(length(sortq), 0.85))
   percentiles[18] <- floor(findrank(length(sortq), 0.9))
   percentiles[19] <- floor(findrank(length(sortq), 0.95))
-  mean <- mean(percentiles,na.rm=true)
-  sdev <- sd(percentiles, na.rm=true)
+  mean <- mean(percentiles,na.rm=TRUE)
+  sdev <- sd(percentiles, na.rm=TRUE)
   ma4 <- sdev/mean*100
   ma5 <- ma1(x)/ma2(x)
   ma6 <- percentiles[2]/percentiles[18]
@@ -295,18 +303,18 @@ ma36.40 <- function(qfiletemp) {
   colnames(meanbymon) <- c("Month","meanmo")
   maxbymon <- aggregate(qfiletemp$discharge, list(qfiletemp$month_val), FUN = max, na.rm=TRUE)
   colnames(maxbymon) <- c("Month","maxmo")
-  minbymon <- aggregate(qfiletemp$discharge, list(qfiletemp$month_Val), FUN = min, na.rm=TRUE)
+  minbymon <- aggregate(qfiletemp$discharge, list(qfiletemp$month_val), FUN = min, na.rm=TRUE)
   colnames(minbymon) <- c("Month","minmo")
-  sortmeanbymon <- sort(meanbymon)
+  sortmeanbymon <- sort(meanbymon$meanmo)
   perc_10 <- floor(findrank(length(sortmeanbymon), 0.1))
   perc_25 <- floor(findrank(length(sortmeanbymon), 0.25))
   perc_75 <- floor(findrank(length(sortmeanbymon), 0.75))
   perc_90 <- floor(findrank(length(sortmeanbymon), 0.9))
-  ma36 <- (max(maxbymon)-min(minbymon))/median(meanbymon)
-  ma37 <- (perc_75-perc_25)/median(meanbymon)
-  ma38 <- (perc_90-perc_10)/median(meanbymon)
-  ma39 <- (sd(meanbymon)*100)/mean(meanbymon)
-  ma40 <- (mean(meanbymon)-median(meanbymon))/median(meanbymon)
+  ma36 <- (max(maxbymon$maxmo)-min(minbymon$minmo))/median(meanbymon$meanmo)
+  ma37 <- (perc_75-perc_25)/median(meanbymon$meanmo)
+  ma38 <- (perc_90-perc_10)/median(meanbymon$meanmo)
+  ma39 <- (sd(meanbymon$meanmo)*100)/mean(meanbymon$meanmo)
+  ma40 <- (mean(meanbymon$meanmo)-median(meanbymon$meanmo))/median(meanbymon$meanmo)
   ma36.40 <- list(ma36,ma37,ma38,ma39,ma40)
   return(ma36.40)
 }
@@ -314,16 +322,16 @@ ma36.40 <- function(qfiletemp) {
 ma41.45 <- function(qfiletemp,drainarea) {
   meanbyyr <- aggregate(qfiletemp$discharge, list(qfiletemp$year_val), FUN = mean, na.rm=TRUE)
   colnames(meanbyyr) <- c("Year","meanyr")
-  sortmeanbyyr <- sort(meanbyyr)
+  sortmeanbyyr <- sort(meanbyyr$meanyr)
   perc_10 <- floor(findrank(length(sortmeanbyyr), 0.1))
   perc_25 <- floor(findrank(length(sortmeanbyyr), 0.25))
   perc_75 <- floor(findrank(length(sortmeanbyyr), 0.75))
   perc_90 <- floor(findrank(length(sortmeanbyyr), 0.9))
-  ma41 <- mean(meanbyyr)/drainarea
-  ma42 <- (max(meanbyyr)-min(meanbyyr))/median(meanbyyr)
-  ma43 <- (perc_75-perc_25)/median(meanbyyr)
-  ma44 <- (perc_90-perc_10)/median(meanbyyr)
-  ma45 <- (mean(meanbyyr)-median(meanbyyr))/median(meanbyyr)
+  ma41 <- mean(meanbyyr$meanyr)/drainarea
+  ma42 <- (max(meanbyyr$meanyr)-min(meanbyyr$meanyr))/median(meanbyyr$meanyr)
+  ma43 <- (perc_75-perc_25)/median(meanbyyr$meanyr)
+  ma44 <- (perc_90-perc_10)/median(meanbyyr$meanyr)
+  ma45 <- (mean(meanbyyr$meanyr)-median(meanbyyr$meanyr))/median(meanbyyr$meanyr)
   ma41.45 <- list(ma41,ma42,ma43,ma44,ma45)
   return(ma41.45)
 }
@@ -365,7 +373,7 @@ ml14.16 <- function(qfiletempf) {
   medflow <- aggregate(qfiletempf$discharge, list(qfiletempf$year_val), 
                        median, na.rm=TRUE)
   meanflow <- aggregate(qfiletempf$discharge, list(qfiletempf$year_val), mean, na.rm=TRUE)
-  computeml14 <- merge(minbyyear, medflow, meanflow, by = "Group.1")
+  computeml14 <- merge(merge(minbyyear, medflow, by.x="Group.1", by.y="Group.1"),meanflow, by.x="Group.1", by.z="Group.1")
   colnames(computeml14) <- c("year", "minbyyr", "medbyyr", "meanbyyr")
   dfml14 <- computeml14$minbyyr/computeml14$medbyyr
   dfml15 <- computeml14$minbyyr/computeml14$meanbyyr
@@ -866,7 +874,14 @@ yv<-vector(length=al)
 ma1v<-vector(length=al)
 ma2v<-vector(length=al)
 ma3v<-vector(length=al)
+ma4v<-vector(length=al)
 ma5v<-vector(length=al)
+ma6v<-vector(length=al)
+ma7v<-vector(length=al)
+ma8v<-vector(length=al)
+ma9v<-vector(length=al)
+ma10v<-vector(length=al)
+ma11v<-vector(length=al)
 ma12v<-vector(length=al)
 ma13v<-vector(length=al)
 ma14v<-vector(length=al)
@@ -891,11 +906,29 @@ ma32v<-vector(length=al)
 ma33v<-vector(length=al)
 ma34v<-vector(length=al)
 ma35v<-vector(length=al)
+ma36v<-vector(length=al)
 ma37v<-vector(length=al)
+ma38v<-vector(length=al)
 ma39v<-vector(length=al)
 ma40v<-vector(length=al)
+ml1v<-vector(length=al)
+ml2v<-vector(length=al)
+ml3v<-vector(length=al)
+ml4v<-vector(length=al)
+ml5v<-vector(length=al)
+ml6v<-vector(length=al)
+ml7v<-vector(length=al)
+ml8v<-vector(length=al)
+ml9v<-vector(length=al)
+ml10v<-vector(length=al)
+ml11v<-vector(length=al)
+ml12v<-vector(length=al)
 ml13v<-vector(length=al)
 ml14v<-vector(length=al)
+ml15v<-vector(length=al)
+ml16v<-vector(length=al)
+ml17v<-vector(length=al)
+ml18v<-vector(length=al)
 mh14v<-vector(length=al)
 mh16v<-vector(length=al)
 mh26v<-vector(length=al)
@@ -1041,7 +1074,14 @@ dfcvbyyrf_list[[as.character(sites)]]<-dfcvbyyrf
                     ma1v[i]<-ma1(obs_data)
                     ma2v[i]<-ma2(obs_data)
                     ma3v[i]<-ma3(obs_data)
-                    ma5v[i]<-ma5(obs_data)
+                    ma4v[i]<-unlist(ma4.11(obs_data)[1])
+                    ma5v[i]<-unlist(ma4.11(obs_data)[2])
+                    ma6v[i]<-unlist(ma4.11(obs_data)[3])
+                    ma7v[i]<-unlist(ma4.11(obs_data)[4])
+                    ma8v[i]<-unlist(ma4.11(obs_data)[5])
+                    ma9v[i]<-unlist(ma4.11(obs_data)[6])
+                    ma10v[i]<-unlist(ma4.11(obs_data)[7])
+                    ma11v[i]<-unlist(ma4.11(obs_data)[8])
                     ma12v[i]<-ma12.23(obs_data)[1:1,2:2]
                     ma13v[i]<-ma12.23(obs_data)[2:2,2:2]
                     ma14v[i]<-ma12.23(obs_data)[3:3,2:2]
@@ -1066,12 +1106,28 @@ dfcvbyyrf_list[[as.character(sites)]]<-dfcvbyyrf
                     ma33v[i]<-ma24.35(obs_data)[10,1]
                     ma34v[i]<-ma24.35(obs_data)[11,1]
                     ma35v[i]<-ma24.35(obs_data)[12,1]
-                    ma37v[i]<-unname(ma37(obs_data))
-                    ma39v[i]<-ma39(obs_data)
-                    ma40v[i]<-unname(ma40(obs_data))
+                    ma36v[i]<-unlist(ma36.40(obs_data)[1])
+                    ma37v[i]<-unlist(ma36.40(obs_data)[2])
+                    ma38v[i]<-unlist(ma36.40(obs_data)[3])
+                    ma39v[i]<-unlist(ma36.40(obs_data)[4])
+                    ma40v[i]<-unlist(ma36.40(obs_data)[5])
+                    ml1v[i]<-unlist(ml1.12(obs_data)[1])
+                    ml2v[i]<-unlist(ml1.12(obs_data)[2])
+                    ml3v[i]<-unlist(ml1.12(obs_data)[3])
+                    ml4v[i]<-unlist(ml1.12(obs_data)[4])
+                    ml5v[i]<-unlist(ml1.12(obs_data)[5])
+                    ml6v[i]<-unlist(ml1.12(obs_data)[6])
+                    ml7v[i]<-unlist(ml1.12(obs_data)[7])
+                    ml8v[i]<-unlist(ml1.12(obs_data)[8])
+                    ml9v[i]<-unlist(ml1.12(obs_data)[9])
+                    ml10v[i]<-unlist(ml1.12(obs_data)[10])
+                    ml11v[i]<-unlist(ml1.12(obs_data)[11])
+                    ml12v[i]<-unlist(ml1.12(obs_data)[12])
                     ml13v[i]<-ml13(obs_data)
-                    ml14v[i]<-ml14(obs_data)
-                    ml17v[i]<-ml14(obs_data)
+                    ml14v[i]<-unlist(ml14.16(obs_data)[1])
+                    ml15v[i]<-unlist(ml14.16(obs_data)[2])
+                    ml16v[i]<-unlist(ml14.16(obs_data)[3])
+                    ml17v[i]<-ml17(obs_data)
                     ml18v[i]<-ml18(obs_data)
                     mh14v[i]<-mh14(obs_data)
                     mh16v[i]<-mh16(obs_data)
@@ -1152,13 +1208,14 @@ flow_90_obs[i]<-sort_x_obs[rank_90obs]
 
 statsout<-data.frame(t(a),yv,ymaxv,mean_flow,med_flow,cv_flow,
                      flow_10_obs,flow_25_obs,flow_50_obs,flow_75_obs,flow_90_obs,
-                     cv_daily,ma1v,ma2v,ma3v,ma5v,ma12v,ma13v,
+                     cv_daily,ma1v,ma2v,ma3v,ma4v,ma5v,ma6v,ma7v,ma8v,ma9v,ma10v,ma11v,ma12v,ma13v,
                      ma14v,ma15v,ma16v,ma17v,ma18v,ma19v,ma20v,
                      ma21v,ma22v,ma23v,mamin12v,mamin13v,mamin14v,mamin15v,mamin16v,mamin17v,mamin18v,
                      mamin19v,mamin20v,mamin21v,mamin22v,mamin23v,mamax12v,mamax13v,mamax14v,mamax15v,mamax16v,mamax17v,mamax18v,
                      mamax19v,mamax20v,mamax21v,mamax22v,mamax23v,ma24v,ma25v,ma26v,ma27v,
-                     ma28v,ma29v,ma30v,ma31v,ma32v,ma33v,ma34v,ma35v,
-                     ma37v,ma39v,ma40v,ml13v,ml14v,
+                     ma28v,ma29v,ma30v,ma31v,ma32v,ma33v,ma34v,ma35v,ma36v,
+                     ma37v,ma38v,ma39v,ma40v,ml1v,ml2v,ml3v,ml4v,ml5v,ml6v,ml7v,ml8v,ml9v,
+                     ml10v,ml11v,ml12v,ml13v,ml14v,ml15v,ml16v,ml17v,ml18v,
                      mh14v,mh16v,mh26v,ml17v,ml18v,
                      fl1v,fl2v,fh1v,fh2v,fh3v,
                      fh4v,dl1v,dl2v,dl4v,dl5v,
@@ -1168,13 +1225,14 @@ statsout<-data.frame(t(a),yv,ymaxv,mean_flow,med_flow,cv_flow,
                      comment)
 colnames(statsout)<-c('site_no','min_date','max_date','mean_of_annual_flows','median_of_annual_flows','cv_of_annual_flows',
                       'flow_10_obs,','flow_25_obs','flow_50_obs','flow_75_obs','flow_90_obs',
-                      'cv_daily_flows','ma1_mean_disc','ma2_median_disc','ma3_mean_annual_var','ma5_skew','ma12_jan_mean','ma13_feb_mean',
+                      'cv_daily_flows','ma1_mean_disc','ma2_median_disc','ma3_mean_annual_var','ma4','ma5_skew','ma6','ma7','ma8','ma9','ma10','ma11','ma12_jan_mean','ma13_feb_mean',
                       'ma14_mar_mean','ma15_apr_mean','ma16_may_mean','ma17_june_mean','ma18_july_mean','ma19_aug_mean','ma20_sep_mean',
                       'ma21_oct_mean','ma22_nov_mean','ma23_dec_mean','jan_min','feb_min','mar_min','apr_min','may_min','jun_min','jul_min',
                       'aug_min','sept_min','oct_min','nov_min','dec_min','jan_max','feb_max','mar_max','apr_max','may_max','june_max','jul_max',
                       'aug_max','sept_max','oct_max','nov_max','dec_max','ma24_jan_var','ma25_feb_var','ma26_mar_var','ma27_apr_var',
-                      'ma28_may_var','ma29_jun_var','ma30_july_var','ma31_aug_var','ma32_sep_var','ma33_oct_var','ma34_nov_var','ma35_dec_var',
-                      'ma37_var_across_months','ma39_monthly_std_dev','ma40_monthly_skewness','ml13_min_monthly_var','ml14_min_annual_flow',
+                      'ma28_may_var','ma29_jun_var','ma30_july_var','ma31_aug_var','ma32_sep_var','ma33_oct_var','ma34_nov_var','ma35_dec_var','ma36',
+                      'ma37_var_across_months','ma38','ma39_monthly_std_dev','ma40_monthly_skewness','ml1','ml2','ml3','ml4','ml5','ml6','ml7','ml8','ml9',
+                      'ml10','ml11','ml12','ml13_min_monthly_var','ml14_min_annual_flow','ml15','ml16','ml17','ml18',
                       'mh14_med_annual_max','mh16_high_flow_index','mh26_high_peak_flow','ml17_base_flow','ml18_base_flow_var',
                       'fl1_low_flood_pulse','fl2_low_pulse_var','fh1_high_pulse_count','fh2_high_pulse_var','fh3_high_pulse_count_three',
                       'fh4_high_pulse_count_seven','dl1_min_daily_flow','dl2_min_3_day_avg','dl4_min_30_day_avg','dl5_min_90_day_avg',
