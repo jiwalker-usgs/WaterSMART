@@ -1,5 +1,3 @@
-# wps.des: id=test_stats, title = test stats, abstract = Finds the mean daily flow median daily flow and skewness of daily flow in the input dataset;
-# wps.in: sites, string, list of sites, A list of sites;
 
 library(XML)
 library(zoo)
@@ -8,10 +6,10 @@ library(doBy)
 library(hydroGOF)
 #library(dataRetrieval)
 
-sos_url_temp="http://waterservices.usgs.gov/nwis/dv/?format=waterml,1.1&sites="
-offering_temp='00003'
-property_temp='00060'
-drainage_url="http://waterdata.usgs.gov/nwis/nwisman/?site_no="
+sos_url="http://waterservices.usgs.gov/nwis/dv/?format=waterml,1.1&sites="
+offering='00003'
+property='00060'
+drainage_url="http://waterservices.usgs.gov/nwis/site/?siteOutput=Expanded&site="
 site_url="http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/nwc/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=nwc:se_sites"
 
 getXMLDV2Data <- function(sos_url,sites,property,offering,startdate,enddate,interval,latest){
@@ -77,10 +75,9 @@ getXMLWML1.1Data <- function(obs_url){
 
 getDrainageArea <- function(drain_url){
   cat(paste("Retrieving data from: \n", drain_url, "\n", sep=" "))
-  doc<-readLines(drain_url)
-  doc2<-htmlParse(drain_url)
-  doc3<-readHTMLTable(drain_url)
-  txt<-xpathSApply(doc2,"//dd")
+  site_service<-read.delim(drain_url, header=TRUE, quote="\"", dec=".", sep="\t", colClasses=c("character"), fill=TRUE, comment.char="#")
+  site_service<-site_service[2,]
+  drain_area<-as.numeric(site_service$drain_area_va)
 }
 
 # This function computes the Nash-Sutcliffe value between two data series
@@ -268,6 +265,12 @@ mamax12.23 <- function(qfiletempf) {
                       max, na.rm=TRUE)
   mamax12.23 <- data.frame(maxmon)
   return(mamax12.23)
+}
+
+monthly.mean.ts <- function(qfiletempf,modsite) {
+  meanmonts <- aggregate(qfiletempf$discharge, list(qfiletempf$year_val,qfiletempf$month_val), FUN = mean, na.rm=TRUE)
+  colnames(meanmonts) <- c("Year","Month","Mean_disch")
+  return(meanmonts)
 }
 
 ma24.35 <- function(qfiletempf, pref = "mean") {
@@ -867,7 +870,7 @@ return_10 <- function(qfiletempf) {
 }
 setwd('/Users/jlthomps/Documents/R/')
 #a<-read.csv(header=F,colClasses=c("character"),text=sites)
-a<-read.csv("sites_waters_stat.txt",header=F,colClasses=c("character"))
+a<-read.csv("sites_waters_stat_part.txt",header=F,colClasses=c("character"))
 #a<-t(getAllSites(site_url))
 al<-length(a)
 yv<-vector(length=al)
@@ -911,6 +914,11 @@ ma37v<-vector(length=al)
 ma38v<-vector(length=al)
 ma39v<-vector(length=al)
 ma40v<-vector(length=al)
+ma41v<-vector(length=al)
+ma42v<-vector(length=al)
+ma43v<-vector(length=al)
+ma44v<-vector(length=al)
+ma45v<-vector(length=al)
 ml1v<-vector(length=al)
 ml2v<-vector(length=al)
 ml3v<-vector(length=al)
@@ -1009,13 +1017,15 @@ for (i in 1:length(sites)){
 startdate<-"1900-01-01"
 enddate<-"2012-10-01"
 sites=a[i]
-url2<-paste(sos_url_temp,sites,'&startDT=',startdate,'&endDT=',enddate,'&statCd=',offering_temp,'&parameterCd=',property_temp,'&access=3',sep='')
+url2<-paste(sos_url,sites,'&startDT=',startdate,'&endDT=',enddate,'&statCd=',offering,'&parameterCd=',property,'&access=3',sep='')
 x_obs <- getXMLWML1.1Data(url2)
 #x_obs <- getXMLDV2Data(sos_url,sites,property,offering,startdate,enddate,interval,latest)
 if (nrow(x_obs)>2) {
 x2<-(x_obs$date)
 x_obs<-data.frame(strptime(x2, "%Y-%m-%d"),x_obs$discharge)
 colnames(x_obs)<-c("date","discharge")
+drain_url<-paste(drainage_url,sites,sep="")
+drain_area<-getDrainageArea(drain_url)
 
 selqfile<-x_obs
 tempdatafr<-NULL
@@ -1049,6 +1059,9 @@ yv[i]<-as.character(min(obs_data$date))
 ymaxv[i]<-as.character(max(obs_data$date))
 x_obsz<-obs_data$discharge
 dates<-as.Date(obs_data$date)
+file<-paste("monthly_mean_ts_obs",toString(sites),".txt",sep="")
+monthly_mean<-monthly.mean.ts(obs_data,sites)
+write.table(monthly_mean,file=file,col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
 sdbyyr <- aggregate(obs_data$discharge, list(obs_data$year_val), 
                     sd)
 colnames(sdbyyr) <- c("Year", "sdq")
@@ -1111,6 +1124,11 @@ dfcvbyyrf_list[[as.character(sites)]]<-dfcvbyyrf
                     ma38v[i]<-unlist(ma36.40(obs_data)[3])
                     ma39v[i]<-unlist(ma36.40(obs_data)[4])
                     ma40v[i]<-unlist(ma36.40(obs_data)[5])
+                    ma41v[i]<-unlist(ma41.45(obs_data,drain_area)[1])
+                    ma42v[i]<-unlist(ma41.45(obs_data,drain_area)[2])
+                    ma43v[i]<-unlist(ma41.45(obs_data,drain_area)[3])
+                    ma44v[i]<-unlist(ma41.45(obs_data,drain_area)[4])
+                    ma45v[i]<-unlist(ma41.45(obs_data,drain_area)[5])
                     ml1v[i]<-unlist(ml1.12(obs_data)[1])
                     ml2v[i]<-unlist(ml1.12(obs_data)[2])
                     ml3v[i]<-unlist(ml1.12(obs_data)[3])
@@ -1214,9 +1232,9 @@ statsout<-data.frame(t(a),yv,ymaxv,mean_flow,med_flow,cv_flow,
                      mamin19v,mamin20v,mamin21v,mamin22v,mamin23v,mamax12v,mamax13v,mamax14v,mamax15v,mamax16v,mamax17v,mamax18v,
                      mamax19v,mamax20v,mamax21v,mamax22v,mamax23v,ma24v,ma25v,ma26v,ma27v,
                      ma28v,ma29v,ma30v,ma31v,ma32v,ma33v,ma34v,ma35v,ma36v,
-                     ma37v,ma38v,ma39v,ma40v,ml1v,ml2v,ml3v,ml4v,ml5v,ml6v,ml7v,ml8v,ml9v,
+                     ma37v,ma38v,ma39v,ma40v,ma41v,ma42v,ma43v,ma44v,ma45v,ml1v,ml2v,ml3v,ml4v,ml5v,ml6v,ml7v,ml8v,ml9v,
                      ml10v,ml11v,ml12v,ml13v,ml14v,ml15v,ml16v,ml17v,ml18v,
-                     mh14v,mh16v,mh26v,ml17v,ml18v,
+                     mh14v,mh16v,mh26v,
                      fl1v,fl2v,fh1v,fh2v,fh3v,
                      fh4v,dl1v,dl2v,dl4v,dl5v,
                      dl6v,dl9v,dl10v,dl18v,dh5v,
@@ -1231,9 +1249,9 @@ colnames(statsout)<-c('site_no','min_date','max_date','mean_of_annual_flows','me
                       'aug_min','sept_min','oct_min','nov_min','dec_min','jan_max','feb_max','mar_max','apr_max','may_max','june_max','jul_max',
                       'aug_max','sept_max','oct_max','nov_max','dec_max','ma24_jan_var','ma25_feb_var','ma26_mar_var','ma27_apr_var',
                       'ma28_may_var','ma29_jun_var','ma30_july_var','ma31_aug_var','ma32_sep_var','ma33_oct_var','ma34_nov_var','ma35_dec_var','ma36',
-                      'ma37_var_across_months','ma38','ma39_monthly_std_dev','ma40_monthly_skewness','ml1','ml2','ml3','ml4','ml5','ml6','ml7','ml8','ml9',
+                      'ma37_var_across_months','ma38','ma39_monthly_std_dev','ma40_monthly_skewness','ma41','ma42','ma43','ma44','ma45','ml1','ml2','ml3','ml4','ml5','ml6','ml7','ml8','ml9',
                       'ml10','ml11','ml12','ml13_min_monthly_var','ml14_min_annual_flow','ml15','ml16','ml17','ml18',
-                      'mh14_med_annual_max','mh16_high_flow_index','mh26_high_peak_flow','ml17_base_flow','ml18_base_flow_var',
+                      'mh14_med_annual_max','mh16_high_flow_index','mh26_high_peak_flow',
                       'fl1_low_flood_pulse','fl2_low_pulse_var','fh1_high_pulse_count','fh2_high_pulse_var','fh3_high_pulse_count_three',
                       'fh4_high_pulse_count_seven','dl1_min_daily_flow','dl2_min_3_day_avg','dl4_min_30_day_avg','dl5_min_90_day_avg',
                       'dl6_min_flow_var','dl9_min_30_day_var','dl10_min_90_day_var','dl18_zero_flow_days','dh5_max_90_day_avg',
@@ -1242,5 +1260,3 @@ colnames(statsout)<-c('site_no','min_date','max_date','mean_of_annual_flows','me
                       'comment')
 output="output.txt"
 write.table(statsout,file="output.txt",col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
-
-# wps.out: output, text, output_file, A file containing the mean daily flow median daily flow and skewness of daily flow;
