@@ -22,13 +22,16 @@ public class LDAPConnect {
 
     private static final Logger LOG = LoggerFactory.getLogger(DSGParser.class);
     private static DynamicReadOnlyProperties jndiProps = JNDISingleton.getInstance();
+    
 
     public static User authenticate(String username, String password) {
+        boolean requireGroup = Boolean.parseBoolean(jndiProps.getProperty("watersmart.ldap.require.auth", "true"));
+        
         Properties props = new Properties();
         props.put(Context.INITIAL_CONTEXT_FACTORY,
                   "com.sun.jndi.ldap.LdapCtxFactory");
         props.put(Context.PROVIDER_URL, jndiProps.getProperty(
-                "watersmart.ldap.url", "ldaps://gsvaresh02.er.usgs.gov:636"));
+                "watersmart.ldap.url", "ldaps://gssdsflh02.cr.usgs.gov:636"));
         props.put(Context.REFERRAL, "ignore");
 
         // set properties for authentication
@@ -58,12 +61,12 @@ public class LDAPConnect {
                 String dn = result.getNameInNamespace();
                 
                 user = new User(dn, mail, givenname, sn, uid);
-                String group = jndiProps.getProperty("watersmart.ldap.group");
+                String group = jndiProps.getProperty("watersmart.ldap.group", "GS WaterSmart Portal");
                 answers = context.search(
                         "", 
                         "(&(objectClass=groupOfNames)(cn=" + group + ")(member=" + dn + "))",
                         null);
-                if (answers.hasMore()) {
+                if (answers.hasMore() || !requireGroup) {
                     user.setAuthentication(true);
                 }
             }
