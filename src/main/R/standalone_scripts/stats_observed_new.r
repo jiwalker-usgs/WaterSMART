@@ -402,8 +402,87 @@ ml18 <- function(qfiletempf) {
   bfibyyear <- bfi(qfiletempf)
   sdbfi <- sd(bfibyyear)
   meanbfi <- mean(bfibyyear)
-  ml18 <- meanbfi/sdbfi
+  ml18 <- (sdbfi*100)/meanbfi
   return(ml18)
+}
+
+ml19 <- function(qfiletempf, pref = "mean") {
+  minbyyr <- aggregate(qfiletempf$discharge,list(qfiletempf$year_val),FUN=min,na.rm=TRUE)
+  colnames(minbyyr) <- c("Year","yrmin")
+  meanbyyr <- aggregate(qfiletempf$discharge,list(qfiletempf$year_val),FUN=mean,na.rm=TRUE)
+  colnames(meanbyyr) <- c("Year","yrmean")
+  ratiominmean <- minbyyr$yrmin/meanbyyr$yrmean
+  if (pref == "median") {
+    ml19 <- median(ratiominmean)
+  }
+  else {
+    ml19 <- mean(ratiominmean)
+  }
+  return(ml19)
+}
+
+ml20 <- function(x) {
+  sub_flow <- subset(x,x$discharge>0,na.rm=TRUE)
+  numdays <- nrow(sub_flow)
+  numsets <- ceiling(numdays)
+  sets <- c(1:numsets)
+  sets_merge <- as.data.frame(as.vector(sort(rep.int(sets,5)))[1:nrow(x), ])
+  merge_data <- as.data.frame(union(sub_flow,sets_merge))
+  colnames(merge_data) <- c("date","discharge","month_val","year_val","day_val","jul_val","wy_val")
+  min5day <- aggregate(merge_data$discharge,list(merge_data$seq_num),FUN=min,na.rm=TRUE)
+  merge_data merge(min5day,merge_data,by.x="Group.1",by.y="seq.num")
+  colnames(merge_data) c("seq_num","base_flow","date","discharge","month_val","year_val","day_val","jul_val","wy_val")
+  
+}
+
+ml21 <- function(x) {
+  minbyyr aggregate(x$discharge,list(x$year_val),FUN=min,na.rm=TRUE)
+  colnames(minbyyr) <- c("Year","yrmin")
+  ml21 <- (sd(minbyyr$yrmin)*100)/mean(sdminbyyr$yrmin)
+  return(ml21)
+}
+
+ml22 <- function(x,drainarea,pref = "mean") {
+  minbyyr aggregate(x$discharge,list(x$year_val),FUN=min,na.rm=TRUE)
+  colnames(minbyyr) <- c("Year","yrmin")
+  if (pref == "median") {
+    ml22 <- (median(minbyyr$yrmin))/drainarea
+  } 
+  else {
+    ml22 <- (mean(minbyyr$yrmin))/drainarea
+  }
+  return(ml22)
+}
+
+mh1.12 <- function(qfiletemp) {
+  maxbymonyr <- aggregate(qfiletemp$discharge, list(qfiletemp$year_val, qfiletemp$month_val), FUN = max, na.rm=TRUE)
+  colnames(minbymonyr) <- c("Year","Month","maxmo")
+  meanmaxbymon <- aggregate(maxbymonyr$minmo, list(maxbymonyr$Month), FUN = mean, na.rm=TRUE)
+  colnames(meanmaxbymon) <- c("Month","meanmax")
+  mh1 <- meanmaxbymon[1,2]
+  mh2 <- meanmaxbymon[2,2]
+  mh3 <- meanmaxbymon[3,2]
+  mh4 <- meanmaxbymon[4,2]
+  mh5 <- meanmaxbymon[5,2]
+  mh6 <- meanmaxbymon[6,2]
+  mh7 <- meanmaxbymon[7,2]
+  mh8 <- meanmaxbymon[8,2]
+  mh9 <- meanmaxbymon[9,2]
+  mh10 <- meanmaxbymon[10,2]
+  mh11 <- meanmaxbymon[11,2]
+  mh12 <- meanmaxbymon[12,2]
+  mh1.12 <- list(mh1,mh2,mh3,mh4,mh5,mh6,mh7,mh8,mh9,mh10,mh11,mh12)
+  return(mh1.12)
+}
+
+mh13 <- function(qfiletempf) {
+  maxmonbyyr <- aggregate(qfiletempf$discharge, list(qfiletempf$year_val, 
+                                                     qfiletempf$month_val), FUN = max, na.rm=TRUE)
+  colnames(maxmonbyyr) <- c("Year", "Month", "maxmo")
+  sdmaxmonflows <- sd(maxmonbyyr$maxmo)
+  meanmaxmonflows <- mean(maxmonbyyr$maxmo)
+  mh13 <- (sdmaxmonflows * 100)/meanmaxmonflows
+  return(mh13)
 }
 
 mh14 <- function(qfiletempf) {
@@ -421,13 +500,58 @@ mh14 <- function(qfiletempf) {
   return(mh14)
 }
 
-mh16 <- function(qfiletempf) {
+mh15.17 <- function(qfiletempf) {
   isolateq <- qfiletempf$discharge
   sortq <- sort(isolateq)
-  frank <- floor(findrank(length(sortq), 0.1))
-  hfcrit <- sortq[frank]
-  mh16 <- hfcrit/ma2(qfiletempf)
-  return(mh16)
+  frank10 <- floor(findrank(length(sortq), 0.1))
+  frank1 <- floor(findrank(length(sortq),0.01))
+  frank25 <- floor(findrank(length(sortq),0.25))
+  hfcrit10 <- sortq[frank10]
+  hfcrit1 <- sortq[frank1]
+  hfcrit25 <- sortq[frank25]
+  mh15 <- hfcrit1/ma2(qfiletempf)
+  mh16 <- hfcrit10/ma2(qfiletempf)
+  mh17 <- hfcrit25/ma2(qfiletempf)
+  mh15.17 <- list(mh15,mh16,mh17)
+  return(mh15.17)
+}
+
+mh18 <- function(x) {
+  maxbyyr <- aggregate(x$discharge,list(x$year_val),FUN=max,na.rm=TRUE)
+  colnames(maxbyyr) <- c("Year","yrmax")
+  log10maxbyyr <- log10(maxbyyr$yrmax)
+  mh18 <- (sd(log10maxbyyr)*100)/mean(log10maxbyyr)
+  return(mh18)
+}
+
+mh20 <- function(x,drainarea,pref = "mean") {
+  maxbyyr aggregate(x$discharge,list(x$year_val),FUN=max,na.rm=TRUE)
+  colnames(maxbyyr) <- c("Year","yrmax")
+  if (pref == "median") {
+    mh20 <- (median(maxbyyr$yrmax))/drainarea
+  } 
+  else {
+    mh20 <- (mean(maxbyyr$yrmax))/drainarea
+  }
+  return(mh20)
+}
+
+mh24 <- function(qfiletempf) {
+  hfcrit <- ma2(qfiletempf)
+  isolateq <- qfiletempf$discharge
+  exchfcrit <- subset(isolateq, isolateq > hfcrit)
+  meanex <- mean(exchfcrit)
+  mh24 <- meanex/ma2(qfiletempf)
+  return(mh26)
+}
+
+mh25 <- function(qfiletempf) {
+  hfcrit <- 3 * ma2(qfiletempf)
+  isolateq <- qfiletempf$discharge
+  exchfcrit <- subset(isolateq, isolateq > hfcrit)
+  meanex <- mean(exchfcrit)
+  mh25 <- meanex/ma2(qfiletempf)
+  return(mh26)
 }
 
 mh26 <- function(qfiletempf) {
@@ -437,6 +561,17 @@ mh26 <- function(qfiletempf) {
   meanex <- mean(exchfcrit)
   mh26 <- meanex/ma2(qfiletempf)
   return(mh26)
+}
+
+mh27 <- function(qfiletempf) {
+  isolateq <- qfiletempf$discharge
+  sortq <- sort(isolateq)
+  frank75 <- floor(findrank(length(sortq),0.75))
+  hfcrit75 <- sortq[frank75]
+  exchfcrit <- subset(isolateq, isolateq > hfcrit75)
+  meanex <- mean(exchfcrit)
+  mh27 <- meanex/ma2(qfiletempf)
+  return(mh27)
 }
 
 fl1.2 <- function(qfiletempf, pref = "mean") {
