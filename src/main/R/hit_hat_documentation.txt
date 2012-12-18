@@ -176,10 +176,13 @@ MH20	Specific mean annual maximum flow. MH20 is the mean (or median - use prefer
 	(mean(maxbyyr))/drainarea
 MH21	High flow volume index. Compute the average volume for flow events above a threshold equal to the median flow 
 	for the entire record. MH21 is the average volume divided by the median flow for the entire record.
-MH22	High flow volume. Compute the average volume for flow events above a threshold equal to three times the median flow 
-	for the entire record. MH22 is the average volume divided by the median flow for the entire record. 
-MH23	High flow volume. Compute the average volume for flow events above a threshold equal to seven times the median flow 
-	for the entire record. MH23 is the average volume divided by the median flow for the entire record. 
+	This description does not match the code. Currently implemented as average flow where flow is above threshold 
+	divided by median of all flow
+	flag where flow is above threshold
+	calculate avg_ex mean(x$discharge)
+	avg_ex/ma2(x)	
+MH22	Same as MH21, but using a threshold of 3*median flow. 
+MH23	Same as MH21, but using a threshold of 7*median flow. 
 MH24	High peak flow. Compute the average peak flow value for flow events above a threshold equal to the median for for the 
 	entire record. MH24 is the average peak flow divided by the median flow for the entire record. 
 	hfcrit ma2(x)
