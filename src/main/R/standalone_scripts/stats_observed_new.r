@@ -424,17 +424,40 @@ ml19 <- function(qfiletempf, pref = "mean") {
 ml20 <- function(x) {
   sub_flow <- subset(x,x$discharge>0,na.rm=TRUE)
   numdays <- nrow(sub_flow)
-  numsets <- ceiling(numdays)
+  numsets <- ceiling(numdays/5)
   sets <- c(1:numsets)
-  sets_merge <- as.data.frame(as.vector(sort(rep.int(sets,5)))[1:nrow(x), ])
-  merge_data <- as.data.frame(union(sub_flow,sets_merge))
-  colnames(merge_data) <- c("date","discharge","month_val","year_val","day_val","jul_val","wy_val")
+  sets_merge <- as.data.frame(sort(rep.int(sets,5))[1:nrow(x)],stringsAsFactors=FALSE)
+  merge_data <- as.data.frame(union(sub_flow,sets_merge),stringsAsFactors=FALSE)
+  colnames(merge_data) <- c("date","discharge","month_val","year_val","day_val","jul_val","wy_val","seq_num")
   min5day <- aggregate(merge_data$discharge,list(merge_data$seq_num),FUN=min,na.rm=TRUE)
-  merge_data merge(min5day,merge_data,by.x="Group.1",by.y="seq.num")
-  colnames(merge_data) c("seq_num","base_flow","date","discharge","month_val","year_val","day_val","jul_val","wy_val")
-  
-}
-
+  merge_data <- merge(min5day,merge_data,by.x="Group.1",by.y="seq_num")
+  colnames(merge_data) <- c("seq_num","base_flow","date","discharge","month_val","year_val","day_val","jul_val","wy_val")
+  base_flows <- unique(merge_data[, c("seq_num","base_flow")])
+  base_flows$base_flow <- 0.9*base_flows$base_flow
+  base_flows_lag <- unique(merge_data[, c("seq_num","base_flow")])
+  base_flows_lag$seq_num <- base_flows_lag$seq_num-1
+  base_flows_lead <- unique(merge_data[, c("seq_num","base_flow")])
+  base_flows_lead$seq_num <- base_flows_lead$seq_num+1
+  merge_base_flows_lag <- merge(base_flows,base_flows_lag,by="seq_num")
+  merge_base_flows_lead <- merge(base_flows,base_flows_lead,by="seq_num")
+  merge_base_flows <- merge(merge_base_flows_lag,merge_base_flows_lead,all=TRUE,by="seq_num")
+  colnames(merge_base_flows) <- c("seq_num","base_flow","base_flow_lag","base_flow1","base_flow_lead")
+  merge_base_flows["final_base_flow"] <- NA
+  merge_base_flows$final_base_flow[1:numsets-1] <- ifelse(merge_base_flows$base_flow[1:numsets-1]<merge_base_flows$base_flow_lag[1:numsets-1],merge_base_flows$base_flow[1:numsets-1],0)
+  merge_base_flows$final_base_flow[2:numsets] <- ifelse(merge_base_flows$base_flow1[2:numsets]<merge_base_flows$base_flow_lead[2:numsets],merge_base_flows$base_flow1[2:numsets],0)
+  base_flows <- merge_base_flows$final_base_flow[merge_base_flows$final_base_flow!=0]
+  base_flows_interp <- approx(merge_base_flows$seq_num[merge_base_flows$final_base_flow!=0],base_flows,xout=merge_base_flows$seq_num[merge_base_flows$final_base_flow==0],method="linear",rule=2)
+  merge_base_flows_interp <- merge(merge_base_flows,base_flows_interp,by.x="seq_num",by.y="x",all=TRUE)
+  merge_base_flows_interp[is.na(merge_base_flows_interp)] <- 0
+  merge_base_flows_interp["merge_bf"]<-0
+  merge_base_flows_interp$merge_bf <- ifelse(merge_base_flows_interp$final_base_flow>merge_base_flows_interp$y,merge_base_flows_interp$final_base_flow,merge_base_flows_interp$y)
+  bfi_sub <- merge_base_flows_interp[,c("seq_num","merge_bf")]
+  merge_data_final <- merge(merge_data,bfi_sub,by="seq_num")
+  total_bf <- sum(merge_data_final$merge_bf)
+  total_flow <- sum(merge_data_final$discharge)
+  ml20 <- total_flow/total_bf
+  return(ml20)
+}  
 ml21 <- function(x) {
   minbyyr aggregate(x$discharge,list(x$year_val),FUN=min,na.rm=TRUE)
   colnames(minbyyr) <- c("Year","yrmin")
