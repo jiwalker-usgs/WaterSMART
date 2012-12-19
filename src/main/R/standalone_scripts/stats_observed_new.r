@@ -413,7 +413,7 @@ ml20 <- function(x) {
   numsets <- ceiling(numdays/5)
   sets <- c(1:numsets)
   sets_merge <- as.data.frame(sort(rep.int(sets,5))[1:nrow(x)],stringsAsFactors=FALSE)
-  merge_data <- as.data.frame(union(sub_flow,sets_merge),stringsAsFactors=FALSE)
+  merge_data <- cbind(sub_flow,sets_merge)
   colnames(merge_data) <- c("date","discharge","month_val","year_val","day_val","jul_val","wy_val","seq_num")
   min5day <- aggregate(merge_data$discharge,list(merge_data$seq_num),FUN=min,na.rm=TRUE)
   merge_data <- merge(min5day,merge_data,by.x="Group.1",by.y="seq_num")
