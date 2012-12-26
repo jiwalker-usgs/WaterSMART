@@ -65,8 +65,6 @@
                 <Format mimetype="application/x-geotiff" encoding="base64"/>
                 <Format mimetype="application/x-geotiff"/>
                 <Format mimetype="application/remap" encoding="base64"/>
-            </Generator>
-            <Generator name="ZipGenerator" className="gov.usgs.cida.gdp.wps.generator.ZipGenerator" active="true">
                 <Format mimetype="application/zip"/>
                 <Format mimetype="application/zip" encoding="base64"/>
             </Generator>
