@@ -6,7 +6,7 @@
   <serverInformation>
     <name>National Water Census THREDDS Server</name>
     <logoUrl>http://cida.usgs.gov/images/logo/cida_logo_4c-300_notext.jpg</logoUrl>
-    <logoAltText>Initial TDS Installation</logoAltText>
+    <logoAltText>NWC THREDDS Catalog</logoAltText>
 
     <abstract>Scientific Data</abstract>
     <keywords>meteorology, atmosphere, climate, ocean, earth science</keywords>
