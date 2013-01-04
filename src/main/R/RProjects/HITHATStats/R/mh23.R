@@ -17,5 +17,5 @@ mh23 <- function(x) {
   exthresh <- subset(x$discharge,x$discharge > thresh)
   avg_ex <- mean(exthresh)
   mh23 <- avg_ex/ma2(x)
-  return(mh21)
+  return(mh23)
 }
