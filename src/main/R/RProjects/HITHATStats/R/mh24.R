@@ -18,5 +18,5 @@ mh24 <- function(qfiletempf) {
   exchfcrit <- subset(isolateq, isolateq > hfcrit)
   meanex <- mean(exchfcrit)
   mh24 <- meanex/ma2(qfiletempf)
-  return(mh26)
+  return(mh24)
 }
