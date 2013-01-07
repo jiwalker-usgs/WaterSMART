@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog name="National Water Census THREDDS Server"
+        xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
+        xmlns:xlink="http://www.w3.org/1999/xlink">
+
+  <service name="all" base="" serviceType="compound">
+    <service name="odap" serviceType="OpenDAP" base="/thredds/dodsC/" />
+    <service name="sos" serviceType="SOS" base="/thredds/sos/" />
+  </service>
+
+  <datasetScan name="WaterSMART SOS" path="watersmart" location="/opt/tomcat/data/NWC/MIP/netcdf/">
+    <serviceName>all</serviceName>
+  </datasetScan>
+  
+</catalog>

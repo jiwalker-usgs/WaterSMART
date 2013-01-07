@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>gov.usgs.cida.watersmart</groupId>
+        <artifactId>watersmart</artifactId>
+        <version>007-SNAPSHOT</version>
+    </parent>
+    <groupId>gov.usgs.cida.watersmart</groupId>
+    <artifactId>watersmart-thredds</artifactId>
+    <name>WaterSMART THREDDS</name>
+    <packaging>war</packaging>
+    
+    <dependencies>
+        <dependency>
+            <groupId>gov.usgs.cida.ncsos</groupId>
+            <artifactId>ncsosx-thredds</artifactId>
+            <version>1-SNAPSHOT</version>
+            <type>war</type>
+        </dependency>
+    </dependencies>
+    <build>
+        <finalName>thredds</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <overlays>
+                        <overlay>
+                            <groupId>gov.usgs.cida.ncsos</groupId>
+                            <artifactId>ncsosx-thredds</artifactId>
+                        </overlay>
+                    </overlays>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

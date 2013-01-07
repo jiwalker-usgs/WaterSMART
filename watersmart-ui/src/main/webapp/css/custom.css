@@ -1,0 +1,52 @@
+.run-label {
+    font-weight: bold;
+    color: #3D3D3D;
+}
+
+.run-panel-mouseover {
+    background-color: #EBEBEB !important;
+    cursor: pointer !important; 
+}
+.run-panel-selected{
+    background-color: #CCCCCC !important;
+}
+
+
+#plotter-year-output-display {
+    font-weight: bold; 
+}
+
+.plotter-x-label-display {
+/*    font-weight: bold; */
+}
+
+#plotter-value-output-display {
+    font-weight: bold; 
+}
+
+.dygraph-ylabel {
+    color: #008080;
+    font-weight: bold;
+}
+
+.run-value {
+    color: #5C5C5C;
+}
+.run-value-list-item {
+    color: #5C5C5C;
+}
+
+#watersmart-title-image {
+    clear: right;
+}
+#watersmart-key-image {
+    height: 100px;
+}
+#watersmart-stophand-image {
+    height: 30px;
+    padding-left: 100px;
+}
+
+ol.ipsum {
+    list-style: decimal inside none;
+}

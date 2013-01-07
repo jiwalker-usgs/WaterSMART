@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <comment>These are endpoints to load into the cache on startup, representative urls are all that is needed</comment>
+<!--    <entry key="javadevgeoserver">http://igsarm-cida-javadev1.er.usgs.gov:8081/geoserver/watersmart/ows</entry>-->
+    <entry key="qaSosServer">http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/thredds/sos/watersmart/test.nc</entry>
+</properties>
