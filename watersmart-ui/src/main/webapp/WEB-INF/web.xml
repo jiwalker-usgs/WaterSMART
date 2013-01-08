@@ -2,17 +2,13 @@
 <web-app id="WebApp_ID" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
     <description>WaterSMART Model Intercomparison Portal</description>
     <display-name>WaterSMART {Owner: DB, Coder: JW, IS}</display-name>
-    
     <welcome-file-list>
         <welcome-file>login.jsp</welcome-file>
     </welcome-file-list>
-    
     <listener>
         <listener-class>gov.usgs.cida.jna.NetCDFJNAInitializer</listener-class>
     </listener>
-    
     <!-- Security -->
-    
     <!-- SSL Configuration -->
     <security-constraint>
         <display-name>Security Constraint</display-name>
@@ -25,7 +21,6 @@
         </user-data-constraint>
     </security-constraint>
     <!-- /SSL Configuration -->
-    
     <!-- Session Checking -->
     <filter>
         <filter-name>SessionFilter</filter-name>
@@ -43,7 +38,6 @@
         <filter-name>SessionFilter</filter-name>
         <url-pattern>/index.jsp</url-pattern>
     </filter-mapping>
-    
     <!-- Should keep services on different path. Put paths here -->
     <filter>
         <filter-name>ServiceSessionFilter</filter-name>
@@ -57,17 +51,14 @@
         <filter-name>ServiceSessionFilter</filter-name>
         <url-pattern>/service/*</url-pattern>
     </filter-mapping>
-    
     <!--  the /files/ path does not require auth for now
     <filter-mapping>
         <filter-name>ServiceSessionFilter</filter-name>
         <url-pattern>/files/*</url-pattern>
     </filter-mapping>
-    --> 
+    -->
     <!-- /Session Checking -->
-    
     <!-- /Security -->
-    
     <filter>
         <filter-name>RequestHeaderFilter</filter-name>
         <filter-class>gov.usgs.cida.tomcatfilters.RequestFilter</filter-class>
@@ -76,7 +67,6 @@
         <filter-name>RequestHeaderFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-    
     <servlet>
         <servlet-name>OWSProxy</servlet-name>
         <servlet-class>gov.usgs.service.OWSProxyServletX</servlet-class>
@@ -105,6 +95,10 @@
         <servlet-name>FileRepository</servlet-name>
         <servlet-class>gov.usgs.cida.watersmart.repo.FileRepository</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>PrepareRecord</servlet-name>
+        <servlet-class>gov.usgs.cida.watersmart.util.PrepareRecord</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>OWSProxy</servlet-name>
         <url-pattern>/service/proxy</url-pattern>
@@ -132,5 +126,9 @@
     <servlet-mapping>
         <servlet-name>FileRepository</servlet-name>
         <url-pattern>/files/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PrepareRecord</servlet-name>
+        <url-pattern>/prepare</url-pattern>
     </servlet-mapping>
 </web-app>

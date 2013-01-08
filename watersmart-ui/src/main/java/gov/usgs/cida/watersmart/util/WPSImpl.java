@@ -2,7 +2,6 @@ package gov.usgs.cida.watersmart.util;
 
 import com.google.common.collect.Maps;
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
-import gov.usgs.cida.netcdf.dsg.Station;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import gov.usgs.cida.watersmart.common.RunMetadata;
 import gov.usgs.cida.watersmart.communication.EmailHandler;

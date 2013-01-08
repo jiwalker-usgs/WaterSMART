@@ -141,7 +141,9 @@ public class CSWTransactionHelper {
             }
         }
         finally {
-            httpClient.getConnectionManager().closeExpiredConnections();
+            if (httpClient.getConnectionManager() != null) {
+                httpClient.getConnectionManager().closeExpiredConnections();
+            }
             cswSession.logout();
             InputStream is = methodResponse.getEntity().getContent();
             String responseText = IOUtils.toString(is);

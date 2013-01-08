@@ -161,7 +161,7 @@ public class RunMetadata {
         String value = item.getString();
         return set(param, value);
     }
-
+    
     public boolean set(String param, String value) {
         if (TYPE.equals(param)) {
             ModelType mt = ModelType.valueOf(value.toUpperCase());
