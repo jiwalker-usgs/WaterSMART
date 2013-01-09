@@ -536,60 +536,64 @@ WaterSMART.ModelRunSelectionPanel = Ext.extend(Ext.Panel, {
         
     },
     runSelected : function(panel) {
-        LOG.debug('ModelRunSelectionpanel.js:: A run has been selected with the SOS endpoint of: ' + panel.panelInfo.operationURL);
+        if (!panel.panelInfo.operationURL) {
+            LOG.debug('ModelRunSelectionpanel.js:runSelected:: A run has been selected without an SOS endpoint');
+        } else {
+            LOG.debug('ModelRunSelectionpanel.js:runSelected:: A run has been selected with the SOS endpoint of: ' + panel.panelInfo.operationURL);
         
-        // Load SOS store
-        this.controller.getCaps(panel.panelInfo.operationURL);
+            // Load SOS store
+            this.controller.getCaps(panel.panelInfo.operationURL);
         
-        this.scenarioPanel.currentlySelectedRun = panel;
-        this.scenarioPanel.getTopToolbar().get('edit-selected-run-button').setDisabled(false);
+            this.scenarioPanel.currentlySelectedRun = panel;
+            this.scenarioPanel.getTopToolbar().get('edit-selected-run-button').setDisabled(false);
 
-        // Close any current plotter windows
-        if (Ext.getCmp('plotter-window')) {
-            Ext.getCmp('plotter-window').hide();
-        }
+            // Close any current plotter windows
+            if (Ext.getCmp('plotter-window')) {
+                Ext.getCmp('plotter-window').hide();
+            }
 
-        Ext.each(this.scenarioPanel.items.getRange(), function(accordPanel) {
-            Ext.each(accordPanel.items.getRange(), function (runPanel) {
-                if (runPanel.body) {
-                    runPanel.body.removeClass('run-panel-selected');
-                }
-            });
-        })
-        this.scenarioPanel.currentlySelectedRun.body.addClass('run-panel-selected');
-        this.mapPanel.sosEndpoint = panel.panelInfo.operationURL;
-        
-        // TODO- We will need to change this when (if?) we get more than one sites layer on the map at any given time
-        if (this.mapPanel.currentMapConfig.layers.layers.length 
-            && this.mapPanel.currentMapConfig.layers.layers[0].params.LAYERS === panel.panelInfo.owsResourceName) {
-            LOG.debug('ModelRunSelectionpanel.js::New sites layer is the same as the current sites layer. New sites layer will not be created')
-            return;
-        }
-        
-        var newSitesLayerArray = [
-        new OpenLayers.Layer.WMS(
-            panel.panelInfo.fileIdentifier,
-            panel.panelInfo.owsEndpoint,
-            {
-                LAYERS: panel.panelInfo.owsResourceName,
-                transparent : true,
-                format: 'image/png'
-            },
-            {
-                gutter : 5, // Should always be half the size of the point size
-                extractAttributes : true,
-                opacity : '0.5',
-                displayOutsideMaxExtent: true,
-                isBaseLayer: false,
-                transitionEffect : 'resize'
+            Ext.each(this.scenarioPanel.items.getRange(), function(accordPanel) {
+                Ext.each(accordPanel.items.getRange(), function (runPanel) {
+                    if (runPanel.body) {
+                        runPanel.body.removeClass('run-panel-selected');
+                    }
+                });
             })
-        ];
+            this.scenarioPanel.currentlySelectedRun.body.addClass('run-panel-selected');
+            this.mapPanel.sosEndpoint = panel.panelInfo.operationURL;
         
-        this.mapPanel.currentMapConfig.layers.layers = newSitesLayerArray;
-        this.mapPanel.processMapConfigObject(this.mapPanel.currentMapConfig);
+            // TODO- We will need to change this when (if?) we get more than one sites layer on the map at any given time
+            if (this.mapPanel.currentMapConfig.layers.layers.length 
+                && this.mapPanel.currentMapConfig.layers.layers[0].params.LAYERS === panel.panelInfo.owsResourceName) {
+                LOG.debug('ModelRunSelectionpanel.js::New sites layer is the same as the current sites layer. New sites layer will not be created')
+                return;
+            }
+        
+            var newSitesLayerArray = [
+            new OpenLayers.Layer.WMS(
+                panel.panelInfo.fileIdentifier,
+                panel.panelInfo.owsEndpoint,
+                {
+                    LAYERS: panel.panelInfo.owsResourceName,
+                    transparent : true,
+                    format: 'image/png'
+                },
+                {
+                    gutter : 5, // Should always be half the size of the point size
+                    extractAttributes : true,
+                    opacity : '0.5',
+                    displayOutsideMaxExtent: true,
+                    isBaseLayer: false,
+                    transitionEffect : 'resize'
+                })
+            ];
+        
+            this.mapPanel.currentMapConfig.layers.layers = newSitesLayerArray;
+            this.mapPanel.processMapConfigObject(this.mapPanel.currentMapConfig);
         
 
-        this.mapPanel.addIdentifyToolingToMap();
+            this.mapPanel.addIdentifyToolingToMap();
+        }
     },
     updateModelStore : function() {
         // TODO- For quicktips, we should add more fields to this store from the underlying 

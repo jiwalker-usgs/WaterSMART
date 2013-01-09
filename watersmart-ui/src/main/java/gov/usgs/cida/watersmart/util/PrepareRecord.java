@@ -42,18 +42,19 @@ public class PrepareRecord extends HttpServlet {
         wpsOutputMap.put(WPSImpl.stats_compare, "");
 
         CSWTransactionHelper cswTransactionHelper = new CSWTransactionHelper(RunMetadata.getInstance(meta.toKeyValueMap()), null, wpsOutputMap);
-        String addRecordResponse;
+        String addRecordResponse, responseText;
         try {
             addRecordResponse = cswTransactionHelper.addServiceIdentification();
-        } catch (Exception ex) {
-            String responseText = "{success: false, message: " + ex.getMessage() + "}";
-            sendResponse(response, responseText);
-            return;
-        }
-        if (StringUtils.isNotBlank(addRecordResponse) && addRecordResponse.contains("<csw:totalUpdated>1</csw:totalUpdated>")) {
             
+            if (StringUtils.isNotBlank(addRecordResponse) && addRecordResponse.contains("<csw:totalUpdated>1</csw:totalUpdated>")) {
+                responseText = "{success: true, message: 'A record has been prepared for this upload'}";
+            } else {
+                responseText = "{success: false, message: 'Could not create record for upload. Please try again. If the problem persists, please contact the system administrator'}";
+            }
+        } catch (Exception ex) {
+            log.warn("An error has occurred during record preparation", ex);
+            responseText = "{success: false, message: 'An error occurred during record preparation" + ex.getMessage() + "'}";
         }
-        String responseText = "{success: false, message: 'still in dev'}";
         sendResponse(response, responseText);
     }
 
