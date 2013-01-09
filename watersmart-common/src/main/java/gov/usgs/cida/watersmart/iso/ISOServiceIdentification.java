@@ -13,23 +13,23 @@ import org.w3c.dom.Text;
  * @author Jordan Walker <jiwalker@usgs.gov>
  */
 public class ISOServiceIdentification {
-    
+
     private RunMetadata metadata;
     private String sosEndpoint;
     private Map<String, String> algorithmOutputMap;
     private Document document;
-    
+
     public ISOServiceIdentification(RunMetadata meta, String sosEndpoint, Map<String, String> algorithmOutputMap, Document doc) {
         this.metadata = meta;
         this.sosEndpoint = sosEndpoint;
         this.algorithmOutputMap = algorithmOutputMap;
         this.document = doc;
     }
-    
+
     public Node makeIdentificationInfo() {
         Node identificationInfo = document.createElementNS(NAMESPACE_GMD, "gmd:identificationInfo");
         Element serviceIdentification = document.createElementNS(NAMESPACE_SRV, "srv:SV_ServiceIdentification");
-        
+
         serviceIdentification.setAttribute("id", "ncSOS");
         serviceIdentification.appendChild(makeCitation());
         serviceIdentification.appendChild(makeAbstract());
@@ -39,12 +39,14 @@ public class ISOServiceIdentification {
             serviceIdentification.appendChild(couplingType.makeCoupledResource());
         }
         serviceIdentification.appendChild(makeCouplingType());
-        serviceIdentification.appendChild(makeContainsOperations());
+        if (this.sosEndpoint != null) {
+            serviceIdentification.appendChild(makeContainsOperations());
+        }
         serviceIdentification.appendChild(makeOperatesOn());
         identificationInfo.appendChild(serviceIdentification);
         return identificationInfo;
     }
-    
+
     private Node makeCitation() {
         Element citation = document.createElementNS(NAMESPACE_GMD, "gmd:citation");
         Element ciCitation = document.createElementNS(NAMESPACE_GMD, "gmd:CI_Citation");
@@ -64,14 +66,14 @@ public class ISOServiceIdentification {
         citation.appendChild(ciCitation);
         return citation;
     }
-    
+
     private Node makeTitle() {
         Element title = document.createElementNS(NAMESPACE_GMD, "gmd:title");
         Node charString = makeCharacterString(metadata.getScenario());
         title.appendChild(charString);
         return title;
     }
-    
+
     private Node makeDate() {
         Element date = document.createElementNS(NAMESPACE_GMD, "gmd:date");
         Element CIdate = document.createElementNS(NAMESPACE_GMD, "gmd:CI_Date");
@@ -90,14 +92,14 @@ public class ISOServiceIdentification {
         date.appendChild(CIdate);
         return date;
     }
-    
+
     private Node makeEdition() {
         Element edition = document.createElementNS(NAMESPACE_GMD, "gmd:edition");
         Node charString = makeCharacterString(metadata.getEditionString());
         edition.appendChild(charString);
         return edition;
     }
-    
+
     private Node makeCitedResponsibleParty() {
         Element citedResponsibleParty = document.createElementNS(NAMESPACE_GMD, "gmd:citedResponsibleParty");
         Element ciResponsibleParty = document.createElementNS(NAMESPACE_GMD, "gmd:CI_ResponsibleParty");
@@ -110,14 +112,14 @@ public class ISOServiceIdentification {
         citedResponsibleParty.appendChild(ciResponsibleParty);
         return citedResponsibleParty;
     }
-    
+
     private Node makeIndividualName() {
         Element individualName = document.createElementNS(NAMESPACE_GMD, "gmd:individualName");
         Node charString = makeCharacterString(metadata.getName());
         individualName.appendChild(charString);
         return individualName;
     }
-    
+
     private Node makeContactInfo() {
         Element contactInfo = document.createElementNS(NAMESPACE_GMD, "gmd:contactInfo");
         Element ciContact = document.createElementNS(NAMESPACE_GMD, "gmd:CI_Contact");
@@ -127,7 +129,7 @@ public class ISOServiceIdentification {
         contactInfo.appendChild(ciContact);
         return contactInfo;
     }
-    
+
     private Node makeAddress() {
         Element address = document.createElementNS(NAMESPACE_GMD, "gmd:address");
         Element ciAddress = document.createElementNS(NAMESPACE_GMD, "gmd:CI_Address");
@@ -137,14 +139,14 @@ public class ISOServiceIdentification {
         address.appendChild(ciAddress);
         return address;
     }
-    
+
     private Node makeEmail() {
         Element email = document.createElementNS(NAMESPACE_GMD, "gmd:electronicMailAddress");
         Node charString = makeCharacterString(metadata.getEmail());
         email.appendChild(charString);
         return email;
     }
-    
+
     private Node makeRole() {
         Element role = document.createElementNS(NAMESPACE_GMD, "gmd:role");
         Element ciRoleCode = document.createElementNS(NAMESPACE_GMD, "gmd:CI_RoleCode");
@@ -153,7 +155,7 @@ public class ISOServiceIdentification {
         role.appendChild(ciRoleCode);
         return role;
     }
-    
+
     private Node makePresentationForm() {
         Element presForm = document.createElementNS(NAMESPACE_GMD, "gmd:presentationForm");
         Element ciPresFormCode = document.createElementNS(NAMESPACE_GMD, "gmd:CI_PresentationFormCode");
@@ -162,21 +164,21 @@ public class ISOServiceIdentification {
         presForm.appendChild(ciPresFormCode);
         return presForm;
     }
-    
+
     private Node makeOtherCitationDetails() {
         Element otherDetails = document.createElementNS(NAMESPACE_GMD, "gmd:otherCitationDetails");
         Node charString = makeCharacterString(""); // may want to default BEST, but need logic for that
         otherDetails.appendChild(charString);
         return otherDetails;
     }
-    
+
     private Node makeAbstract() {
         Element abstrakt = document.createElementNS(NAMESPACE_GMD, "gmd:abstract");
         Node charString = makeCharacterString(metadata.getComments());
         abstrakt.appendChild(charString);
         return abstrakt;
     }
-    
+
     private Node makeServiceType() {
         Element serviceType = document.createElementNS(NAMESPACE_SRV, "srv:serviceType");
         Element localName = document.createElementNS(NAMESPACE_GCO, "gco:LocalName");
@@ -185,7 +187,7 @@ public class ISOServiceIdentification {
         serviceType.appendChild(localName);
         return serviceType;
     }
-    
+
     private Node makeCouplingType() {
         Element couplingType = document.createElementNS(NAMESPACE_SRV, "srv:couplingType");
         Element svCouplingType = document.createElementNS(NAMESPACE_SRV, "srv:SV_CouplingType");
@@ -194,7 +196,7 @@ public class ISOServiceIdentification {
         couplingType.appendChild(svCouplingType);
         return couplingType;
     }
-    
+
     private Node makeContainsOperations() {
         Element containsOperations = document.createElementNS(NAMESPACE_SRV, "srv:containsOperations");
         Element svOperationMetadata = document.createElementNS(NAMESPACE_SRV, "srv:SV_OperationMetadata");
@@ -220,18 +222,17 @@ public class ISOServiceIdentification {
         containsOperations.appendChild(svOperationMetadata);
         return containsOperations;
     }
-    
+
     private Node makeOperatesOn() {
         Element operatesOn = document.createElementNS(NAMESPACE_SRV, "srv:operatesOn");
         operatesOn.setAttributeNS(NAMESPACE_XLINK, "xlink:href", "#DataIdentification");
         return operatesOn;
     }
-    
+
     private Node makeCharacterString(String str) {
         Element charString = document.createElementNS(NAMESPACE_GCO, "gco:CharacterString");
         Text text = document.createTextNode(str);
         charString.appendChild(text);
         return charString;
     }
-    
 }
