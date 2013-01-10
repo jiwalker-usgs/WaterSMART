@@ -14,15 +14,18 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
         this.panelInfo.edition = this.serviceIdentification.citation.edition.CharacterString.value;
         this.panelInfo['abstract'] = this.serviceIdentification['abstract'].CharacterString.value;
         this.panelInfo.serviceType = this.serviceIdentification.serviceType.LocalName.value;
-        this.panelInfo.operationURL = this.serviceIdentification.operationMetadata[0].connectPoint[0].ciOnlineResource.linkage.URL;
-        this.panelInfo.operationName = this.serviceIdentification.operationMetadata[0].operationName.CharacterString.value;
         this.panelInfo.citedResponsibleParty = this.serviceIdentification.citation.citedResponsibleParty; // Array
         this.panelInfo.date = this.serviceIdentification.citation.date; // Array
         this.panelInfo.presentationForm = this.serviceIdentification.citation.presentationForm; // Array
         this.panelInfo.isBestScenario = false;
         this.panelInfo.coupledResource = this.serviceIdentification.coupledResource;
         this.panelInfo.modelName = config.modelName;
-            
+        
+        if (this.serviceIdentification.operationMetadata) {
+            this.panelInfo.operationURL = this.serviceIdentification.operationMetadata[0].connectPoint[0].ciOnlineResource.linkage.URL;
+            this.panelInfo.operationName = this.serviceIdentification.operationMetadata[0].operationName.CharacterString.value;
+        }
+        
         if (this.serviceIdentification.citation.otherCitationDetails && this.serviceIdentification.citation.otherCitationDetails.CharacterString.value.toLowerCase() === 'best') {
             this.panelInfo.isBestScenario = true;
             this.panelInfo.edition += ' -- (Best Available)';
@@ -115,8 +118,8 @@ WaterSMART.RunPanel = Ext.extend(Ext.Panel, {
                             if (response.responseText.toLowerCase().contains('success: true')) {
                                 NOTIFY.info({
                                     msg : "Your request is being processed. Due to the possibility "
-                                    + "that your request may take some time, you will be sent an e-mail "
-                                    + "when the process has completed. You may continue to use the application or close it."
+                                + "that your request may take some time, you will be sent an e-mail "
+                                + "when the process has completed. You may continue to use the application or close it."
                                 })
                             } else {
                                 NOTIFY.warn({

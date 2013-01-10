@@ -2,7 +2,6 @@ package gov.usgs.cida.watersmart.util;
 
 import com.google.common.collect.Maps;
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
-import gov.usgs.cida.netcdf.dsg.Station;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import gov.usgs.cida.watersmart.common.RunMetadata;
 import gov.usgs.cida.watersmart.communication.EmailHandler;
@@ -174,10 +173,7 @@ class WPSTask extends Thread {
 
         if (procStat.isSuccess()) {
             return true;
-        } //        else if (procStat.isStarted()) {
-        //            // keep it going
-        //        }
-        else if (procStat.isFailed()) {
+        } else if (procStat.isFailed()) {
             throw new IOException("Process failed");
         }
         return false;
@@ -206,9 +202,10 @@ class WPSTask extends Thread {
         if (StringUtils.isBlank(sosEndpoint)) {
             // SOS is blank which means we have to create it. Otherwise, the typical use 
             // case is that the client is requesting a re-run
-            
+
             // 1. Create NetCDF file
             try {
+                log.debug("Creating NetCDF file");
                 // CreateDSGFromZip.create() seems to cause a lot of grief. We keep getting:
                 // java.lang.UnsatisfiedLinkError: Native Library ${application_path}/loader/com/sun/jna/linux-amd64/libnetcdf.so already loaded in another classloader
                 // When developing and I see this, I have to restart the server and redeploy the project
@@ -244,6 +241,7 @@ class WPSTask extends Thread {
             helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
             // 2. Add results from NetCDF creation to CSW record
             try {
+                log.debug("Adding results from NetCDF creation to CSW record");
                 cswResponse = helper.addServiceIdentification();
                 if (cswResponse != null) {
                     cswTransSuccessful = true;
@@ -259,16 +257,19 @@ class WPSTask extends Thread {
 
             // 3. Wait for THREDDS
             try {
+                log.debug("Beginning THREDDS wait period");
                 Thread.sleep(SLEEP_FOR_THREDDS);
             } catch (InterruptedException ex) {
                 // Typically we don't care about this, but we can log and move on.
                 log.warn("THREDDS wait period was interrupted.");
                 // If anything needs to be handled on an interruption, handle it here
             }
+            log.trace("End of THREDDS wait period");
         }
 
         // 4. Run the compare stats using the R-WPS package
         try {
+            log.debug("Sending request for compare stats");
             compReq = WPSImpl.createCompareStatsRequest(sosEndpoint);
             String algorithmOutput = runNamedAlgorithm("compare", compReq, uuid, metaObj);
             wpsOutputMap.put(WPSImpl.stats_compare, algorithmOutput);
@@ -280,6 +281,7 @@ class WPSTask extends Thread {
 
         // 5. Add results from WPS process to CSW record
         if (wpsOutputMap.get(WPSImpl.stats_compare) != null) {
+            log.debug("Stats compare completed successfully");
             rStatsSuccessful = true;
             helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
             try {
@@ -294,7 +296,7 @@ class WPSTask extends Thread {
                 sendFailedEmail(ex);
             }
         } else {
-            log.error("Failed to run WPS algorithm");
+            log.error("Stats compare failed");
             sendFailedEmail(new Exception("Failed to run WPS algorithm"));
         }
     }
@@ -474,7 +476,7 @@ class WPSTask extends Thread {
         content.append("\n\tDate: ").append(metaObj.getCreationDate());
 
         content.append("\n\nthe application failed with message: ").append(ex.getMessage());
-        
+
         content.append("\n\nhere is the stack trace for troubleshooting:\n\n");
         for (StackTraceElement el : ex.getStackTrace()) {
             content.append(el.toString()).append("\n");
