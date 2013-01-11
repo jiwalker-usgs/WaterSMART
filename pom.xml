@@ -235,7 +235,7 @@
                 <version>2.2</version>
                 <scope>provided</scope>
             </dependency>
-        <!-- TODO switch to httpcomponents -->
+            <!-- TODO switch to httpcomponents -->
             <dependency>
                 <groupId>commons-httpclient</groupId>
                 <artifactId>commons-httpclient</artifactId>
@@ -279,8 +279,8 @@
                 <version>3.0</version>
             </dependency>
             
-        <!-- LOGGING START-->
-        <!-- needed for patch 52n code -->
+            <!-- LOGGING START-->
+            <!-- needed for patch 52n code -->
             <dependency>
                 <artifactId>log4j</artifactId>
                 <groupId>log4j</groupId>
@@ -303,16 +303,16 @@
                 <artifactId>slf4j-simple</artifactId>
                 <version>1.6.4</version>
             </dependency>
-        <!-- install commons logging to slf4j bridge -->
+            <!-- install commons logging to slf4j bridge -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>jcl-over-slf4j</artifactId>
                 <version>1.6.4</version>
                 <scope>runtime</scope>
             </dependency>
-        <!-- LOGGING END-->
+            <!-- LOGGING END-->
         
-        <!-- Testing! -->
+            <!-- Testing! -->
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
@@ -348,6 +348,11 @@
                 <artifactId>objenesis</artifactId>
                 <version>1.2</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>commons-jxpath</groupId>
+                <artifactId>commons-jxpath</artifactId>
+                <version>1.3</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
