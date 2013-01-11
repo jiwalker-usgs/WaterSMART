@@ -4,22 +4,15 @@ import com.google.common.collect.Maps;
 import gov.usgs.cida.watersmart.common.RunMetadata;
 import gov.usgs.cida.watersmart.csw.CSWTransactionHelper;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.net.URISyntaxException;
 import java.util.Enumeration;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 /**
  * @author isuftin
