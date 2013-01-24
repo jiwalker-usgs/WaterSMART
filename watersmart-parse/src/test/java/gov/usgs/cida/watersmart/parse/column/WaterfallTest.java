@@ -45,7 +45,7 @@ public class WaterfallTest {
             "Special", "comments", "jiwalker@usgs.gov", "http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/NWC/ows", 
             "NWC:Dense1", "site_no");
         ReturnInfo info = CreateDSGFromZip.create(sampleFile, runMeta);
-        File ncFile = new File("/tmp/waterfall/" + info.filename);
+        File ncFile = new File(new File(outputDir), info.filename);
         
         assertEquals(info.filename, "WATERFALL_realupload.nc");
         assertEquals(FileUtils.sizeOf(ncFile), 3179793L);
