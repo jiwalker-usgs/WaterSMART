@@ -26,18 +26,16 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
+                    <warSourceExcludes>WEB-INF/web.xml</warSourceExcludes>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
                     <overlays>
                         <overlay>
                             <groupId>gov.usgs.cida.geoserver</groupId>
                             <artifactId>geoserver</artifactId>
                         </overlay>
                     </overlays>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-    <properties>
-        <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
-    </properties>
 </project>
