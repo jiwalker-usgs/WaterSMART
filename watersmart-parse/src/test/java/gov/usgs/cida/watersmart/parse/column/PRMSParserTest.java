@@ -47,7 +47,7 @@ public class PRMSParserTest {
             "Special", "comments", "jiwalker@usgs.gov", "http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/NWC/ows", 
             "NWC:Dense1", "site_no");
         ReturnInfo info = CreateDSGFromZip.create(sampleFile, runMeta);
-        File ncFile = new File("/tmp/prms/" + info.filename);
+        File ncFile = new File(new File(outputDir), info.filename);
         
         assertThat(info.filename, is(equalTo("prms.nc")));
         assertThat(FileUtils.sizeOf(ncFile), is(equalTo(168891L)));
