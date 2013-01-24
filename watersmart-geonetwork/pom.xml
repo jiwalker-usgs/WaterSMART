@@ -19,6 +19,7 @@
             <type>war</type>
         </dependency>
     </dependencies>
+    
     <build>
         <finalName>geonetwork</finalName>
         <plugins>
@@ -26,13 +27,14 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
+                    <warSourceExcludes>WEB-INF/web.xml</warSourceExcludes>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
                     <overlays>
                         <overlay>
                             <groupId>org.geonetwork-opensource</groupId>
                             <artifactId>geonetwork-main</artifactId>
                         </overlay>
                     </overlays>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
         </plugins>
