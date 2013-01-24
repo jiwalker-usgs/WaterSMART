@@ -7,11 +7,6 @@ import gov.usgs.cida.watersmart.parse.CreateDSGFromZip;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ReturnInfo;
 import java.io.File;
 import java.io.IOException;
-import java.util.Hashtable;
-import java.util.Properties;
-import javax.mail.Session;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.FileUtils;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -20,7 +15,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockejb.jndi.MockContextFactory;
 
 /**
  *
