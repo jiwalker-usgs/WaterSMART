@@ -7,6 +7,11 @@ import gov.usgs.cida.watersmart.parse.CreateDSGFromZip;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ReturnInfo;
 import java.io.File;
 import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Properties;
+import javax.mail.Session;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.FileUtils;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -15,6 +20,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockejb.jndi.MockContextFactory;
 
 /**
  *
@@ -47,7 +53,7 @@ public class AFINCHParserTest {
             "Special", "comments", "jiwalker@usgs.gov", "http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/NWC/ows", 
             "NWC:Dense1", "site_no");
         ReturnInfo info = CreateDSGFromZip.create(sampleFile, runMeta);
-        File ncFile = new File("/tmp/afinch/" + info.filename);
+        File ncFile = new File(new File(outputDir), info.filename);
         
         assertThat(info.filename, is(equalTo("afinch.nc")));
         assertThat(FileUtils.sizeOf(ncFile), is(equalTo(1118897L)));

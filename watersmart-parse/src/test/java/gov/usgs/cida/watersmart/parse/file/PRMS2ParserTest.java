@@ -45,7 +45,7 @@ public class PRMS2ParserTest {
             "Special", "comments", "jiwalker@usgs.gov", "http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/NWC/ows", 
             "NWC:Dense1", "site_no");
         CreateDSGFromZip.ReturnInfo info = CreateDSGFromZip.create(sampleFile, runMeta);
-        File ncFile = new File("/tmp/prms2/" + info.filename);
+        File ncFile = new File(new File(outputDir), info.filename);
         
         assertThat(info.filename, is(equalTo("PRMS_2_realupload.nc")));
         assertThat(FileUtils.sizeOf(ncFile), is(equalTo(13935321L)));
@@ -62,7 +62,7 @@ public class PRMS2ParserTest {
             "Special", "comments", "jiwalker@usgs.gov", "http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/NWC/ows", 
             "NWC:Dense1", "site_no");
         CreateDSGFromZip.ReturnInfo info = CreateDSGFromZip.create(sampleFile, runMeta);
-        File ncFile = new File("/tmp/prms2/" + info.filename);
+        File ncFile = new File(new File(outputDir), info.filename);
         
         assertThat(info.filename, is(equalTo("PRMS2_sample.nc")));
         assertThat(FileUtils.sizeOf(ncFile), is(equalTo(1101945L)));
