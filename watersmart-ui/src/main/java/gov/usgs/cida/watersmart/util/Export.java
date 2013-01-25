@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import sun.misc.BASE64Decoder;
 
@@ -50,16 +51,11 @@ public class Export extends HttpServlet {
             
             in = new ByteArrayInputStream(dataByteArr);
             out = new BufferedOutputStream(response.getOutputStream());
-            
-            byte[] outputByte = new byte[4096];
-            while (in.read(outputByte, 0, 4096) != -1) {
-                out.write(outputByte, 0, 4096);
-            }
-            out.flush();
-            out.close();
+           
+            IOUtils.copy(in, out);
         } finally {
-            if (out != null) out.close();
-            if (in != null) in.close();
+            IOUtils.closeQuietly(out);
+            IOUtils.closeQuietly(in);
         }
     }
 
