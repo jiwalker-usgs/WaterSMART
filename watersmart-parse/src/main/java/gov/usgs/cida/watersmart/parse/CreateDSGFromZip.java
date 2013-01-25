@@ -175,7 +175,7 @@ public class CreateDSGFromZip {
         globalAttrs.put("creator_email", meta.getEmail());
         globalAttrs.put("project", "WaterSMART Water Census");
         globalAttrs.put("processing_level", "Model Results");
-        globalAttrs.put("standard_name_vocabulary", RecordType.CF_VER);
+        globalAttrs.put("standard_name_vocabulary", StationTimeSeriesNetCDFFile.CF_VER);
         return globalAttrs;
     }
 }
