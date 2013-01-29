@@ -227,4 +227,9 @@ public class PRMSParser extends StationPerColumnDSGParser {
         // I'm not actually sure why I did this this way.
         throw new UnsupportedOperationException("Not supported yet.");
     }
+    
+    @Override
+    public int getTimeStepCount() {
+        return allData.get(allData.keySet().iterator().next()).size();
+    }
 }

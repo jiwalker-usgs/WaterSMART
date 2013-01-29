@@ -19,6 +19,7 @@
     
     <properties>
         <cida.maven.url>http://cida-wiwsc-maven.er.usgs.gov:8080/maven</cida.maven.url>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     
     <url>http://cida-usgs.github.com/WaterSMART</url>
