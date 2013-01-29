@@ -165,4 +165,9 @@ public class AFINCHParser extends StationPerColumnDSGParser {
     protected final DateTimeFormatter getInputDateFormatter() {
         return inputDateFormatter;
     }  
+    
+    @Override
+    public int getTimeStepCount() {
+        return allData.get(allData.keySet().iterator().next()).size();
+    }
 }
