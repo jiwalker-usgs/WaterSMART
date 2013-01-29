@@ -92,5 +92,4 @@ public abstract class DSGParser implements Iterator<Observation> {
      */
     protected abstract String getStationId(String parseText);
     
-    public abstract int getTimeStepCount();
 }
