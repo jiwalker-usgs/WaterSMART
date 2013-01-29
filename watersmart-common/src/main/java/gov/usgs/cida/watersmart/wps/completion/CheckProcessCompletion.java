@@ -1,6 +1,7 @@
 package gov.usgs.cida.watersmart.wps.completion;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
+import gov.usgs.cida.watersmart.common.ContextConstants;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import gov.usgs.cida.watersmart.communication.EmailHandler;
 import gov.usgs.cida.watersmart.communication.EmailMessage;
@@ -12,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
-import javax.naming.NamingException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -44,7 +44,7 @@ public class CheckProcessCompletion {
 
 	private CheckProcessCompletion() {
 		timer = new Timer("ProcessEmailCheck", true);
-		recheckTime = Long.parseLong(props.getProperty("watersmart.email.check.interval.millis"));
+		recheckTime = Long.parseLong(props.getProperty(ContextConstants.EMAIL_CHECK));
 	}
 
 	public synchronized static CheckProcessCompletion getInstance() {
@@ -174,7 +174,7 @@ class EmailCheckTask extends TimerTask {
                 processInfo = prettyXML;
             }
             
-            String from = CheckProcessCompletion.props.getProperty("watersmart.email.from");
+            String from = CheckProcessCompletion.props.getProperty(ContextConstants.EMAIL_FROM);
                     
             String subject = "Processing Complete";
             String content = "The processing has completed on your request."
@@ -182,7 +182,7 @@ class EmailCheckTask extends TimerTask {
                             + "\n\n\nProcess Information Follows:\n"
                             + processInfo;
             List<String> bcc = new ArrayList<String>();
-            String bccAddr = CheckProcessCompletion.props.getProperty("watersmart.email.tracker");
+            String bccAddr = CheckProcessCompletion.props.getProperty(ContextConstants.EMAIL_TRACK);
             if (!"".equals(bccAddr)) {
                     bcc.add(bccAddr);
             }
@@ -192,13 +192,13 @@ class EmailCheckTask extends TimerTask {
 	}
 
 	private void sendFailedEmail(String errorMsg) throws AddressException, MessagingException {
-		String from = CheckProcessCompletion.props.getProperty("watersmart.email.from");
+		String from = CheckProcessCompletion.props.getProperty(ContextConstants.EMAIL_FROM);
 		String subject = "Processing Failed";
 		String content = "The processing has failed on your request."
 				+ " The following errors occured: " + errorMsg;
 
 		List<String> bcc = new ArrayList<String>();
-		String bccAddr = CheckProcessCompletion.props.getProperty("watersmart.email.tracker");
+		String bccAddr = CheckProcessCompletion.props.getProperty(ContextConstants.EMAIL_TRACK);
 		if (!"".equals(bccAddr)) {
 			bcc.add(bccAddr);
 		}

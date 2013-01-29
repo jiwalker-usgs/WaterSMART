@@ -1,6 +1,7 @@
 package gov.usgs.cida.watersmart.util;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
+import gov.usgs.cida.watersmart.common.ContextConstants;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import gov.usgs.cida.watersmart.common.RunMetadata;
 import java.io.*;
@@ -43,7 +44,7 @@ public class Upload extends HttpServlet {
 
         // filename is parameter passed by our javascript uploader
         //String filename = request.getParameter("filename");
-        String tempDir = props.getProperty("watersmart.file.location");
+        String tempDir = props.getProperty(ContextConstants.UPLOAD_LOCATION);
         File dirFile = new File(tempDir);
         if (!dirFile.exists()) {
             dirFile.mkdirs();

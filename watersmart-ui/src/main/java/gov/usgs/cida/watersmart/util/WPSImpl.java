@@ -2,6 +2,8 @@ package gov.usgs.cida.watersmart.util;
 
 import com.google.common.collect.Maps;
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
+import gov.usgs.cida.netcdf.dsg.Station;
+import gov.usgs.cida.watersmart.common.ContextConstants;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import gov.usgs.cida.watersmart.common.RunMetadata;
 import gov.usgs.cida.watersmart.communication.EmailHandler;
@@ -136,7 +138,7 @@ class WPSTask extends Thread {
 
     static {
         try {
-            SLEEP_FOR_THREDDS = Integer.parseInt(props.getProperty("watersmart.wps.delay.ms"));
+            SLEEP_FOR_THREDDS = Integer.parseInt(props.getProperty(ContextConstants.WPS_WAIT));
         } catch (NumberFormatException nfe) {
             SLEEP_FOR_THREDDS = 300000;
         }
@@ -186,7 +188,7 @@ class WPSTask extends Thread {
         ReturnInfo info;
         RunMetadata metaObj = RunMetadata.getInstance(metadata);
         String compReq;
-        String repo = props.getProperty("watersmart.sos.model.repo");
+        String repo = props.getProperty(ContextConstants.STATS_SOS_URL);
         String netCDFFailMessage = "NetCDF failed unexpectedly ";
         String cswResponse;
         UUID uuid = UUID.randomUUID();
@@ -318,7 +320,7 @@ class WPSTask extends Thread {
             throws IOException, ParserConfigurationException, SAXException, XPathExpressionException, InterruptedException {
 
         //String wpsRequest = WPSImpl.createNahatStatsRequest(sosEndpoint, info.stations, info.properties);
-        String wpsResponse = postToWPS(props.getProperty("watersmart.wps.url"), wpsRequest);
+        String wpsResponse = postToWPS(props.getProperty(ContextConstants.WPS_URL), wpsRequest);
         log.debug(wpsResponse);
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
@@ -326,7 +328,7 @@ class WPSTask extends Thread {
         ProcessStatus procStat = new ProcessStatus(wpsResponseDoc);
         String wpsCheckPoint = procStat.getStatusLocation();
         log.debug(wpsCheckPoint);
-        String contextPath = props.getProperty("watersmart.external.mapping.url");
+        String contextPath = props.getProperty(ContextConstants.APP_URL);
 
         InputStream is = null;
         InputStream resultIs = null;
@@ -359,8 +361,8 @@ class WPSTask extends Thread {
 
             log.debug(resultStr);
 
-            File destinationDir = new File(props.getProperty("watersmart.file.location")
-                    + props.getProperty("watersmart.file.location.wps.repository") + File.separatorChar
+            File destinationDir = new File(props.getProperty(ContextConstants.UPLOAD_LOCATION)
+                    + props.getProperty(ContextConstants.WPS_DIRECTORY) + File.separatorChar
                     + uuid);
             if (!destinationDir.exists()) {
                 FileUtils.forceMkdir(destinationDir);
@@ -372,7 +374,7 @@ class WPSTask extends Thread {
                     + File.separatorChar + filename);
             FileUtils.write(destinationFile, resultStr, "UTF-8");
             String destinationFileName = destinationFile.getName();
-            String webAccessibleFile = contextPath + props.getProperty("watersmart.file.location.wps.repository")
+            String webAccessibleFile = contextPath + props.getProperty(ContextConstants.WPS_DIRECTORY)
                     + "/" + uuid + "/" + destinationFileName;
 
             return webAccessibleFile;
@@ -393,8 +395,8 @@ class WPSTask extends Thread {
         content.append("\n\tMetadata: ").append((cswTransSuccessful) ? "success" : "waiting");
         content.append("\n\nYou will receive another email if there is a success, but may not receive a failure notification.");
         List<String> bcc = new ArrayList<String>();
-        String from = props.getProperty("watersmart.email.from");
-        String bccAddr = props.getProperty("watersmart.email.tracker");
+        String from = props.getProperty(ContextConstants.EMAIL_FROM);
+        String bccAddr = props.getProperty(ContextConstants.EMAIL_TRACK);
         if (!"".equals(bccAddr)) {
             bcc.add(bccAddr);
         }
@@ -439,8 +441,8 @@ class WPSTask extends Thread {
 
         content.append("\n\nHave a nice day!");
         List<String> bcc = new ArrayList<String>();
-        String from = props.getProperty("watersmart.email.from");
-        String bccAddr = props.getProperty("watersmart.email.tracker");
+        String from = props.getProperty(ContextConstants.EMAIL_FROM);
+        String bccAddr = props.getProperty(ContextConstants.EMAIL_TRACK);
         if (!"".equals(bccAddr)) {
             bcc.add(bccAddr);
         }
@@ -482,8 +484,8 @@ class WPSTask extends Thread {
             content.append(el.toString()).append("\n");
         }
         List<String> bcc = new ArrayList<String>();
-        String from = props.getProperty("watersmart.email.from");
-        String bccAddr = props.getProperty("watersmart.email.tracker");
+        String from = props.getProperty(ContextConstants.EMAIL_FROM);
+        String bccAddr = props.getProperty(ContextConstants.EMAIL_TRACK);
         if (!"".equals(bccAddr)) {
             bcc.add(bccAddr);
         }

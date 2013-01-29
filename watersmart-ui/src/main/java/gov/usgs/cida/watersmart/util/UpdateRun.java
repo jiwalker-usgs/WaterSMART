@@ -1,6 +1,7 @@
 package gov.usgs.cida.watersmart.util;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
+import gov.usgs.cida.watersmart.common.ContextConstants;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import gov.usgs.cida.watersmart.common.ModelType;
 import gov.usgs.cida.watersmart.common.RunMetadata;
@@ -107,7 +108,8 @@ public class UpdateRun extends HttpServlet {
                 updateAsBest);
 
         if (rerun) {
-            String sosEndpoint = props.getProperty("watersmart.sos.model.repo") + originalRunMetadata.getTypeString() + "/" + originalRunMetadata.getFileName() + ".nc";
+            // this next line should come from the CSW rather than be rebuilt here
+            String sosEndpoint = props.getProperty(ContextConstants.STATS_SOS_URL) + originalRunMetadata.getTypeString() + "/" + originalRunMetadata.getFileName() + ".nc";
             WPSImpl impl = new WPSImpl();
             String implResponse = impl.executeProcess(sosEndpoint, originalRunMetadata);
             Boolean processStarted = implResponse.toLowerCase().equals("ok");

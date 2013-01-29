@@ -1,6 +1,7 @@
 package gov.usgs.cida.watersmart.ldap;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
+import gov.usgs.cida.watersmart.common.ContextConstants;
 import gov.usgs.cida.watersmart.parse.DSGParser;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import java.util.Properties;
@@ -25,13 +26,12 @@ public class LDAPConnect {
     
 
     public static User authenticate(String username, String password) {
-        boolean requireGroup = Boolean.parseBoolean(jndiProps.getProperty("watersmart.ldap.require.auth", "true"));
+        boolean requireGroup = Boolean.parseBoolean(jndiProps.getProperty(ContextConstants.AUTHORIZATION_REQUIRED, "true"));
         
         Properties props = new Properties();
-        props.put(Context.INITIAL_CONTEXT_FACTORY,
-                  "com.sun.jndi.ldap.LdapCtxFactory");
+        props.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         props.put(Context.PROVIDER_URL, jndiProps.getProperty(
-                "watersmart.ldap.url", "ldaps://gssdsflh02.cr.usgs.gov:636"));
+                ContextConstants.LDAP_URL, "ldaps://gssdsflh02.cr.usgs.gov:636"));
         props.put(Context.REFERRAL, "ignore");
 
         // set properties for authentication
@@ -61,7 +61,7 @@ public class LDAPConnect {
                 String dn = result.getNameInNamespace();
                 
                 user = new User(dn, mail, givenname, sn, uid);
-                String group = jndiProps.getProperty("watersmart.ldap.group", "GS WaterSmart Portal");
+                String group = jndiProps.getProperty(ContextConstants.LDAP_GROUP, "GS WaterSmart Portal");
                 answers = context.search(
                         "", 
                         "(&(objectClass=groupOfNames)(cn=" + group + ")(member=" + dn + "))",

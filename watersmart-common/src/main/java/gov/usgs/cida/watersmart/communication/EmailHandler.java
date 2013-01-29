@@ -1,6 +1,7 @@
 package gov.usgs.cida.watersmart.communication;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
+import gov.usgs.cida.watersmart.common.ContextConstants;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import java.util.Properties;
 import javax.mail.Message;
@@ -19,8 +20,8 @@ public class EmailHandler {
 	public static void sendMessage(EmailMessage message) throws AddressException, MessagingException {
 		Properties properties = System.getProperties();
 
-                properties.put("mail.smtp.host", props.getProperty("watersmart.email.host"));
-                properties.put("mail.smtp.port", props.getProperty("watersmart.email.port"));
+                properties.put("mail.smtp.host", props.getProperty(ContextConstants.EMAIL_HOST));
+                properties.put("mail.smtp.port", props.getProperty(ContextConstants.EMAIL_PORT));
 
 		Session session = Session.getInstance(properties, null);
 		session.setDebug(true);

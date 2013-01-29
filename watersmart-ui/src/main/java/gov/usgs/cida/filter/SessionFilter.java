@@ -1,5 +1,6 @@
 package gov.usgs.cida.filter;
 
+import gov.usgs.cida.watersmart.common.ContextConstants;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import gov.usgs.cida.watersmart.ldap.LDAPConnect;
 import gov.usgs.cida.watersmart.ldap.LoginMessage;
@@ -33,12 +34,12 @@ public class SessionFilter extends HttpServlet implements Filter {
     public boolean redirectOnFail;
     public static String redirectPage;
     public static String dataSource;
-    private static final String DEVELOPMENT = "watersmart.development";
+    
     private static final String REDIRECT_PAGE = "redirect_page";
     
     @Override
     public void init(FilterConfig conf) throws ServletException {
-        String dev = JNDISingleton.getInstance().getProperty(DEVELOPMENT, "false");
+        String dev = JNDISingleton.getInstance().getProperty(ContextConstants.DEVELOPMENT, "false");
 
         if ("true".equals(dev)) {
             //Set Development true

@@ -1,5 +1,6 @@
 package gov.usgs.cida.n52.wps.config;
 
+import gov.usgs.cida.watersmart.common.ContextConstants;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import java.io.IOException;
 import javax.servlet.ServletContextEvent;
@@ -14,12 +15,12 @@ import org.n52.wps.commons.WPSConfig;
  */
 public class ForceConfigInitializeListener implements ServletContextListener {
     
-    private static final String WPS_CONFIG_LOCATION = "watersmart.wps.config.location";
+    
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         String defaultLocation = WPSConfig.getConfigPath();
-        String configLocation = JNDISingleton.getInstance().getProperty(WPS_CONFIG_LOCATION, defaultLocation);
+        String configLocation = JNDISingleton.getInstance().getProperty(ContextConstants.WPS_CONFIG_LOCATION, defaultLocation);
         System.out.println(configLocation);
         try {
             WPSConfig.forceInitialization(configLocation);

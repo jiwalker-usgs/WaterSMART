@@ -6,8 +6,7 @@ import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Station;
 import gov.usgs.cida.netcdf.dsg.StationTimeSeriesMultiDimensional;
 import gov.usgs.cida.netcdf.dsg.StationTimeSeriesNetCDFFile;
-import gov.usgs.cida.netcdf.dsg.Variable;
-import gov.usgs.cida.netcdf.jna.NCUtil;
+import gov.usgs.cida.watersmart.common.ContextConstants;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import gov.usgs.cida.watersmart.common.RunMetadata;
 import gov.usgs.cida.watersmart.parse.column.AFINCHParser;
@@ -26,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
+import javax.swing.text.AbstractDocument;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -50,7 +50,7 @@ public class CreateDSGFromZip {
     
     public static ReturnInfo create(File srcZip, RunMetadata runMeta) throws IOException, XMLStreamException {
         // Need to put the resulting NetCDF file somewhere that ncSOS knows about
-        String sosPath = JNDISingleton.getInstance().getProperty("watersmart.sos.location", System.getProperty("java.io.tmpdir"));
+        String sosPath = JNDISingleton.getInstance().getProperty(ContextConstants.NETCDF_LOCATION, System.getProperty("java.io.tmpdir"));
         
         FileUtils.forceMkdir(new File(sosPath));
         

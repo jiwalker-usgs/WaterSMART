@@ -17,6 +17,7 @@
     <Environment name="watersmart.ldap.group" type="java.lang.String" value="GS WaterSmart Portal"/>
     <Environment name="watersmart.wps.url" type="java.lang.String" value="http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/wps/WebProcessingService" />
     <Environment name="watersmart.wps.delay.ms" type="java.lang.String" value="300000" />
+    <Environment name="watersmart.wps.config.location" type="java.lang.String" value="/tmp/n52/wps_config.xml" />
     <Environment name="watersmart.geonetwork.addr" type="java.lang.String" value="http://cida-wiwsc-gdp2qa.er.usgs.gov:8081/geonetwork"/>
     <Environment name="watersmart.geonetwork.user" type="java.lang.String" value="watersmart" />
     <Environment name="watersmart.geonetwork.pass" type="java.lang.String" value="not_the_password" />
