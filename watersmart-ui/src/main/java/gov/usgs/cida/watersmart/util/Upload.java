@@ -35,7 +35,7 @@ public class Upload extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         log.info("A file is being uploaded");
-        int maxFileSize = Integer.parseInt(props.getProperty("watersmart.file.maxsize"));
+        int maxFileSize = Integer.parseInt(props.getProperty(ContextConstants.UPLOAD_MAXSIZE));
         int fileSize = Integer.parseInt(request.getHeader("Content-Length"));
         if (fileSize > maxFileSize) {
             sendErrorResponse(response, "Upload exceeds max file size of " + maxFileSize + " bytes");

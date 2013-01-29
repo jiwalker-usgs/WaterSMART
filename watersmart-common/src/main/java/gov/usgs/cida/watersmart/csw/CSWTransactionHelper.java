@@ -78,7 +78,7 @@ public class CSWTransactionHelper {
 
     public String addServiceIdentification() throws IOException, UnsupportedEncodingException, URISyntaxException, ParserConfigurationException, SAXException, TransformerException {
         Document getRecordsDoc = getRecordsCall();
-        String sosRepo = props.getProperty("watersmart.sos.model.repo");
+        String sosRepo = props.getProperty(ContextConstants.STATS_SOS_URL);
         NodeList nodes = getRecordsDoc.getElementsByTagNameNS(NAMESPACE_GMD, "MD_Metadata");
 
         if (nodes.getLength() != 1) {
