@@ -67,8 +67,7 @@ public class CreateDSGFromZip {
         ZipFile zip = new ZipFile(verifiedSrcZip);
         Enumeration<? extends ZipEntry> entries = zip.entries();
         
-        //StationTimeSeriesNetCDFFile nc = null;
-        StationTimeSeriesMultiDimensional nc = null;
+        StationTimeSeriesNetCDFFile nc = null;
         
         // Get station wfs used for model
         
@@ -134,19 +133,7 @@ public class CreateDSGFromZip {
                     Station[] stationArray = stations.toArray(new Station[stations.size()]);
                     Map<String,String> globalAttrs = applyBusinessRulesToMeta(runMeta);
                     
-//                    nc = new StationTimeSeriesNetCDFFile(ncFile, meta, globalAttrs, false, stationArray);
-                    int timeStepCount = dsgParse.getTimeStepCount();
-                    int[] timeSteps = new int[timeStepCount];
-                    for (int timeStepIndex = 0; timeStepIndex < timeStepCount; ++timeStepCount) {
-                        timeSteps[timeStepIndex] = timeStepIndex;
-                    }
-                    nc = new StationTimeSeriesMultiDimensional(
-                            ncFile,
-                            globalAttrs,
-                            stationArray,
-                            timeSteps,
-                            meta.getTimeUnit(),
-                            meta.getDataVars().toArray(new Variable[0]));
+                    nc = new StationTimeSeriesNetCDFFile(ncFile, meta, globalAttrs, false, stationArray);
                 }
                 while (dsgParse.hasNext()) {
                     Observation ob = dsgParse.next();
