@@ -228,8 +228,4 @@ public class PRMSParser extends StationPerColumnDSGParser {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
-    @Override
-    public int getTimeStepCount() {
-        return allData.get(allData.keySet().iterator().next()).size();
-    }
 }
