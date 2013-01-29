@@ -4,7 +4,10 @@ import com.google.common.collect.Maps;
 import gov.usgs.cida.netcdf.dsg.Observation;
 import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Station;
+import gov.usgs.cida.netcdf.dsg.StationTimeSeriesMultiDimensional;
 import gov.usgs.cida.netcdf.dsg.StationTimeSeriesNetCDFFile;
+import gov.usgs.cida.netcdf.dsg.Variable;
+import gov.usgs.cida.netcdf.jna.NCUtil;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import gov.usgs.cida.watersmart.common.RunMetadata;
 import gov.usgs.cida.watersmart.parse.column.AFINCHParser;
@@ -27,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.NotImplementedException;
+import org.omg.CORBA.INTERNAL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +66,9 @@ public class CreateDSGFromZip {
         
         ZipFile zip = new ZipFile(verifiedSrcZip);
         Enumeration<? extends ZipEntry> entries = zip.entries();
-        StationTimeSeriesNetCDFFile nc = null;
+        
+        //StationTimeSeriesNetCDFFile nc = null;
+        StationTimeSeriesMultiDimensional nc = null;
         
         // Get station wfs used for model
         
@@ -128,7 +134,19 @@ public class CreateDSGFromZip {
                     Station[] stationArray = stations.toArray(new Station[stations.size()]);
                     Map<String,String> globalAttrs = applyBusinessRulesToMeta(runMeta);
                     
-                    nc = new StationTimeSeriesNetCDFFile(ncFile, meta, globalAttrs, true, stationArray);
+//                    nc = new StationTimeSeriesNetCDFFile(ncFile, meta, globalAttrs, false, stationArray);
+                    int timeStepCount = dsgParse.getTimeStepCount();
+                    int[] timeSteps = new int[timeStepCount];
+                    for (int timeStepIndex = 0; timeStepIndex < timeStepCount; ++timeStepCount) {
+                        timeSteps[timeStepIndex] = timeStepIndex;
+                    }
+                    nc = new StationTimeSeriesMultiDimensional(
+                            ncFile,
+                            globalAttrs,
+                            stationArray,
+                            timeSteps,
+                            meta.getTimeUnit(),
+                            meta.getDataVars().toArray(new Variable[0]));
                 }
                 while (dsgParse.hasNext()) {
                     Observation ob = dsgParse.next();
