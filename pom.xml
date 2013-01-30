@@ -414,7 +414,7 @@
                     <version>2.12</version>
                     <configuration>
                         <includes>
-                            <include>**/*Spec.*</include>
+                            <!--include>**/*Spec.*</include-->
                             <include>**/*Test.java</include>
                         </includes>
                     </configuration>
