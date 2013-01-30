@@ -14,8 +14,6 @@ import org.n52.wps.commons.WPSConfig;
  * @author Jordan Walker <jiwalker@usgs.gov>
  */
 public class ForceConfigInitializeListener implements ServletContextListener {
-    
-    
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
