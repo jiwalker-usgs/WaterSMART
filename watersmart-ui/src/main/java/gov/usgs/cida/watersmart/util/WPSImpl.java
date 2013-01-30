@@ -257,14 +257,22 @@ class WPSTask extends Thread {
             }
 
             // 3. Wait for THREDDS
+            InputStream getCaps = null;
             try {
                 log.debug("Beginning THREDDS wait period");
+                // SLEEP should be as short as necessary
                 Thread.sleep(SLEEP_FOR_THREDDS);
+                getCaps = HTTPUtils.sendPacket(new URL(sosEndpoint), "GET");
             } catch (InterruptedException ex) {
                 // Typically we don't care about this, but we can log and move on.
                 log.warn("THREDDS wait period was interrupted.");
                 // If anything needs to be handled on an interruption, handle it here
+            } catch (IOException ex) {
+                log.warn("Error warming up the SOS GetCaps cache");
+            } finally {
+                IOUtils.closeQuietly(getCaps);
             }
+            
             log.trace("End of THREDDS wait period");
         }
 
