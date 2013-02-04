@@ -13,7 +13,7 @@
     
     <properties>
         <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
-        <gdp.version>19.2-SNAPSHOT</gdp.version>
+        <gdp.version>20</gdp.version>
     </properties>
     
     <dependencies>
