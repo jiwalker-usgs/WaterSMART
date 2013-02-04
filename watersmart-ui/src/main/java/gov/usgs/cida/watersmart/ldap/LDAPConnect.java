@@ -4,6 +4,7 @@ import gov.usgs.cida.config.DynamicReadOnlyProperties;
 import gov.usgs.cida.watersmart.common.ContextConstants;
 import gov.usgs.cida.watersmart.parse.DSGParser;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
+import java.security.KeyStore;
 import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -31,11 +32,12 @@ public class LDAPConnect {
         Properties props = new Properties();
         props.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         props.put(Context.PROVIDER_URL, jndiProps.getProperty(
-                ContextConstants.LDAP_URL, "ldaps://gssdsflh02.cr.usgs.gov:636"));
+            ContextConstants.LDAP_URL, "ldaps://gssdsflh02.cr.usgs.gov:636"));
         props.put(Context.REFERRAL, "ignore");
+        props.put(Context.SECURITY_AUTHENTICATION, "simple");
 
         // set properties for authentication
-        props.put(Context.SECURITY_PRINCIPAL, username);
+        props.put(Context.SECURITY_PRINCIPAL, username + "@gs.doi.net");
         props.put(Context.SECURITY_CREDENTIALS, password);
         
         User user = null;
@@ -43,12 +45,12 @@ public class LDAPConnect {
         try {
             InitialDirContext context = new InitialDirContext(props);
             SearchControls ctrls = new SearchControls();
-            ctrls.setReturningAttributes(new String[] { "dn", "mail", "givenname", "sn", "uid" });
+            ctrls.setReturningAttributes(new String[] { "dn", "mail", "givenname", "sn", "samaccountname" });
             ctrls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            
+            String basedn = props.getProperty(ContextConstants.LDAP_BASEDN, "DC=gs,DC=doi,dc=net");
             NamingEnumeration<SearchResult> answers = context.search(
-                    "OU=USGS,O=DOI",
-                    "(uid=" + username + ")",
+                    basedn,  
+                    "(samaccountname=" + username + ")",
                     ctrls
                     );
             if (answers.hasMore()) {
@@ -57,15 +59,17 @@ public class LDAPConnect {
                 String mail = (String)attributes.get("mail").get();
                 String givenname = (String)attributes.get("givenname").get();
                 String sn = (String)attributes.get("sn").get();
-                String uid = (String)attributes.get("uid").get();
+                String uid = (String)attributes.get("samaccountname").get();
                 String dn = result.getNameInNamespace();
                 
                 user = new User(dn, mail, givenname, sn, uid);
-                String group = jndiProps.getProperty(ContextConstants.LDAP_GROUP, "GS WaterSmart Portal");
+                String group = jndiProps.getProperty(ContextConstants.LDAP_GROUP, "GS WaterSmartPortal");
+                ctrls = new SearchControls();
+                ctrls.setSearchScope(SearchControls.SUBTREE_SCOPE);
                 answers = context.search(
-                        "", 
-                        "(&(objectClass=groupOfNames)(cn=" + group + ")(member=" + dn + "))",
-                        null);
+                        basedn, 
+                        "(&(objectClass=group)(cn=" + group + ")(member=" + dn + "))",
+                        ctrls);
                 if (answers.hasMore() || !requireGroup) {
                     user.setAuthentication(true);
                 }
