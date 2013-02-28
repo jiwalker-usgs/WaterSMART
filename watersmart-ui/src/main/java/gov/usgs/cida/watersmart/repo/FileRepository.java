@@ -1,6 +1,7 @@
 package gov.usgs.cida.watersmart.repo;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
+import gov.usgs.cida.watersmart.common.ContextConstants;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import java.io.*;
 import javax.servlet.ServletException;
@@ -19,8 +20,8 @@ public class FileRepository extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileRepository.class);
     private static final DynamicReadOnlyProperties props = JNDISingleton.getInstance();
-    private static final String filePath = props.getProperty("watersmart.file.location")
-            + props.getProperty("watersmart.file.location.wps.repository");
+    private static final String filePath = props.getProperty(ContextConstants.UPLOAD_LOCATION)
+            + props.getProperty(ContextConstants.WPS_DIRECTORY);
     
     /**
      * Processes requests for both HTTP

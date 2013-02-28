@@ -167,9 +167,10 @@
             
         </script>
 
+        <% String url = request.getRequestURL().toString(); %>
         <jsp:include page="template/USGSFooter.jsp">
             <jsp:param name="footer-class" value="x-hidden"/>
-            <jsp:param name="site-url" value="http://cida.usgs.gov/watersmart"/>
+            <jsp:param name="site-url" value="<%=url%>"/>
             <jsp:param name="contact-info" value="dblodgett@usgs.gov"/>
         </jsp:include>
     </body>

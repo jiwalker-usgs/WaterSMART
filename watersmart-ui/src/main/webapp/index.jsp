@@ -1,4 +1,5 @@
 
+<%@page import="gov.usgs.cida.watersmart.common.ContextConstants"%>
 <%@page import="javax.naming.NamingException"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
 <%@page import="gov.usgs.cida.config.DynamicReadOnlyProperties"%>
@@ -29,22 +30,25 @@
             <% 
                 DynamicReadOnlyProperties props = new DynamicReadOnlyProperties();
                 props.addJNDIContexts(new String[0]);
-                boolean development = Boolean.parseBoolean(props.getProperty("watersmart.development"));
+                boolean development = Boolean.parseBoolean(props.getProperty(ContextConstants.DEVELOPMENT));
                 User user = (User)request.getSession().getAttribute("X_AUTH_REAL_USER");
                 int timeout = request.getSession().getMaxInactiveInterval();
             %>
             
-            CONFIG.LOG4JS_PATTERN_LAYOUT = '<%= props.getProperty("watersmart.frontend.log4js.pattern.layout","%rms - %-5p - %m%n") %>';
-            CONFIG.LOG4JS_LOG_THRESHOLD = '<%= props.getProperty("watersmart.frontend.log4js.threshold", "info") %>';
-            CONFIG.GEOSERVER_URL = '<%= props.getProperty("watersmart.stations.url", "http://localhost:8080/geoserver/ows") %>';
-            CONFIG.WPS_URL = '<%= props.getProperty("watersmart.wps.url", "http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/gdp-process-wps") %>';
-            CONFIG.SITES_LAYER = '<%= props.getProperty("watersmart.stations.typeName", "watersmart:se_sites") %>';
+            CONFIG.LOG4JS_PATTERN_LAYOUT = '<%= props.getProperty(ContextConstants.UI_LOG_PATTERN,"%rms - %-5p - %m%n") %>';
+            CONFIG.LOG4JS_LOG_THRESHOLD = '<%= props.getProperty(ContextConstants.UI_LOG_THRESHOLD, "info") %>';
+            CONFIG.WPS_URL = '<%= props.getProperty(ContextConstants.WPS_URL, "http://cida-wiwsc-gdp1qa.er.usgs.gov:8080/gdp-process-wps") %>';
+            
+            // next 2 variables no longer used
+            CONFIG.GEOSERVER_URL = '<%= props.getProperty(ContextConstants.STATION_WFS_URL, "http://localhost:8080/geoserver/ows") %>';
+            CONFIG.SITES_LAYER = '<%= props.getProperty(ContextConstants.LAYER_TYPENAME, "watersmart:se_sites") %>';
+            
             CONFIG.DEVELOPMENT = <%= development %>;
-            CONFIG.CSW_PARENT_IDENTIFIER = '<%= props.getProperty("watersmart.csw.identifier.parent", "497cf2db-56d6-4cad-9a56-a14b63fb232a") %>';
+            CONFIG.CSW_PARENT_IDENTIFIER = '<%= props.getProperty(ContextConstants.CSW_UUID, "497cf2db-56d6-4cad-9a56-a14b63fb232a") %>';
             // This is probably no longer needed  since the value now comes from the CSW record, but it does not hurt to have it here either
             // in case the CSW record for some reason does not hold the value
-            CONFIG.COMMON_ATTR = '<%= props.getProperty("watersmart.stations.primaryAttribute", "site_no") %>'; 
-            CONFIG.OBSERVED_SOS = '<%= props.getProperty("watersmart.sos.observed") %>';
+            CONFIG.COMMON_ATTR = '<%= props.getProperty(ContextConstants.LAYER_ATTR, "site_no") %>'; 
+            CONFIG.OBSERVED_SOS = '<%= props.getProperty(ContextConstants.SOS_OBSERVED_URL) %>';
             CONFIG.PROXY = 'service/proxy?';
             CONFIG.TIMEOUT = <%= timeout %>;
             CONFIG.TIMEOUT_ID = 0;
@@ -145,9 +149,10 @@
             <div id="dygraph-legend" class="x-hidden"></div>
         </div>
 
+        <% String url = request.getRequestURL().toString(); %>
         <jsp:include page="template/USGSFooter.jsp">
             <jsp:param name="footer-class" value="x-hidden"/>
-            <jsp:param name="site-url" value="http://cida.usgs.gov/watersmart"/>
+            <jsp:param name="site-url" value="<%=url%>"/>
             <jsp:param name="contact-info" value="dblodgett@usgs.gov"/>
         </jsp:include>
     </body>

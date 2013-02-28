@@ -8,7 +8,7 @@ library(chron)
 library(doBy)
 library(hydroGOF)
 
-sos_url_temp="http://waterservices.usgs.gov/nwis/dv/?format=waterml,1.1&sites="
+sos_url_temp="http://waterservices.usgs.gov/nwis/dv/?format=rdb,1.0&sites="
 offering_temp='00003'
 property_temp='00060'
 
@@ -24,7 +24,7 @@ SWE_CSV_IHA <- function(input) {
                                                                "//swe:values", xmlValue)[[1]])
     nms <- c("date", "discharge")
     names(flow) <- nms
-    flow$date <- as.POSIXct(strptime(flow$date, format = "%Y-%m-%dT%H:%M:%SZ"))
+    flow$date <- as.Date(strptime(flow$date, format = "%Y-%m-%dT%H:%M:%SZ"))
     flow$discharge <- as.numeric(flow$discharge)
     flow <- as.data.frame(flow)
     attr(flow, "SRC") <- input
@@ -36,6 +36,21 @@ SWE_CSV_IHA <- function(input) {
     flow<-""
     return(flow)}
 }
+
+retrieveNWISData <-
+  function(obs_url){
+    tmp <- read.delim(obs_url,header = TRUE, quote="\"", dec=".", sep='\t', colClasses=c('character'), fill = TRUE, comment.char="#")
+    dataType <- tmp[1,]
+    data <- tmp[-1,]
+    data[,regexpr('d$',dataType) > 0] <- as.Date(data[,regexpr('d$', dataType) > 0])
+    tempDF <- data[,which(regexpr('n$', dataType) > 0)]
+    tempDF <- suppressWarnings(sapply(tempDF, function(x) as.numeric(x)))
+    data[,which(regexpr('n$', dataType) > 0)] <- tempDF
+    row.names(data) <- NULL 
+    Daily <- data[, 3:4]
+    colnames(Daily) <- c('date','discharge')
+    return (Daily)
+  }
 
 getXMLDV2Data <- function(sos_url,sites,property,offering,startdate,enddate,interval,latest){
   
@@ -1105,14 +1120,14 @@ for (i in 1:length(a2)){
     latest<-''
     sites=a[i]
     url2<-paste(sos_url_temp,sites,'&startDT=',startdate,'&endDT=',enddate,'&statCd=',offering_temp,'&parameterCd=',property_temp,'&access=3',sep='')
-    x_obs <- getXMLWML1.1Data(url2)
+    x_obs <- retrieveNWISData(url2)
 
     if (nrow(x_obs)>2) {
       x<-(x_mod$date)
-      x_mod<-data.frame(strptime(x, "%Y-%m-%d"),x_mod$discharge)
+      x_mod<-data.frame(x,x_mod$discharge)
       colnames(x_mod)<-c("date","discharge")
       x2<-(x_obs$date)
-      x_obs<-data.frame(strptime(x2, "%Y-%m-%d"),x_obs$discharge)
+      x_obs<-data.frame(x2,x_obs$discharge)
       colnames(x_obs)<-c("date","discharge")
 
       x_mod<-x_mod[x_mod$date>=min(x_obs$date) & x_mod$date<=max(x_obs$date), ]

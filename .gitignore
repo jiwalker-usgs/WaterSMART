@@ -1,8 +1,5 @@
 /target/
 /**/target/
+/**/content/
 /**/src/main/webapp/META-INF/context.xml
 .DS_Store
-/watersmart-geonetwork/target/
-/watersmart-wps/target/
-/watersmart-geoserver/target/
-/watersmart-thredds/target/

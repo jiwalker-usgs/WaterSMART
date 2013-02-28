@@ -1,6 +1,7 @@
 package gov.usgs.cida.watersmart.util;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
+import gov.usgs.cida.watersmart.common.ContextConstants;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import gov.usgs.cida.watersmart.common.RunMetadata;
 import java.io.*;
@@ -34,7 +35,7 @@ public class Upload extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         log.info("A file is being uploaded");
-        int maxFileSize = Integer.parseInt(props.getProperty("watersmart.file.maxsize"));
+        int maxFileSize = Integer.parseInt(props.getProperty(ContextConstants.UPLOAD_MAXSIZE));
         int fileSize = Integer.parseInt(request.getHeader("Content-Length"));
         if (fileSize > maxFileSize) {
             sendErrorResponse(response, "Upload exceeds max file size of " + maxFileSize + " bytes");
@@ -43,7 +44,7 @@ public class Upload extends HttpServlet {
 
         // filename is parameter passed by our javascript uploader
         //String filename = request.getParameter("filename");
-        String tempDir = props.getProperty("watersmart.file.location");
+        String tempDir = props.getProperty(ContextConstants.UPLOAD_LOCATION);
         File dirFile = new File(tempDir);
         if (!dirFile.exists()) {
             dirFile.mkdirs();

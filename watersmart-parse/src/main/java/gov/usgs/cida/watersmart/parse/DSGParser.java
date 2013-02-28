@@ -91,4 +91,5 @@ public abstract class DSGParser implements Iterator<Observation> {
      * @return station name for this data
      */
     protected abstract String getStationId(String parseText);
+    
 }

@@ -9,8 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.FileUtils;
-import static org.junit.Assert.*;
 import org.junit.AfterClass;
+import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -30,7 +30,7 @@ public class WaterfallTest {
     public static void setupClass() throws IOException {
         FileUtils.forceMkdir(new File(outputDir));
         sampleFile = new File(WaterfallTest.class.getClassLoader()
-                .getResource("gov/usgs/cida/watersmart/netcdf/WATERFALL_realupload.zip")
+                .getResource("gov/usgs/cida/watersmart/parse/test/WATERFALL.zip")
                 .getFile());
     }
     
@@ -41,14 +41,15 @@ public class WaterfallTest {
 
     @Test
     public void testNetCDFFromWaterfall() throws IOException, XMLStreamException {
+        //TODO fix this
         RunMetadata runMeta = new RunMetadata(ModelType.WATERFALL, "1", "test", "1", "1", "2012-07-10T00:00:00Z", 
             "Special", "comments", "jiwalker@usgs.gov", "http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/NWC/ows", 
             "NWC:Dense1", "site_no");
         ReturnInfo info = CreateDSGFromZip.create(sampleFile, runMeta);
-        File ncFile = new File("/tmp/waterfall/" + info.filename);
+        File ncFile = new File(new File(outputDir), info.filename);
         
-        assertEquals(info.filename, "WATERFALL_realupload.nc");
-        assertEquals(FileUtils.sizeOf(ncFile), 3179793L);
+        assertEquals(info.filename, "WATERFALL.nc");
+        assertEquals(FileUtils.sizeOf(ncFile), 52145L);
         FileUtils.deleteQuietly(ncFile);
     }
 

@@ -5,6 +5,7 @@ import gov.usgs.cida.netcdf.dsg.Observation;
 import gov.usgs.cida.netcdf.dsg.RecordType;
 import gov.usgs.cida.netcdf.dsg.Station;
 import gov.usgs.cida.netcdf.dsg.StationTimeSeriesNetCDFFile;
+import gov.usgs.cida.watersmart.common.ContextConstants;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import gov.usgs.cida.watersmart.common.RunMetadata;
 import gov.usgs.cida.watersmart.parse.column.AFINCHParser;
@@ -46,7 +47,7 @@ public class CreateDSGFromZip {
     
     public static ReturnInfo create(File srcZip, RunMetadata runMeta) throws IOException, XMLStreamException {
         // Need to put the resulting NetCDF file somewhere that ncSOS knows about
-        String sosPath = JNDISingleton.getInstance().getProperty("watersmart.sos.location", System.getProperty("java.io.tmpdir"));
+        String sosPath = JNDISingleton.getInstance().getProperty(ContextConstants.NETCDF_LOCATION, System.getProperty("java.io.tmpdir"));
         
         FileUtils.forceMkdir(new File(sosPath));
         
@@ -62,6 +63,7 @@ public class CreateDSGFromZip {
         
         ZipFile zip = new ZipFile(verifiedSrcZip);
         Enumeration<? extends ZipEntry> entries = zip.entries();
+        
         StationTimeSeriesNetCDFFile nc = null;
         
         // Get station wfs used for model
@@ -128,7 +130,7 @@ public class CreateDSGFromZip {
                     Station[] stationArray = stations.toArray(new Station[stations.size()]);
                     Map<String,String> globalAttrs = applyBusinessRulesToMeta(runMeta);
                     
-                    nc = new StationTimeSeriesNetCDFFile(ncFile, meta, globalAttrs, true, stationArray);
+                    nc = new StationTimeSeriesNetCDFFile(ncFile, meta, globalAttrs, false, stationArray);
                 }
                 while (dsgParse.hasNext()) {
                     Observation ob = dsgParse.next();
@@ -175,7 +177,7 @@ public class CreateDSGFromZip {
         globalAttrs.put("creator_email", meta.getEmail());
         globalAttrs.put("project", "WaterSMART Water Census");
         globalAttrs.put("processing_level", "Model Results");
-        globalAttrs.put("standard_name_vocabulary", RecordType.CF_VER);
+        globalAttrs.put("standard_name_vocabulary", StationTimeSeriesNetCDFFile.CF_VER);
         return globalAttrs;
     }
 }

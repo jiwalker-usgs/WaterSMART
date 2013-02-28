@@ -165,4 +165,5 @@ public class AFINCHParser extends StationPerColumnDSGParser {
     protected final DateTimeFormatter getInputDateFormatter() {
         return inputDateFormatter;
     }  
+    
 }

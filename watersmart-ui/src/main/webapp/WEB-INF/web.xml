@@ -31,7 +31,7 @@
         </init-param>
         <init-param>
             <param-name>redirect_page</param-name>
-            <param-value>/login.jsp</param-value>
+            <param-value>login.jsp</param-value>
         </init-param>
     </filter>
     <filter-mapping>

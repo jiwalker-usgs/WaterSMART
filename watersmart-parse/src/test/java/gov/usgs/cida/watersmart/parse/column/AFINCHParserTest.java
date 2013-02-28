@@ -9,12 +9,10 @@ import java.io.File;
 import java.io.IOException;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.FileUtils;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -32,7 +30,7 @@ public class AFINCHParserTest {
     public static void setupClass() throws IOException {
         FileUtils.forceMkdir(new File(outputDir));
         sampleFile = new File(AFINCHParserTest.class.getClassLoader()
-                .getResource("gov/usgs/cida/watersmart/netcdf/afinch.zip")
+                .getResource("gov/usgs/cida/watersmart/parse/test/AFINCH.zip")
                 .getFile());
     }
     
@@ -43,14 +41,15 @@ public class AFINCHParserTest {
 
     @Test
     public void testNetCDFFromAfinch() throws IOException, XMLStreamException {
+        // TODO stand up dummy service that reads shapefiles
         RunMetadata runMeta = new RunMetadata(ModelType.AFINCH, "1", "test", "1", "1", "2012-07-10T00:00:00Z", 
             "Special", "comments", "jiwalker@usgs.gov", "http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/NWC/ows", 
             "NWC:Dense1", "site_no");
         ReturnInfo info = CreateDSGFromZip.create(sampleFile, runMeta);
-        File ncFile = new File("/tmp/afinch/" + info.filename);
+        File ncFile = new File(new File(outputDir), info.filename);
         
-        assertThat(info.filename, is(equalTo("afinch.nc")));
-        assertThat(FileUtils.sizeOf(ncFile), is(equalTo(1118897L)));
+        assertEquals(info.filename, "AFINCH.nc");
+        assertEquals(FileUtils.sizeOf(ncFile),327233L);
         FileUtils.deleteQuietly(ncFile);
     }
 

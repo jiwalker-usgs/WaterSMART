@@ -15,6 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -32,7 +33,7 @@ public class PRMSParserTest {
     public static void setupClass() throws IOException {
         FileUtils.forceMkdir(new File(outputDir));
         sampleFile = new File(PRMSParserTest.class.getClassLoader()
-                .getResource("gov/usgs/cida/watersmart/netcdf/prms.zip")
+                .getResource("gov/usgs/cida/watersmart/parse/test/PRMS.zip")
                 .getFile());
     }
     
@@ -43,14 +44,15 @@ public class PRMSParserTest {
 
     @Test
     public void testNetCDFFromPRMS() throws IOException, XMLStreamException {
+        // TODO fix to not use gdp2qa
         RunMetadata runMeta = new RunMetadata(ModelType.PRMS, "1", "test", "1", "1", "2012-07-10T00:00:00Z", 
             "Special", "comments", "jiwalker@usgs.gov", "http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/NWC/ows", 
             "NWC:Dense1", "site_no");
         ReturnInfo info = CreateDSGFromZip.create(sampleFile, runMeta);
-        File ncFile = new File("/tmp/prms/" + info.filename);
+        File ncFile = new File(new File(outputDir), info.filename);
         
-        assertThat(info.filename, is(equalTo("prms.nc")));
-        assertThat(FileUtils.sizeOf(ncFile), is(equalTo(168891L)));
+        assertEquals(info.filename, "PRMS.nc");
+        assertEquals(FileUtils.sizeOf(ncFile), 25035L);
         FileUtils.deleteQuietly(ncFile);
     }
 

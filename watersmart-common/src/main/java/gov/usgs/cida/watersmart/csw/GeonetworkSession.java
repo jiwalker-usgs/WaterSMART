@@ -1,6 +1,7 @@
 package gov.usgs.cida.watersmart.csw;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
+import gov.usgs.cida.watersmart.common.ContextConstants;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,12 +39,12 @@ public class GeonetworkSession {
     private static final DynamicReadOnlyProperties props = JNDISingleton.getInstance();
 
     // currently defaults to gdp2 geonetwork
-    public final String GEONETWORK_ENDPOINT = props.getProperty("watersmart.geonetwork.addr");
+    public final String GEONETWORK_ENDPOINT = props.getProperty(ContextConstants.CSW_URL);
     public final String GEONETWORK_CSW = GEONETWORK_ENDPOINT + "/srv/eng/csw-publication";
     public final String GEONETWORK_LOGIN = GEONETWORK_ENDPOINT + "/srv/eng/xml.user.login";
     public final String GEONETWORK_LOGOUT = GEONETWORK_ENDPOINT + "/srv/eng/xml.user.logout";
-    public final String GEONETWORK_USER = props.getProperty("watersmart.geonetwork.user");
-    public final String GEONETWORK_PASS = props.getProperty("watersmart.geonetwork.pass");
+    public final String GEONETWORK_USER = props.getProperty(ContextConstants.CSW_USER);
+    public final String GEONETWORK_PASS = props.getProperty(ContextConstants.CSW_PASS);
     
     private CookieStore cookieJar;
     private Date selfExpireCookieDate;
