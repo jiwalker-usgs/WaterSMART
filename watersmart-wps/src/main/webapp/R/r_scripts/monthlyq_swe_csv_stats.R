@@ -14,15 +14,15 @@ deciles <- function(x) {
   sortq <- sort(isolateq)
   deciles<-matrix(nrow=9,ncol=2)
   deciles[1:9,1] <- seq(0.1,0.9,by=.1)
-  deciles[1,2] <- floor(findrank(length(sortq),0.9))
-  deciles[2,2] <- floor(findrank(length(sortq),0.8))
-  deciles[3,2] <- floor(findrank(length(sortq),0.7))
-  deciles[4,2] <- floor(findrank(length(sortq),0.6))
-  deciles[5,2] <- floor(findrank(length(sortq),0.5))
-  deciles[6,2] <- floor(findrank(length(sortq),0.4))
-  deciles[7,2] <- floor(findrank(length(sortq),0.3))
-  deciles[8,2] <- floor(findrank(length(sortq),0.2))
-  deciles[9,2] <- floor(findrank(length(sortq),0.1))
+  deciles[1,2] <- sortq[floor(findrank(length(sortq),0.9))]
+  deciles[2,2] <- sortq[floor(findrank(length(sortq),0.8))]
+  deciles[3,2] <- sortq[floor(findrank(length(sortq),0.7))]
+  deciles[4,2] <- sortq[floor(findrank(length(sortq),0.6))]
+  deciles[5,2] <- sortq[floor(findrank(length(sortq),0.5))]
+  deciles[6,2] <- sortq[floor(findrank(length(sortq),0.4))]
+  deciles[7,2] <- sortq[floor(findrank(length(sortq),0.3))]
+  deciles[8,2] <- sortq[floor(findrank(length(sortq),0.2))]
+  deciles[9,2] <- sortq[floor(findrank(length(sortq),0.1))]
   return(deciles)
 }
 SWE_CSV_IHA <- function(input) {
