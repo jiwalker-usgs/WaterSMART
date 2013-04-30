@@ -7,6 +7,7 @@ library(zoo)
 library(chron)
 library(doBy)
 library(hydroGOF)
+library(RCurl)
 
 sos_url_temp="http://waterservices.usgs.gov/nwis/dv/?format=waterml,1.1&sites="
 offering_temp='00003'
