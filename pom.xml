@@ -67,11 +67,11 @@
     <repositories>
         <repository>
             <id>cida-releases</id>
-            <url>http://internal.cida.usgs.gov/maven/content/repositories/cida-releases/</url>
+            <url>http://internal.cida.usgs.gov/maven/content/groups/public/</url>
         </repository>
         <repository>
             <id>cida-snapshots</id>
-            <url>http://internal.cida.usgs.gov/maven/content/repositories/cida-snapshots/</url>
+            <url>http://internal.cida.usgs.gov/maven/content/groups/public-snapshots/</url>
         </repository>
         <repository>
             <id>cida-thirdparty</id>
