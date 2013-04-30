@@ -51,7 +51,7 @@ public class WFSPointStationLookup implements StationLookup {
         }
         InputStream response = get.getResponseBodyAsStream();
 
-        XMLInputFactory factory = WstxInputFactory.newFactory();
+        XMLInputFactory factory = WstxInputFactory.newInstance();
         XMLStreamReader reader = factory.createXMLStreamReader(response);
 
         float lat = Float.NaN;
