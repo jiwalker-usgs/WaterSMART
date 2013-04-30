@@ -24,7 +24,7 @@ SWE_CSV_IHA <- function(input) {
                                                                "//swe:values", xmlValue)[[1]])
     nms <- c("date", "discharge")
     names(flow) <- nms
-    flow$date <- as.POSIXct(strptime(flow$date, format = "%Y-%m-%dT%H:%M:%SZ"))
+    flow$date <- as.Date(strptime(flow$date, format = "%Y-%m-%dT%H:%M:%SZ"))
     flow$discharge <- as.numeric(flow$discharge)
     flow <- as.data.frame(flow)
     attr(flow, "SRC") <- input
@@ -36,6 +36,21 @@ SWE_CSV_IHA <- function(input) {
     flow<-""
     return(flow)}
 }
+
+retrieveNWISData <-
+  function(obs_url){
+    tmp <- read.delim(obs_url,header = TRUE, quote="\"", dec=".", sep='\t', colClasses=c('character'), fill = TRUE, comment.char="#")
+    dataType <- tmp[1,]
+    data <- tmp[-1,]
+    data[,regexpr('d$',dataType) > 0] <- as.Date(data[,regexpr('d$', dataType) > 0])
+    tempDF <- data[,which(regexpr('n$', dataType) > 0)]
+    tempDF <- suppressWarnings(sapply(tempDF, function(x) as.numeric(x)))
+    data[,which(regexpr('n$', dataType) > 0)] <- tempDF
+    row.names(data) <- NULL 
+    Daily <- data[, 3:4]
+    colnames(Daily) <- c('date','discharge')
+    return (Daily)
+  }
 
 getXMLDV2Data <- function(sos_url,sites,property,offering,startdate,enddate,interval,latest){
   
@@ -85,16 +100,22 @@ getAllSites <- function(site_url){
 
 getXMLWML1.1Data <- function(obs_url){
   cat(paste("Retrieving data from: \n", obs_url, "\n", sep = " "))
-  doc<-xmlTreeParse(obs_url, getDTD=F, useInternalNodes=TRUE)
-  values<-xpathSApply(doc, "//ns1:timeSeries//ns1:value")
+  content <- getURLContent(obs_url,.opts=list(timeout.ms=500000))
+  test <- capture.output(tryCatch(xmlTreeParse(content, getDTD=F, useInternalNodes=TRUE),"XMLParserErrorList" = function(e) {cat("incomplete",e$message)}))
+  while (length(grep("<?xml",test))==0) {
+    content <- getURLContent(obs_url,.opts=list(timeout.ms=500000))
+    test <- capture.output(tryCatch(xmlTreeParse(content, getDTD=F, useInternalNodes=TRUE),"XMLParserErrorList" = function(e) {cat("incomplete",e$message)}))
+  }
+  doc <- htmlTreeParse(content, asText=TRUE, useInternalNodes=TRUE)
+  values<-xpathSApply(doc, "//timeseries//value")
   values2<-sapply(values,function(x) as.numeric(xmlValue(x)))
-  dateSet<-xpathSApply(doc, "//@dateTime")
+  dateSet<-xpathSApply(doc, "//@datetime")
   dateSet2<-sapply(dateSet,function(x) toString(substr(x,1,10)))
   Daily<-as.data.frame(matrix(ncol=2,nrow=length(values2)))
   colnames(Daily)<-c('date','discharge')
   Daily$discharge<-values2
   if (length(dateSet)>2) {
-    Daily$date<-dateSet}
+    Daily$date<-as.Date(dateSet2)}
   return (Daily)
 }
 
@@ -1109,10 +1130,10 @@ for (i in 1:length(a2)){
 
     if (nrow(x_obs)>2) {
       x<-(x_mod$date)
-      x_mod<-data.frame(strptime(x, "%Y-%m-%d"),x_mod$discharge)
+      x_mod<-data.frame(x,x_mod$discharge)
       colnames(x_mod)<-c("date","discharge")
       x2<-(x_obs$date)
-      x_obs<-data.frame(strptime(x2, "%Y-%m-%d"),x_obs$discharge)
+      x_obs<-data.frame(x2,x_obs$discharge)
       colnames(x_obs)<-c("date","discharge")
 
       x_mod<-x_mod[x_mod$date>=min(x_obs$date) & x_mod$date<=max(x_obs$date), ]
