@@ -43,7 +43,7 @@ public class WaterfallTest {
     public void testNetCDFFromWaterfall() throws IOException, XMLStreamException {
         //TODO fix this
         RunMetadata runMeta = new RunMetadata(ModelType.WATERFALL, "1", "test", "1", "1", "2012-07-10T00:00:00Z", 
-            "Special", "comments", "jiwalker@usgs.gov", "http://cida-wiwsc-gdp2qa.er.usgs.gov:8082/geoserver/NWC/ows", 
+            "Special", "comments", "jiwalker@usgs.gov", "http://cida-wiwsc-wsdev.er.usgs.gov:8080/geoserver/NWC/ows", 
             "NWC:Dense1", "site_no");
         ReturnInfo info = CreateDSGFromZip.create(sampleFile, runMeta);
         File ncFile = new File(new File(outputDir), info.filename);
