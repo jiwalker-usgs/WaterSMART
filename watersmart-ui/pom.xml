@@ -15,7 +15,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>watersmart-common</artifactId>
-            <version>007-SNAPSHOT</version>
+            <version>${project.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
