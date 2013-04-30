@@ -8,7 +8,7 @@ library(chron)
 library(doBy)
 library(hydroGOF)
 
-sos_url_temp="http://waterservices.usgs.gov/nwis/dv/?format=rdb,1.0&sites="
+sos_url_temp="http://waterservices.usgs.gov/nwis/dv/?format=waterml,1.1&sites="
 offering_temp='00003'
 property_temp='00060'
 
@@ -100,16 +100,22 @@ getAllSites <- function(site_url){
 
 getXMLWML1.1Data <- function(obs_url){
   cat(paste("Retrieving data from: \n", obs_url, "\n", sep = " "))
-  doc<-xmlTreeParse(obs_url, getDTD=F, useInternalNodes=TRUE)
-  values<-xpathSApply(doc, "//ns1:timeSeries//ns1:value")
+  content <- getURLContent(obs_url,.opts=list(timeout.ms=500000))
+  test <- capture.output(tryCatch(xmlTreeParse(content, getDTD=F, useInternalNodes=TRUE),"XMLParserErrorList" = function(e) {cat("incomplete",e$message)}))
+  while (length(grep("<?xml",test))==0) {
+    content <- getURLContent(obs_url,.opts=list(timeout.ms=500000))
+    test <- capture.output(tryCatch(xmlTreeParse(content, getDTD=F, useInternalNodes=TRUE),"XMLParserErrorList" = function(e) {cat("incomplete",e$message)}))
+  }
+  doc <- htmlTreeParse(content, asText=TRUE, useInternalNodes=TRUE)
+  values<-xpathSApply(doc, "//timeseries//value")
   values2<-sapply(values,function(x) as.numeric(xmlValue(x)))
-  dateSet<-xpathSApply(doc, "//@dateTime")
+  dateSet<-xpathSApply(doc, "//@datetime")
   dateSet2<-sapply(dateSet,function(x) toString(substr(x,1,10)))
   Daily<-as.data.frame(matrix(ncol=2,nrow=length(values2)))
   colnames(Daily)<-c('date','discharge')
   Daily$discharge<-values2
   if (length(dateSet)>2) {
-    Daily$date<-dateSet}
+    Daily$date<-as.Date(dateSet2)}
   return (Daily)
 }
 
@@ -1120,7 +1126,7 @@ for (i in 1:length(a2)){
     latest<-''
     sites=a[i]
     url2<-paste(sos_url_temp,sites,'&startDT=',startdate,'&endDT=',enddate,'&statCd=',offering_temp,'&parameterCd=',property_temp,'&access=3',sep='')
-    x_obs <- retrieveNWISData(url2)
+    x_obs <- getXMLWML1.1Data(url2)
 
     if (nrow(x_obs)>2) {
       x<-(x_mod$date)
