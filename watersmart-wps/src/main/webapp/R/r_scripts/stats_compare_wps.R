@@ -22,7 +22,7 @@ scenario_url=paste(substr(model_url,1,regexpr("Get",model_url)-1),"GetCapabiliti
 #a2<-read.csv(header=F,colClasses=c("character"),text=sites)
 getcap<-getScenarioSites(scenario_url)
 modprop<-getcap$modprop
-a<-t(getcap$scenario_sites[1:10])
+a<-t(getcap$scenario_sites)
 a2<-a
 al<-length(a)
 
