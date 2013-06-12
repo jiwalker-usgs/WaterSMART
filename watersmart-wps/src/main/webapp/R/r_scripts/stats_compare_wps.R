@@ -40,7 +40,7 @@ for (i in 1:length(a2)){
   modsites<-a2[i]
   url<-paste(model_url,'=',modsites,'&observedProperty=',modprop,sep='',collapse=NULL)
   x_mod<-SWE_CSV_IHA(url)
-  if (length(sapply(x_mod,nchar))>1) {
+  if (nrow(x_mod)>2) {
     startdate<-min(x_mod$date)
     enddate<-max(x_mod$date)
     interval<-''
@@ -51,14 +51,16 @@ for (i in 1:length(a2)){
     
     if (nrow(x_obs)>2) {
       obs_data <- get_obsdata(x_obs)
-      cat(paste("get_obsdata run on x_obs for site",sites,"\n",sep=" "))
+      obs_count<-nrow(obs_data)
+      cat(paste("get_obsdata run on x_obs for site",sites,obs_count,"\n",sep=" "))
       x_mod$date <- as.Date(x_mod$date,format="%Y-%m-%d")
       x_mod<-x_mod[x_mod$date>=min(x_obs$date) & x_mod$date<=max(x_obs$date), ]
       drain_url<-paste(drainage_url,sites,sep="")
       drain_area<-getDrainageArea(drain_url)
       cat(paste("data and drainage area retrieved for site",sites,"\n",sep=" "))
       mod_data <- get_obsdata(x_mod)
-      cat(paste("get_obsdata run on x_mod for site",sites,"\n",sep=" "))
+      mod_count <- nrow(mod_data)
+      cat(paste("get_obsdata run on x_mod for site",sites,mod_count,"\n",sep=" "))
       countbyyr<-aggregate(obs_data$discharge, list(obs_data$wy_val), length)
       countbyyr_mod<-aggregate(mod_data$discharge, list(mod_data$wy_val), length)
       colnames(countbyyr)<-c('wy','num_samples')
@@ -66,44 +68,49 @@ for (i in 1:length(a2)){
       sub_countbyyr<-subset(countbyyr,num_samples >= 365)
       sub_countbyyr_mod<-subset(countbyyr_mod,num_samples >= 365)
       include_yrs<-merge(sub_countbyyr,sub_countbyyr_mod)
-      obs_data<-merge(obs_data,include_yrs,by.x="wy_val",by.y="wy")
-      mod_data<-merge(mod_data,include_yrs,by.x="wy_val",by.y="wy")
-      if (length(mod_data$discharge)<3) { 
-        comment[i]<-"No matching complete water years for site" 
-      } else { 
-        if (length(mod_data$discharge)!=length(obs_data$discharge)) { 
-          comment[i]<-"Observed and modeled time-series don't match for site"
-        } else {
-          cat(paste("data sets merged for site",sites,"\n",sep=" "))
-          yv[i]<-as.character(min(obs_data$date))
-          ymaxv[i]<-as.character(max(obs_data$date))
-          #x_modz<-mod_data$discharge
-          #x_obsz<-obs_data$discharge
-          #dates<-as.Date(obs_data$date)
-          #file<-paste("graph",toString(sites),".png",sep="")
-          #png(file)
-          #ggof(x_modz,x_obsz,na.rm=FALSE,dates,main=modsites)
-          #dev.copy(png,file)
-          #dev.off()
-          #file<-paste("monthly_mean_ts_obs",toString(sites),".txt",sep="")
-          #monthly_mean<-monthly.mean.ts(obs_data)
-          #write.table(monthly_mean,file=file,col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
-          #file<-paste("monthly_mean_ts_mod",toString(sites),".txt",sep="")
-          #monthly_mean<-monthly.mean.ts(mod_data)
-          #write.table(monthly_mean,file=file,col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
-          
-          obs_data <- obs_data[,c('wy_val','date','discharge','month_val','year_val','day_val','jul_val')]
-          mod_data <- mod_data[,c('wy_val','date','discharge','month_val','year_val','day_val','jul_val')]
-          ObsFlowStats[i,] <- FlowStats(obs_data,drain_area)
-          ModFlowStats[i,] <- FlowStats(mod_data,drain_area)
-          magnifSevenObs[i,] <- magnifSeven(obs_data)
-          magnifSevenMod[i,] <- magnifSeven(mod_data)
-          comment <- ""
-          GoFMetrics[i,] <- SiteGoF(obs_data,mod_data)
-          cat(paste("stats calculated for site",sites,"\n",sep=" "))
-          #      MonAnnGoF[i,] <- MonthlyAnnualGoF(obs_data,mod_data)
-        }
-      }
+      if (nrow(include_yrs)==0) {
+        comment[i]<-"No matching complete water years for site"
+      } else {
+        obs_data<-merge(obs_data,include_yrs,by.x="wy_val",by.y="wy")
+        mod_data<-merge(mod_data,include_yrs,by.x="wy_val",by.y="wy")
+        obs_count <- nrow(obs_data)
+        mod_count <- nrow(mod_data)
+        if (length(mod_data$discharge)<3) { 
+          comment[i]<-"No matching complete water years for site" 
+        } else { 
+          if (length(mod_data$discharge)!=length(obs_data$discharge)) { 
+            comment[i]<-"Observed and modeled time-series don't match for site"
+          } else {
+            cat(paste("data sets merged for site",sites,obs_count,mod_count,"\n",sep=" "))
+            yv[i]<-as.character(min(obs_data$date))
+            ymaxv[i]<-as.character(max(obs_data$date))
+            #x_modz<-mod_data$discharge
+            #x_obsz<-obs_data$discharge
+            #dates<-as.Date(obs_data$date)
+            #file<-paste("graph",toString(sites),".png",sep="")
+            #png(file)
+            #ggof(x_modz,x_obsz,na.rm=FALSE,dates,main=modsites)
+            #dev.copy(png,file)
+            #dev.off()
+            #file<-paste("monthly_mean_ts_obs",toString(sites),".txt",sep="")
+            #monthly_mean<-monthly.mean.ts(obs_data)
+            #write.table(monthly_mean,file=file,col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
+            #file<-paste("monthly_mean_ts_mod",toString(sites),".txt",sep="")
+            #monthly_mean<-monthly.mean.ts(mod_data)
+            #write.table(monthly_mean,file=file,col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
+            
+            obs_data <- obs_data[,c('wy_val','date','discharge','month_val','year_val','day_val','jul_val')]
+            mod_data <- mod_data[,c('wy_val','date','discharge','month_val','year_val','day_val','jul_val')]
+            ObsFlowStats[i,] <- FlowStats(obs_data,drain_area)
+            ModFlowStats[i,] <- FlowStats(mod_data,drain_area)
+            magnifSevenObs[i,] <- magnifSeven(obs_data)
+            magnifSevenMod[i,] <- magnifSeven(mod_data)
+            comment <- ""
+            GoFMetrics[i,] <- SiteGoF(obs_data,mod_data)
+            cat(paste("stats calculated for site",sites,"\n",sep=" "))
+            #      MonAnnGoF[i,] <- MonthlyAnnualGoF(obs_data,mod_data)
+          }
+        }}
     } else {
       comment[i]<-"No observed data for this site"
     }
