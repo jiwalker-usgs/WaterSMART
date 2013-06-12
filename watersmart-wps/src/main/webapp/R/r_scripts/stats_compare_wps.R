@@ -57,7 +57,7 @@ for (i in 1:length(a2)){
       x_mod<-x_mod[x_mod$date>=min(x_obs$date) & x_mod$date<=max(x_obs$date), ]
       drain_url<-paste(drainage_url,sites,sep="")
       drain_area<-getDrainageArea(drain_url)
-      cat(paste("data and drainage area retrieved for site",sites,"\n",sep=" "))
+      cat(paste("data and drainage area retrieved for site",sites,drain_area,"\n",sep=" "))
       mod_data <- get_obsdata(x_mod)
       mod_count <- nrow(mod_data)
       cat(paste("get_obsdata run on x_mod for site",sites,mod_count,"\n",sep=" "))
