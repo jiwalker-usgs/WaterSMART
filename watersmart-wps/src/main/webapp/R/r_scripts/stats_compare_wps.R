@@ -84,6 +84,7 @@ for (i in 1:length(a2)){
             cat(paste("data sets merged for site",sites,obs_count,mod_count,"\n",sep=" "))
             yv[i]<-as.character(min(obs_data$date))
             ymaxv[i]<-as.character(max(obs_data$date))
+            cat(paste("dates calculated for site",sites,"\n",sep=" "))
             #x_modz<-mod_data$discharge
             #x_obsz<-obs_data$discharge
             #dates<-as.Date(obs_data$date)
@@ -101,10 +102,15 @@ for (i in 1:length(a2)){
             
             obs_data <- obs_data[,c('wy_val','date','discharge','month_val','year_val','day_val','jul_val')]
             mod_data <- mod_data[,c('wy_val','date','discharge','month_val','year_val','day_val','jul_val')]
+            cat(paste("dfs created for site",sites,"\n",sep=" "))
             ObsFlowStats[i,] <- FlowStats(obs_data,drain_area)
+            cat(paste("Obs flow stats calculated for site",sites,"\n",sep=" "))
             ModFlowStats[i,] <- FlowStats(mod_data,drain_area)
+            cat(paste("Mod flow stats calculated for site",sites,"\n",sep=" "))
             magnifSevenObs[i,] <- magnifSeven(obs_data)
+            cat(paste("Obs mag7 stats calculated for site",sites,"\n",sep=" "))
             magnifSevenMod[i,] <- magnifSeven(mod_data)
+            cat(paste("Mod mag7 stats calculated for site",sites,"\n",sep=" "))
             comment <- ""
             GoFMetrics[i,] <- SiteGoF(obs_data,mod_data)
             cat(paste("stats calculated for site",sites,"\n",sep=" "))
