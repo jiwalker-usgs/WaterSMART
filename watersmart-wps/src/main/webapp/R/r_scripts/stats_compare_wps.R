@@ -102,7 +102,9 @@ for (i in 1:length(a2)){
             
             obs_data <- obs_data[,c('wy_val','date','discharge','month_val','year_val','day_val','jul_val')]
             mod_data <- mod_data[,c('wy_val','date','discharge','month_val','year_val','day_val','jul_val')]
-            cat(paste("dfs created for site",sites,"\n",sep=" "))
+            obs_count <- nrow(obs_data)
+            mod_count <- nrow(mod_data)
+            cat(paste("dfs created for site",sites,obs_count,mod_count,"\n",sep=" "))
             data <- obs_data
             sdbyyr <- aggregate(data$discharge, list(data$year_val), 
                                 sd)
