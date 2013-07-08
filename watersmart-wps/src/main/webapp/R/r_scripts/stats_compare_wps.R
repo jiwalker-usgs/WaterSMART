@@ -31,7 +31,7 @@ ObsFlowStats <- matrix(nrow=al,ncol=28)
 ModFlowStats <- matrix(nrow=nrow(ObsFlowStats),ncol=ncol(ObsFlowStats))
 magnifSevenObs <- matrix(nrow=nrow(ObsFlowStats),ncol=7)
 magnifSevenMod <- matrix(nrow=nrow(ObsFlowStats),ncol=7)
-GoFMetrics <- matrix(nrow=nrow(ObsFlowStats),ncol=108)
+GoFMetrics <- matrix(nrow=nrow(ObsFlowStats),ncol=146)
 #MonAnnGoF <- matrix(nrow=nrow(ObsFlowStats),ncol=84)
 yv<-vector(length=al)
 ymaxv<-vector(length=al)
@@ -132,24 +132,26 @@ magnifSeven.PDiff <- (magnifSevenMod-magnifSevenObs)/magnifSevenObs
 #FlowStats.GoF <- RegionalGoF(ObsFlowStats,ModFlowStats)
 cat("diffs calculated \n")
 statsout<-data.frame(t(a),yv,ymaxv,GoFMetrics,magnifSevenObs,ObsFlowStats,magnifSevenMod,ModFlowStats,magnifSeven.PDiff,FlowStats.PDiff,comment,stringsAsFactors=FALSE)
-colnames(statsout)<-c('site_no','min_date','max_date','nsev','nselogv','rmsev','pbiasv','pearsonv','spearmanv',
-                      'nsev_90','nsev_75_90','nsev_50_75','nsev_25_50','nsev_10_25','nsev_10',
-                      'rmsev_90','rmsev_75_90','rmsev_50_75','rmsev_25_50','rmsev_10_25','rmsev_10',
-                      'pbiasv_90','pbiasv_75_90','pbiasv_50_75','pbiasv_25_50','pbiasv_10_25','pbiasv_10',           
-                      'pearsonv_90','pearsonv_75_90','pearsonv_50_75','pearsonv_25_50','pearsonv_10_25','pearsonv_10',
-                      'spearmanv_90','spearmanv_75_90','spearmanv_50_75','spearmanv_25_50','spearmanv_10_25','spearmanv_10',
-                      'NSEbyMonthJan','NSELOGbyMonthJan','RMSEbyMonthJan','BiasbyMonthJan','PearsonbyMonthJan','SpearmanbyMonthJan',
-                      'NSEbyMonthFeb','NSELOGbyMonthFeb','RMSEbyMonthFeb','BiasbyMonthFeb','PearsonbyMonthFeb','SpearmanbyMonthFeb',
-                      'NSEbyMonthMar','NSELOGbyMonthMar','RMSEbyMonthMar','BiasbyMonthMar','PearsonbyMonthMar','SpearmanbyMonthMar',
-                      'NSEbyMonthApr','NSELOGbyMonthApr','RMSEbyMonthApr','BiasbyMonthApr','PearsonbyMonthApr','SpearmanbyMonthApr',
-                      'NSEbyMonthMay','NSELOGbyMonthMay','RMSEbyMonthMay','BiasbyMonthMay','PearsonbyMonthMay','SpearmanbyMonthMay',
-                      'NSEbyMonthJun','NSELOGbyMonthJun','RMSEbyMonthJun','BiasbyMonthJun','PearsonbyMonthJun','SpearmanbyMonthJun',
-                      'NSEbyMonthJul','NSELOGbyMonthJul','RMSEbyMonthJul','BiasbyMonthJul','PearsonbyMonthJul','SpearmanbyMonthJul',
-                      'NSEbyMonthAug','NSELOGbyMonthAug','RMSEbyMonthAug','BiasbyMonthAug','PearsonbyMonthAug','SpearmanbyMonthAug',
-                      'NSEbyMonthSep','NSELOGbyMonthSep','RMSEbyMonthSep','BiasbyMonthSep','PearsonbyMonthSep','SpearmanbyMonthSep',
-                      'NSEbyMonthOct','NSELOGbyMonthOct','RMSEbyMonthOct','BiasbyMonthOct','PearsonbyMonthOct','SpearmanbyMonthOct',
-                      'NSEbyMonthNov','NSELOGbyMonthNov','RMSEbyMonthNov','BiasbyMonthNov','PearsonbyMonthNov','SpearmanbyMonthNov',
-                      'NSEbyMonthDec','NSELOGbyMonthDec','RMSEbyMonthDec','BiasbyMonthDec','PearsonbyMonthDec','SpearmanbyMonthDec',
+colnames(statsout)<-c('site_no','min_date','max_date','nse','nselog','rmse','rmsne','rsr','pbias','pearson','spearman',
+                      'nse_90','nse_75_90','nse_50_75','nse_25_50','nse_10_25','nse_10',
+                      'rmse_90','rmse_75_90','rmse_50_75','rmse_25_50','rmse_10_25','rmse_10',
+                      'rmsne_90','rmsne_75_90','rmsne_50_75','rmsne_25_50','rmsne_10_25','rmsne_10',
+                      'rsr_90','rsr_75_90','rsr_50_75','rsr_25_50','rsr_10_25','rsr_10',
+                      'pbias_90','pbias_75_90','pbias_50_75','pbias_25_50','pbias_10_25','pbias_10',           
+                      'pearson_90','pearson_75_90','pearson_50_75','pearson_25_50','pearson_10_25','pearson_10',
+                      'spearman_90','spearman_75_90','spearman_50_75','spearman_25_50','spearman_10_25','spearman_10',
+                      'NSEbyMonthJan','NSELOGbyMonthJan','RMSEbyMonthJan','RMSNEbyMonthJan','RSRbyMonthJan','BiasbyMonthJan','PearsonbyMonthJan','SpearmanbyMonthJan',
+                      'NSEbyMonthFeb','NSELOGbyMonthFeb','RMSEbyMonthFeb','RMSNEbyMonthFeb','RSRbyMonthFeb','BiasbyMonthFeb','PearsonbyMonthFeb','SpearmanbyMonthFeb',
+                      'NSEbyMonthMar','NSELOGbyMonthMar','RMSEbyMonthMar','RMSNEbyMonthMar','RSRbyMonthMar','BiasbyMonthMar','PearsonbyMonthMar','SpearmanbyMonthMar',
+                      'NSEbyMonthApr','NSELOGbyMonthApr','RMSEbyMonthApr','RMSNEbyMonthApr','RSRbyMonthApr','BiasbyMonthApr','PearsonbyMonthApr','SpearmanbyMonthApr',
+                      'NSEbyMonthMay','NSELOGbyMonthMay','RMSEbyMonthMay','RMSNEbyMonthMay','RSRbyMonthMay','BiasbyMonthMay','PearsonbyMonthMay','SpearmanbyMonthMay',
+                      'NSEbyMonthJun','NSELOGbyMonthJun','RMSEbyMonthJun','RMSNEbyMonthJun','RSRbyMonthJun','BiasbyMonthJun','PearsonbyMonthJun','SpearmanbyMonthJun',
+                      'NSEbyMonthJul','NSELOGbyMonthJul','RMSEbyMonthJul','RMSNEbyMonthJul','RSRbyMonthJul','BiasbyMonthJul','PearsonbyMonthJul','SpearmanbyMonthJul',
+                      'NSEbyMonthAug','NSELOGbyMonthAug','RMSEbyMonthAug','RMSNEbyMonthAug','RSRbyMonthAug','BiasbyMonthAug','PearsonbyMonthAug','SpearmanbyMonthAug',
+                      'NSEbyMonthSep','NSELOGbyMonthSep','RMSEbyMonthSep','RMSNEbyMonthSep','RSRbyMonthSep','BiasbyMonthSep','PearsonbyMonthSep','SpearmanbyMonthSep',
+                      'NSEbyMonthOct','NSELOGbyMonthOct','RMSEbyMonthOct','RMSNEbyMonthOct','RSRbyMonthOct','BiasbyMonthOct','PearsonbyMonthOct','SpearmanbyMonthOct',
+                      'NSEbyMonthNov','NSELOGbyMonthNov','RMSEbyMonthNov','RMSNEbyMonthNov','RSRbyMonthNov','BiasbyMonthNov','PearsonbyMonthNov','SpearmanbyMonthNov',
+                      'NSEbyMonthDec','NSELOGbyMonthDec','RMSEbyMonthDec','RMSNEbyMonthDec','RSRbyMonthDec','BiasbyMonthDec','PearsonbyMonthDec','SpearmanbyMonthDec',
                       'lam1Obs','tau2Obs','tau3Obs','tau4Obs','ar1Obs','amplitudeObs','phaseObs',
                       'med_flowObs','cv_flowObs','cv_dailyObs','ma26Obs','ma41Obs','ml18Obs','ml20Obs',
                       'mh10Obs','fl2Obs','fh6Obs','fh7Obs','dl6Obs','dh13Obs','dh16Obs','ta1Obs','tl1Obs','th1Obs','ra5Obs','ra7Obs','ra8Obs',
