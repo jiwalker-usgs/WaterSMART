@@ -42,6 +42,7 @@ public class ContextConstants {
     public static final String EMAIL_FROM = "watersmart.email.from";
     public static final String EMAIL_TRACK = "watersmart.email.tracker";
     public static final String EMAIL_CHECK = "watersmart.email.check.interval.millis";
+    public static final String EMAIL_MINUTES = "watersmart.email.notify.minutes";
     
     /* Geonetwork constants */
     public static final String CSW_USER = "watersmart.geonetwork.user";

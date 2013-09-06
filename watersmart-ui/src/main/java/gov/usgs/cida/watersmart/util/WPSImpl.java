@@ -123,7 +123,7 @@ class WPSTask extends Thread {
 
     static final org.slf4j.Logger log = LoggerFactory.getLogger(WPSTask.class);
     private static final DynamicReadOnlyProperties props = JNDISingleton.getInstance();
-    public static final int CHECKS_UNTIL_NOTIFY = 48;
+    public static int CHECKS_UNTIL_NOTIFY;
     public static final int CHECKS_UNTIL_FAIL = 4 * 60 * 24; // currently 24 hours
     public static final int CHECK_WAIT = 15000;
     public static int SLEEP_FOR_THREDDS;
@@ -140,6 +140,13 @@ class WPSTask extends Thread {
             SLEEP_FOR_THREDDS = Integer.parseInt(props.getProperty(ContextConstants.WPS_WAIT));
         } catch (NumberFormatException nfe) {
             SLEEP_FOR_THREDDS = 300000;
+        }
+        try {
+            int minutes = Integer.parseInt(props.getProperty(ContextConstants.EMAIL_MINUTES));
+            double checks = Math.ceil(minutes * 60 * 1000 / CHECK_WAIT);
+            CHECKS_UNTIL_NOTIFY = (int)checks;
+        } catch (NumberFormatException nfe) {
+            CHECKS_UNTIL_NOTIFY = 480; // 2 hours after THREDDS wait
         }
     }
 
