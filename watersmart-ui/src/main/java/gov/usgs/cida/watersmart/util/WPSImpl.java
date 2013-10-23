@@ -50,6 +50,9 @@ class WPSImpl implements WPSInterface {
     static final String stats_csv_obs_test_wps = "org.n52.wps.server.r.stats_csv_obs_test_wps";
     static final String stats_csv_nahat_test_wps = "org.n52.wps.server.r.stats_csv_nahat_test_wps";
     static final String stats_compare = "org.n52.wps.server.r.stats_compare_wps";
+    static final String stats_compare_groups = "org.n52.wps.server.r.stats_compare_groups";
+    
+    static final String ALL_STATS_GROUPS = "GOF,GOFMonth,magnifSeven,magStat,flowStat,durStat,timStat,rateStat,otherStat";
 
     @Override
     public String executeProcess(String sosEndpoint, RunMetadata metadata) {
@@ -96,7 +99,7 @@ class WPSImpl implements WPSInterface {
                 + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
                 + "xsi:schemaLocation=\"http://www.opengis.net/wps/1.0.0 "
                 + "http://schemas.opengis.net/wps/1.0.0/wpsExecute_request.xsd\">"
-                + "<ows:Identifier>" + stats_compare + "</ows:Identifier>"
+                + "<ows:Identifier>" + stats_compare_groups + "</ows:Identifier>"
                 + "<wps:DataInputs>"
                 + "<wps:Input>"
                 + "<ows:Identifier>model_url</ows:Identifier>"
@@ -104,6 +107,14 @@ class WPSImpl implements WPSInterface {
                 + "<wps:LiteralData>"
                 + StringEscapeUtils.escapeXml(sosEndpoint
                 + "?request=GetObservation&service=SOS&version=1.0.0&offering")
+                + "</wps:LiteralData>"
+                + "</wps:Data>"
+                + "</wps:Input>"
+                + "<wps:Input>"
+                + "<ows:Identifier>stats</ows:Identifier>"
+                + "<wps:Data>"
+                + "<wps:LiteralData>"
+                + ALL_STATS_GROUPS
                 + "</wps:LiteralData>"
                 + "</wps:Data>"
                 + "</wps:Input>"
