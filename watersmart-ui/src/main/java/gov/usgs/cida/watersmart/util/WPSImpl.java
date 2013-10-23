@@ -99,7 +99,7 @@ class WPSImpl implements WPSInterface {
                 + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
                 + "xsi:schemaLocation=\"http://www.opengis.net/wps/1.0.0 "
                 + "http://schemas.opengis.net/wps/1.0.0/wpsExecute_request.xsd\">"
-                + "<ows:Identifier>" + stats_compare + "</ows:Identifier>"
+                + "<ows:Identifier>" + stats_compare_groups + "</ows:Identifier>"
                 + "<wps:DataInputs>"
                 + "<wps:Input>"
                 + "<ows:Identifier>model_url</ows:Identifier>"
