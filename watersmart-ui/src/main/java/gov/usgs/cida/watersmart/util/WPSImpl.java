@@ -50,6 +50,7 @@ class WPSImpl implements WPSInterface {
     static final String stats_csv_obs_test_wps = "org.n52.wps.server.r.stats_csv_obs_test_wps";
     static final String stats_csv_nahat_test_wps = "org.n52.wps.server.r.stats_csv_nahat_test_wps";
     static final String stats_compare = "org.n52.wps.server.r.stats_compare_wps";
+    static final String stats_compare_groups = "org.n52.wps.server.r.stats_compare_groups";
 
     @Override
     public String executeProcess(String sosEndpoint, RunMetadata metadata) {
@@ -104,6 +105,14 @@ class WPSImpl implements WPSInterface {
                 + "<wps:LiteralData>"
                 + StringEscapeUtils.escapeXml(sosEndpoint
                 + "?request=GetObservation&service=SOS&version=1.0.0&offering")
+                + "</wps:LiteralData>"
+                + "</wps:Data>"
+                + "</wps:Input>"
+                + "<wps:Input>"
+                + "<ows:Identifier>stats</ows:Identifier>"
+                + "<wps:Data>"
+                + "<wps:LiteralData>"
+                + "GOF,GOFMonth,magnifSeven,magStat,flowStat,durStat,timStat,rateStat,otherStat"
                 + "</wps:LiteralData>"
                 + "</wps:Data>"
                 + "</wps:Input>"
