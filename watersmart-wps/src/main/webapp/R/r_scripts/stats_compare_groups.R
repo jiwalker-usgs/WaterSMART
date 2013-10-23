@@ -1,6 +1,6 @@
 # wps.des: id=test_stats, title = test stats, abstract = Finds the mean daily flow median daily flow and skewness of daily flow in the input dataset;
 # wps.in: model_url, string, SOS Endpoint, A fully formed SOS GetObservations request that will return a SWE common CSV block holding date and flow;
-# wps.in: stats, string, list, a list of the requested statistic groups to return
+# wps.in: stats, string, list, a list of the requested statistic groups to return;
 
 library(XML)
 library(zoo)
@@ -153,7 +153,7 @@ for (i in 1:length(a2)){
             cat(paste("Mod mag7 stats calculated for site",sites,"\n",sep=" "))
             }
             comment <- ""
-            if (GOFnum>0) {
+            if (GoFnum>0) {
             GoFMetrics[i,] <- SiteGoF(obs_data,mod_data,stats)
             cat(paste("stats calculated for site",sites,"\n",sep=" "))
             }
