@@ -51,6 +51,8 @@ class WPSImpl implements WPSInterface {
     static final String stats_csv_nahat_test_wps = "org.n52.wps.server.r.stats_csv_nahat_test_wps";
     static final String stats_compare = "org.n52.wps.server.r.stats_compare_wps";
     static final String stats_compare_groups = "org.n52.wps.server.r.stats_compare_groups";
+    
+    static final String ALL_STATS_GROUPS = "GOF,GOFMonth,magnifSeven,magStat,flowStat,durStat,timStat,rateStat,otherStat";
 
     @Override
     public String executeProcess(String sosEndpoint, RunMetadata metadata) {
@@ -112,7 +114,7 @@ class WPSImpl implements WPSInterface {
                 + "<ows:Identifier>stats</ows:Identifier>"
                 + "<wps:Data>"
                 + "<wps:LiteralData>"
-                + "GOF,GOFMonth,magnifSeven,magStat,flowStat,durStat,timStat,rateStat,otherStat"
+                + ALL_STATS_GROUPS
                 + "</wps:LiteralData>"
                 + "</wps:Data>"
                 + "</wps:Input>"
