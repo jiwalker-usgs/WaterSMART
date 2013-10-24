@@ -26,6 +26,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPathExpressionException;
+import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -256,7 +257,7 @@ class WPSTask extends Thread {
             // The WPS output will be updated once the process succeeds/fails.  The UI
             // will show "Process not yet completed" in the meantime.
             sosEndpoint = repo + metaObj.getTypeString() + "/" + info.filename;
-            wpsOutputMap.put(WPSImpl.stats_compare, "");
+            wpsOutputMap.put(WPSImpl.stats_compare_groups, "");
             helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
             // 2. Add results from NetCDF creation to CSW record
             try {
@@ -299,7 +300,7 @@ class WPSTask extends Thread {
             log.debug("Sending request for compare stats");
             compReq = WPSImpl.createCompareStatsRequest(sosEndpoint);
             String algorithmOutput = runNamedAlgorithm("compare", compReq, uuid, metaObj);
-            wpsOutputMap.put(WPSImpl.stats_compare, algorithmOutput);
+            wpsOutputMap.put(WPSImpl.stats_compare_groups, algorithmOutput);
         } catch (Exception ex) {
             log.error("Failed to run WPS algorithm", ex);
             sendFailedEmail(ex);
@@ -307,7 +308,7 @@ class WPSTask extends Thread {
         }
 
         // 5. Add results from WPS process to CSW record
-        if (wpsOutputMap.get(WPSImpl.stats_compare) != null) {
+        if (wpsOutputMap.get(WPSImpl.stats_compare_groups) != null) {
             log.debug("Stats compare completed successfully");
             rStatsSuccessful = true;
             helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
@@ -357,6 +358,7 @@ class WPSTask extends Thread {
 
         InputStream is = null;
         InputStream resultIs = null;
+        Base64InputStream base64Is = null;
 
         try {
             boolean completed = false;
@@ -381,10 +383,11 @@ class WPSTask extends Thread {
             ProcessStatus resultStatus = new ProcessStatus(document);
             String outputReference = resultStatus.getOutputReference();
             resultIs = HTTPUtils.sendPacket(new URL(outputReference), "GET");
-            String resultStr = IOUtils.toString(resultIs, "UTF-8");
+            
+            // This is now a base64 zip output, so decode and save
+            base64Is = new Base64InputStream(resultIs);
+            
             // copy results to persistant location // switch to completed document above
-
-            log.debug(resultStr);
 
             File destinationDir = new File(props.getProperty(ContextConstants.UPLOAD_LOCATION)
                     + props.getProperty(ContextConstants.WPS_DIRECTORY) + File.separatorChar
@@ -394,10 +397,10 @@ class WPSTask extends Thread {
             }
             String filename = metaObj.getTypeString() + "-" + metaObj.getScenario()
                     + "-" + metaObj.getModelVersion() + "." + metaObj.getRunIdent()
-                    + "-" + alg + ".txt";
+                    + "-" + alg + ".zip";
             File destinationFile = new File(destinationDir.getCanonicalPath()
                     + File.separatorChar + filename);
-            FileUtils.write(destinationFile, resultStr, "UTF-8");
+            FileUtils.copyInputStreamToFile(base64Is, destinationFile);
             String destinationFileName = destinationFile.getName();
             String webAccessibleFile = contextPath + props.getProperty(ContextConstants.WPS_DIRECTORY)
                     + "/" + uuid + "/" + destinationFileName;
@@ -405,7 +408,7 @@ class WPSTask extends Thread {
             return webAccessibleFile;
         } finally {
             IOUtils.closeQuietly(is);
-            IOUtils.closeQuietly(resultIs);
+            IOUtils.closeQuietly(base64Is);
         }
     }
 
