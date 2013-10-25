@@ -5,6 +5,7 @@ import gov.usgs.cida.watersmart.common.ContextConstants;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import java.io.*;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,23 +53,20 @@ public class FileRepository extends HttpServlet {
         if ("txt".equalsIgnoreCase(extension)) {
             response.setContentType("text/plain;charset=UTF-8");
         } else if ("zip".equalsIgnoreCase(extension)) {
-            response.setContentType("application/zip");
+            response.setContentType("application/zip;charset=UTF-8");
         } else {
             LOG.warn("Content type not supported by file repository");
             response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
             return;
         }
-
-        PrintWriter out = response.getWriter();
-        BufferedReader bufIn = new BufferedReader(new FileReader(repoFile));
-        String line = null;
+        
+        InputStream fis = new FileInputStream(repoFile);
+        OutputStream out = response.getOutputStream();
         try {
-            while (null != (line = bufIn.readLine())) {
-                out.println(line);
-            }
+            IOUtils.copy(fis, out);
         }
         finally {            
-            IOUtils.closeQuietly(bufIn);
+            IOUtils.closeQuietly(fis);
             IOUtils.closeQuietly(out);
         }
     }
