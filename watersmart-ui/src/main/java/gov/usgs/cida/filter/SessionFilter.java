@@ -1,5 +1,6 @@
 package gov.usgs.cida.filter;
 
+import gov.usgs.cida.tomcatfilters.MyHttpServletRequestWrapper;
 import gov.usgs.cida.watersmart.common.ContextConstants;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import gov.usgs.cida.watersmart.ldap.LDAPConnect;
@@ -61,8 +62,10 @@ public class SessionFilter extends HttpServlet implements Filter {
         HttpServletRequest httpreq = (HttpServletRequest) req;
         HttpServletResponse httpresp = (HttpServletResponse) resp;
         HttpSession session = httpreq.getSession();
-        String redirectPath = httpreq.getContextPath() + redirectPage;
-
+        String redirectPath = httpreq.getContextPath() + "/" + redirectPage;
+        //will use this var in watches to remotely debug
+        MyHttpServletRequestWrapper wrappedHttpReq = new MyHttpServletRequestWrapper(httpreq);
+        
         User sessionUser = (developmentMode && null != developmentUser) ? developmentUser : (User) session.getAttribute(APP_AUTH);
         if (developmentMode && session.getAttribute(APP_AUTH) == null) {
             session.setAttribute(APP_AUTH, developmentUser);
