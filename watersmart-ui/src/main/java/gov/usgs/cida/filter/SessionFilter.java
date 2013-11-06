@@ -63,8 +63,6 @@ public class SessionFilter extends HttpServlet implements Filter {
         HttpServletResponse httpresp = (HttpServletResponse) resp;
         HttpSession session = httpreq.getSession();
         String redirectPath = httpreq.getContextPath() + "/" + redirectPage;
-        //will use this var in watches to remotely debug
-        MyHttpServletRequestWrapper wrappedHttpReq = new MyHttpServletRequestWrapper(httpreq);
         
         User sessionUser = (developmentMode && null != developmentUser) ? developmentUser : (User) session.getAttribute(APP_AUTH);
         if (developmentMode && session.getAttribute(APP_AUTH) == null) {
