@@ -67,7 +67,7 @@ for (i in 1:length(sites)) {
     obs_count <- nrow(obs_data)
     cat(paste("dfs created for site", site, obs_count, "\n", sep = " "))
     if (Flownum > 0) {
-      ObsFlowStats[i, ] <- FlowStatsAll(obs_data, drain_area)
+      ObsFlowStats[i, ] <- FlowStatsAll(obs_data, drain_area,stats=stats)
       cat(paste("Obs flow stats calculated for site", site, "\n", sep = " "))
     }
     if (Magnifnum > 0) {
