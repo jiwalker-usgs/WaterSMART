@@ -9,7 +9,8 @@ library(NWCCompare)
 # startdate <- "2008-10-01"
 # enddate <- "2013-09-29"
 # stats<-"GOF,GOFMonth,magnifSeven,magStat,flowStat,durStat,timStat,rateStat,otherStat"
-
+temp_TOTAL_time<-0
+temp_total_tic<-proc.time()
 sites<-read.csv(header=F,colClasses=c("character"),text=sites)
 
 # Hardcode NWIS urls and parameters.
@@ -46,13 +47,16 @@ namesOtherStat <- c("med_flowObs", "cv_flowObs", "cv_dailyObs", "l7Q10Obs", "l7Q
                     "flow_90Obs", "flow_15Obs")
 
 namesFull <- c("site_no", "min_date", "max_date")
-
+temp_DL_time<-0
+temp_STAT_time<-0
 for (i in 1:length(sites)) {
   site = sites[i]
   url2 <- paste(nwisDvUrl, site, "&startDT=", startdate, "&endDT=", enddate, "&statCd=", offering, "&parameterCd=", property, sep = "")
+  temp_tic<-proc.time()
   x_obs <- getXMLWML1.1Data(url2)
-  
+  temp_DL_time<-temp_DL_time+proc.time()-temp_tic
   if (nrow(x_obs) > 2) {
+    temp_tic<-proc.time()
     obs_data <- get_obsdata(x_obs)
     obs_count <- nrow(obs_data)
     cat(paste("get_obsdata run on x_obs for site", site, obs_count, "\n", sep = " "))
@@ -62,10 +66,11 @@ for (i in 1:length(sites)) {
     yv[i] <- as.character(min(obs_data$date))
     ymaxv[i] <- as.character(max(obs_data$date))
     cat(paste("dates calculated for site", site, "\n", sep = " "))
-    
     obs_data <- obs_data[, c("wy_val", "date", "discharge", "month_val", "year_val", "day_val", "jul_val")]
     obs_count <- nrow(obs_data)
     cat(paste("dfs created for site", site, obs_count, "\n", sep = " "))
+    temp_DL_time<-temp_DL_time+proc.time()-temp_tic
+    temp_tic<-proc.time()
     if (Flownum > 0) {
       ObsFlowStats[i, ] <- FlowStatsAll(obs_data, drain_area,stats=stats)
       cat(paste("Obs flow stats calculated for site", site, "\n", sep = " "))
@@ -74,6 +79,7 @@ for (i in 1:length(sites)) {
       magnifSevenObs[i, ] <- magnifSeven(obs_data)
       cat(paste("Obs mag7 stats calculated for site", site, "\n", sep = " "))
     }
+    temp_STAT_time<-temp_STAT_time+proc.time()-temp_tic
     comment <- ""
   } else {
     comment[i] <- "No observed data for this site"
@@ -115,5 +121,5 @@ if (i == length(sites)) {
   message <- "One or more web service calls resulted in failure. Please try again."
   write.table(message, file = "output.txt", col.names = FALSE, row.names = FALSE, quote = FALSE)
 }
-
+temp_TOTAL_time<-temp_total_tic-proc.time()
 # wps.out: output, text, Output File, A text file containing the table of statistics as well as monthly stats and graphs for each site;
