@@ -70,7 +70,7 @@ public class LDAPConnect {
                         basedn, 
                         "(&(objectClass=group)(cn=" + group + ")(member=" + dn + "))",
                         ctrls);
-                if (answers.hasMore() || !requireGroup) {
+                if (!requireGroup || answers.hasMore()) {
                     user.setAuthentication(true);
                 }
             }
