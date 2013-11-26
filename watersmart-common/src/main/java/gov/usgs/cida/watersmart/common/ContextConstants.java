@@ -21,7 +21,6 @@ public class ContextConstants {
     /* LDAP constants */
     public static final String LDAP_URL = "watersmart.ldap.url";
     public static final String LDAP_BASEDN = "watersmart.ldap.basedn";
-    public static final String AUTHORIZATION_REQUIRED = "watersmart.ldap.require.auth"; // bother with authorization?
     
     /* File system management constants */
     public static final String UPLOAD_LOCATION = "watersmart.file.location";
