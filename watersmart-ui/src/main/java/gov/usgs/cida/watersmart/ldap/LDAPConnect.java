@@ -27,7 +27,6 @@ public class LDAPConnect {
     
 
     public static User authenticate(String username, String password) {
-        boolean requireGroup = Boolean.parseBoolean(jndiProps.getProperty(ContextConstants.AUTHORIZATION_REQUIRED, "true"));
         
         Properties props = new Properties();
         props.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
@@ -63,16 +62,7 @@ public class LDAPConnect {
                 String dn = result.getNameInNamespace();
                 
                 user = new User(dn, mail, givenname, sn, uid);
-                String group = jndiProps.getProperty(ContextConstants.LDAP_GROUP, "GS WaterSmartPortal");
-                ctrls = new SearchControls();
-                ctrls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-                answers = context.search(
-                        basedn, 
-                        "(&(objectClass=group)(cn=" + group + ")(member=" + dn + "))",
-                        ctrls);
-                if (!requireGroup || answers.hasMore()) {
-                    user.setAuthentication(true);
-                }
+                user.setAuthentication(true);
             }
         }
         catch (NamingException ex) {
