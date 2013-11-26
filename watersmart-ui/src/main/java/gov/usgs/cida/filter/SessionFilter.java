@@ -119,8 +119,8 @@ public class SessionFilter extends HttpServlet implements Filter {
                     session.setAttribute(APP_AUTH, userObj);
                 }
                 else {
-                    log.trace("Correct password, user not in allowed group.");
-                    httpresp.sendRedirect(redirectPath + "?code=" + LoginMessage.BAD_GROUP);
+                    log.error("User object exists but was not authenticated.");
+                    httpresp.sendRedirect(redirectPath + "?code=" + LoginMessage.ERROR);
                     return;
                 }
             }
