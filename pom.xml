@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>gov.usgs.cida.watersmart</groupId>
     <artifactId>watersmart</artifactId>
-    <version>010-SNAPSHOT</version>
+    <version>013-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WaterSMART Parent Project</name>
   
@@ -228,7 +228,7 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.0.1</version>
+                <version>1.0.13</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet.jsp</groupId>

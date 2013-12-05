@@ -16,6 +16,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 
 /**
  *
@@ -41,7 +42,7 @@ public class STATSParserTest {
         FileUtils.deleteDirectory(new File(outputDir));
     }
 
-    @Test
+    @Ignore
     public void testNetCDF() throws IOException, XMLStreamException {
         // TODO remove the gdp2qa dependency
         RunMetadata runMeta = new RunMetadata(ModelType.STATS, "1", "test", "1", "1", "2012-07-10T00:00:00Z", 

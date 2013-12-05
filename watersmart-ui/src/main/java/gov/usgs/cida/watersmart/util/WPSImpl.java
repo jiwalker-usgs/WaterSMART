@@ -26,6 +26,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPathExpressionException;
+import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -50,6 +51,9 @@ class WPSImpl implements WPSInterface {
     static final String stats_csv_obs_test_wps = "org.n52.wps.server.r.stats_csv_obs_test_wps";
     static final String stats_csv_nahat_test_wps = "org.n52.wps.server.r.stats_csv_nahat_test_wps";
     static final String stats_compare = "org.n52.wps.server.r.stats_compare_wps";
+    static final String stats_compare_groups = "org.n52.wps.server.r.stats_compare_groups";
+    
+    static final String ALL_STATS_GROUPS = "GOF,GOFMonth,magnifSeven,magStat,flowStat,durStat,timStat,rateStat,otherStat";
 
     @Override
     public String executeProcess(String sosEndpoint, RunMetadata metadata) {
@@ -96,7 +100,7 @@ class WPSImpl implements WPSInterface {
                 + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
                 + "xsi:schemaLocation=\"http://www.opengis.net/wps/1.0.0 "
                 + "http://schemas.opengis.net/wps/1.0.0/wpsExecute_request.xsd\">"
-                + "<ows:Identifier>" + stats_compare + "</ows:Identifier>"
+                + "<ows:Identifier>" + stats_compare_groups + "</ows:Identifier>"
                 + "<wps:DataInputs>"
                 + "<wps:Input>"
                 + "<ows:Identifier>model_url</ows:Identifier>"
@@ -104,6 +108,14 @@ class WPSImpl implements WPSInterface {
                 + "<wps:LiteralData>"
                 + StringEscapeUtils.escapeXml(sosEndpoint
                 + "?request=GetObservation&service=SOS&version=1.0.0&offering")
+                + "</wps:LiteralData>"
+                + "</wps:Data>"
+                + "</wps:Input>"
+                + "<wps:Input>"
+                + "<ows:Identifier>stats</ows:Identifier>"
+                + "<wps:Data>"
+                + "<wps:LiteralData>"
+                + ALL_STATS_GROUPS
                 + "</wps:LiteralData>"
                 + "</wps:Data>"
                 + "</wps:Input>"
@@ -123,7 +135,7 @@ class WPSTask extends Thread {
 
     static final org.slf4j.Logger log = LoggerFactory.getLogger(WPSTask.class);
     private static final DynamicReadOnlyProperties props = JNDISingleton.getInstance();
-    public static final int CHECKS_UNTIL_NOTIFY = 48;
+    public static int CHECKS_UNTIL_NOTIFY;
     public static final int CHECKS_UNTIL_FAIL = 4 * 60 * 24; // currently 24 hours
     public static final int CHECK_WAIT = 15000;
     public static int SLEEP_FOR_THREDDS;
@@ -140,6 +152,13 @@ class WPSTask extends Thread {
             SLEEP_FOR_THREDDS = Integer.parseInt(props.getProperty(ContextConstants.WPS_WAIT));
         } catch (NumberFormatException nfe) {
             SLEEP_FOR_THREDDS = 300000;
+        }
+        try {
+            int minutes = Integer.parseInt(props.getProperty(ContextConstants.EMAIL_MINUTES));
+            double checks = Math.ceil(minutes * 60 * 1000 / CHECK_WAIT);
+            CHECKS_UNTIL_NOTIFY = (int)checks;
+        } catch (NumberFormatException nfe) {
+            CHECKS_UNTIL_NOTIFY = 480; // 2 hours after THREDDS wait
         }
     }
 
@@ -238,7 +257,7 @@ class WPSTask extends Thread {
             // The WPS output will be updated once the process succeeds/fails.  The UI
             // will show "Process not yet completed" in the meantime.
             sosEndpoint = repo + metaObj.getTypeString() + "/" + info.filename;
-            wpsOutputMap.put(WPSImpl.stats_compare, "");
+            wpsOutputMap.put(WPSImpl.stats_compare_groups, "");
             helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
             // 2. Add results from NetCDF creation to CSW record
             try {
@@ -281,7 +300,7 @@ class WPSTask extends Thread {
             log.debug("Sending request for compare stats");
             compReq = WPSImpl.createCompareStatsRequest(sosEndpoint);
             String algorithmOutput = runNamedAlgorithm("compare", compReq, uuid, metaObj);
-            wpsOutputMap.put(WPSImpl.stats_compare, algorithmOutput);
+            wpsOutputMap.put(WPSImpl.stats_compare_groups, algorithmOutput);
         } catch (Exception ex) {
             log.error("Failed to run WPS algorithm", ex);
             sendFailedEmail(ex);
@@ -289,7 +308,7 @@ class WPSTask extends Thread {
         }
 
         // 5. Add results from WPS process to CSW record
-        if (wpsOutputMap.get(WPSImpl.stats_compare) != null) {
+        if (wpsOutputMap.get(WPSImpl.stats_compare_groups) != null) {
             log.debug("Stats compare completed successfully");
             rStatsSuccessful = true;
             helper = new CSWTransactionHelper(metaObj, sosEndpoint, wpsOutputMap);
@@ -339,6 +358,7 @@ class WPSTask extends Thread {
 
         InputStream is = null;
         InputStream resultIs = null;
+        Base64InputStream base64Is = null;
 
         try {
             boolean completed = false;
@@ -363,10 +383,11 @@ class WPSTask extends Thread {
             ProcessStatus resultStatus = new ProcessStatus(document);
             String outputReference = resultStatus.getOutputReference();
             resultIs = HTTPUtils.sendPacket(new URL(outputReference), "GET");
-            String resultStr = IOUtils.toString(resultIs, "UTF-8");
+            
+            // This is now a base64 zip output, so decode and save
+            base64Is = new Base64InputStream(resultIs);
+            
             // copy results to persistant location // switch to completed document above
-
-            log.debug(resultStr);
 
             File destinationDir = new File(props.getProperty(ContextConstants.UPLOAD_LOCATION)
                     + props.getProperty(ContextConstants.WPS_DIRECTORY) + File.separatorChar
@@ -376,10 +397,10 @@ class WPSTask extends Thread {
             }
             String filename = metaObj.getTypeString() + "-" + metaObj.getScenario()
                     + "-" + metaObj.getModelVersion() + "." + metaObj.getRunIdent()
-                    + "-" + alg + ".txt";
+                    + "-" + alg + ".zip";
             File destinationFile = new File(destinationDir.getCanonicalPath()
                     + File.separatorChar + filename);
-            FileUtils.write(destinationFile, resultStr, "UTF-8");
+            FileUtils.copyInputStreamToFile(base64Is, destinationFile);
             String destinationFileName = destinationFile.getName();
             String webAccessibleFile = contextPath + props.getProperty(ContextConstants.WPS_DIRECTORY)
                     + "/" + uuid + "/" + destinationFileName;
@@ -387,7 +408,7 @@ class WPSTask extends Thread {
             return webAccessibleFile;
         } finally {
             IOUtils.closeQuietly(is);
-            IOUtils.closeQuietly(resultIs);
+            IOUtils.closeQuietly(base64Is);
         }
     }
 

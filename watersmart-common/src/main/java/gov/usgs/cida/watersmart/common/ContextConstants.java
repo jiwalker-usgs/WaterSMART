@@ -20,9 +20,7 @@ public class ContextConstants {
     
     /* LDAP constants */
     public static final String LDAP_URL = "watersmart.ldap.url";
-    public static final String LDAP_GROUP = "watersmart.ldap.group";
     public static final String LDAP_BASEDN = "watersmart.ldap.basedn";
-    public static final String AUTHORIZATION_REQUIRED = "watersmart.ldap.require.auth"; // bother with authorization?
     
     /* File system management constants */
     public static final String UPLOAD_LOCATION = "watersmart.file.location";
@@ -42,6 +40,7 @@ public class ContextConstants {
     public static final String EMAIL_FROM = "watersmart.email.from";
     public static final String EMAIL_TRACK = "watersmart.email.tracker";
     public static final String EMAIL_CHECK = "watersmart.email.check.interval.millis";
+    public static final String EMAIL_MINUTES = "watersmart.email.notify.minutes";
     
     /* Geonetwork constants */
     public static final String CSW_USER = "watersmart.geonetwork.user";

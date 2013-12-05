@@ -5,6 +5,7 @@ import gov.usgs.cida.watersmart.common.ContextConstants;
 import gov.usgs.cida.watersmart.common.JNDISingleton;
 import java.io.*;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,27 +37,36 @@ public class FileRepository extends HttpServlet {
     protected void processRequest(HttpServletRequest request,
                                   HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/plain;charset=UTF-8");
+        
         String file = request.getPathInfo();
         File repoFile = new File(filePath + file);
         
         if (!repoFile.exists() || !repoFile.canRead()) {
-            LOG.info("User requested file which does not exist. File: " + repoFile.getPath());
-            response.sendError(404);
+            LOG.warn("User requested file which does not exist. File: " + repoFile.getPath());
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
         
         LOG.debug("User is requesting file: " + repoFile.getPath());
-        PrintWriter out = response.getWriter();
-        BufferedReader bufIn = new BufferedReader(new FileReader(repoFile));
-        String line = null;
+        
+        String extension = file.substring(file.lastIndexOf(".") + 1);
+        if ("txt".equalsIgnoreCase(extension)) {
+            response.setContentType("text/plain;charset=UTF-8");
+        } else if ("zip".equalsIgnoreCase(extension)) {
+            response.setContentType("application/zip;charset=UTF-8");
+        } else {
+            LOG.warn("Content type not supported by file repository");
+            response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+            return;
+        }
+        
+        InputStream fis = new FileInputStream(repoFile);
+        OutputStream out = response.getOutputStream();
         try {
-            while (null != (line = bufIn.readLine())) {
-                out.println(line);
-            }
+            IOUtils.copy(fis, out);
         }
         finally {            
-            IOUtils.closeQuietly(bufIn);
+            IOUtils.closeQuietly(fis);
             IOUtils.closeQuietly(out);
         }
     }
