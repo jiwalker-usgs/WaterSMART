@@ -2,6 +2,7 @@
 package gov.usgs.cida.watersmart.parse.file;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import gov.usgs.cida.watersmart.common.ModelType;
 import gov.usgs.cida.watersmart.common.RunMetadata;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip;
@@ -15,6 +16,9 @@ import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import ucar.nc2.NetcdfFile;
+import ucar.nc2.Variable;
 
 /**
  *
@@ -49,7 +53,33 @@ public class PRMS2ParserTest {
         File ncFile = new File(new File(outputDir), info.filename);
         
         assertEquals(info.filename, "PRMS2.nc");
-        assertEquals(FileUtils.sizeOf(ncFile), 31049L);
+
+        NetcdfFile dataFile = null;
+		try {
+			dataFile = NetcdfFile.open(ncFile.getPath(), null);
+
+			/**
+			 * observation=217
+			 */	
+			Variable record = dataFile.findVariable("record");
+			int[] shape = record.getShape();
+			
+			if(shape.length > 0) {
+				int shapeValue = shape[0];
+				assertEquals(shapeValue, 217);
+			}
+		} catch (java.io.IOException e) {
+			e.printStackTrace();
+			fail();
+		} finally {
+			if (dataFile != null) {
+				try {
+					dataFile.close();
+				} catch (IOException ioe) {
+					ioe.printStackTrace();
+				}
+			}
+		}
         FileUtils.deleteQuietly(ncFile);
     }
     
@@ -67,7 +97,34 @@ public class PRMS2ParserTest {
         File ncFile = new File(new File(outputDir), info.filename);
         
         assertEquals(info.filename, "PRMS2.nc");
-        assertEquals(FileUtils.sizeOf(ncFile), 31049L);  // better assertion here instead of just size (use netcdf file tools to compare actual file contents)
+        
+
+        NetcdfFile dataFile = null;
+		try {
+			dataFile = NetcdfFile.open(ncFile.getPath(), null);
+
+			/**
+			 * observation=217
+			 */	
+			Variable record = dataFile.findVariable("record");
+			int[] shape = record.getShape();
+			
+			if(shape.length > 0) {
+				int shapeValue = shape[0];
+				assertEquals(shapeValue, 217);
+			}
+		} catch (java.io.IOException e) {
+			e.printStackTrace();
+			fail();
+		} finally {
+			if (dataFile != null) {
+				try {
+					dataFile.close();
+				} catch (IOException ioe) {
+					ioe.printStackTrace();
+				}
+			}
+		}
         FileUtils.deleteQuietly(ncFile);
     }
 

@@ -73,6 +73,11 @@
             <version>0.6-beta2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+		<groupId>edu.ucar</groupId>
+		<artifactId>netcdf</artifactId>
+		<version>4.3.17</version>
+	   </dependency>
             
     </dependencies>
     
