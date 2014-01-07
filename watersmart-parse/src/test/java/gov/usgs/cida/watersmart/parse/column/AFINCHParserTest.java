@@ -50,7 +50,7 @@ public class AFINCHParserTest {
         File ncFile = new File(new File(outputDir), info.filename);
         
         assertEquals(info.filename, "AFINCH.nc");
-        assertEquals(FileUtils.sizeOf(ncFile),327233L);
+        assertEquals(FileUtils.sizeOf(ncFile),327233L);  // better assertion here instead of just size (use netcdf file tools to compare actual file contents)
         FileUtils.deleteQuietly(ncFile);
     }
 

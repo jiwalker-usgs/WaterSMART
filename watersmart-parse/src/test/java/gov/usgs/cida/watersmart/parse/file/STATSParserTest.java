@@ -1,22 +1,21 @@
 
 package gov.usgs.cida.watersmart.parse.file;
 
+import static org.junit.Assert.assertEquals;
 import gov.usgs.cida.watersmart.common.ModelType;
 import gov.usgs.cida.watersmart.common.RunMetadata;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip;
 import gov.usgs.cida.watersmart.parse.column.PRMSParserTest;
+
 import java.io.File;
 import java.io.IOException;
+
 import javax.xml.stream.XMLStreamException;
+
 import org.apache.commons.io.FileUtils;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.junit.Ignore;
 
 /**
  *
@@ -42,17 +41,17 @@ public class STATSParserTest {
         FileUtils.deleteDirectory(new File(outputDir));
     }
 
-    @Ignore
+    @Test
     public void testNetCDF() throws IOException, XMLStreamException {
         // TODO remove the gdp2qa dependency
         RunMetadata runMeta = new RunMetadata(ModelType.STATS, "1", "test", "1", "1", "2012-07-10T00:00:00Z", 
-            "Special", "comments", "jiwalker@usgs.gov", "http://cida-wiwsc-wsdev.er.usgs.gov:8080/geoserver/NWC/ows", 
+            "Special", "comments", "jiwalker@usgs.gov", "http://cida-wiwsc-wsdev.er.usgs.gov:8081/geoserver/NWC/ows", 
             "NWC:Dense1", "site_no");
         CreateDSGFromZip.ReturnInfo info = CreateDSGFromZip.create(sampleFile, runMeta);
         File ncFile = new File(new File(outputDir), info.filename);
         
         assertEquals(info.filename, "STATS.nc");
-        assertEquals(FileUtils.sizeOf(ncFile), 18929L);
+        assertEquals(FileUtils.sizeOf(ncFile), 18929L);  // better assertion here instead of just size (use netcdf file tools to compare actual file contents)
         FileUtils.deleteQuietly(ncFile);
     }
 
