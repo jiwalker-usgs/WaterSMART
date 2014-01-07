@@ -2,6 +2,7 @@
 package gov.usgs.cida.watersmart.parse.column;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import gov.usgs.cida.watersmart.common.ModelType;
 import gov.usgs.cida.watersmart.common.RunMetadata;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip;
@@ -16,6 +17,8 @@ import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import ucar.nc2.NetcdfFile;
 
 /**
  *
@@ -52,7 +55,27 @@ public class WaterfallTest {
         File ncFile = new File(new File(outputDir), info.filename);
         
         assertEquals(info.filename, "WATERFALL.nc");
-        assertEquals(FileUtils.sizeOf(ncFile), 52145L);  // better assertion here instead of just size (use netcdf file tools to compare actual file contents)
+        
+        NetcdfFile dataFile = null;
+		try {
+			dataFile = NetcdfFile.open(ncFile.getPath(), null);
+
+			/**
+			 * location="/var/folders/nt/486jzvcj5d3g9bgwg5x1kv_c0000gp/T/waterfall/WATERFALL.nc"
+			 */			
+			assertEquals(dataFile.getLocation(), "/var/folders/nt/486jzvcj5d3g9bgwg5x1kv_c0000gp/T/waterfall/WATERFALL.nc");
+		} catch (java.io.IOException e) {
+			e.printStackTrace();
+			fail();
+		} finally {
+			if (dataFile != null) {
+				try {
+					dataFile.close();
+				} catch (IOException ioe) {
+					ioe.printStackTrace();
+				}
+			}
+		}
         FileUtils.deleteQuietly(ncFile);
     }
 
