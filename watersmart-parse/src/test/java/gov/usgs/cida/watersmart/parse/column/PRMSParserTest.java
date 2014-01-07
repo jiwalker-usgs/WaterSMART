@@ -19,6 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ucar.nc2.NetcdfFile;
+import ucar.nc2.Variable;
 
 /**
  *
@@ -59,11 +60,17 @@ public class PRMSParserTest {
         NetcdfFile dataFile = null;
 		try {
 			dataFile = NetcdfFile.open(ncFile.getPath(), null);
-
+		
 			/**
-			 * location="/var/folders/nt/486jzvcj5d3g9bgwg5x1kv_c0000gp/T/prms/PRMS.nc"
-			 */			
-			assertEquals(dataFile.getLocation(), "/var/folders/nt/486jzvcj5d3g9bgwg5x1kv_c0000gp/T/prms/PRMS.nc");
+			 * observation=108
+			 */	
+			Variable record = dataFile.findVariable("record");
+			int[] shape = record.getShape();
+			
+			if(shape.length > 0) {
+				int shapeValue = shape[0];
+				assertEquals(shapeValue, 108);
+			}			
 		} catch (java.io.IOException e) {
 			e.printStackTrace();
 			fail();
