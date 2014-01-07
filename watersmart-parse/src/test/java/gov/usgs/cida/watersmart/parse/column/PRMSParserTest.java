@@ -1,21 +1,21 @@
 
 package gov.usgs.cida.watersmart.parse.column;
 
+import static org.junit.Assert.assertEquals;
 import gov.usgs.cida.watersmart.common.ModelType;
 import gov.usgs.cida.watersmart.common.RunMetadata;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ReturnInfo;
+
 import java.io.File;
 import java.io.IOException;
+
 import javax.xml.stream.XMLStreamException;
+
 import org.apache.commons.io.FileUtils;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
