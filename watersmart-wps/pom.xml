@@ -98,44 +98,42 @@
     </dependencies>
     <build>
         <finalName>wps</finalName>
-        <pluginManagement>
-	        <plugins>
-	            <plugin>
-	                <groupId>org.apache.maven.plugins</groupId>
-	                <artifactId>maven-dependency-plugin</artifactId>
-	                <executions>
-	                    <execution>
-	                        <id>patch-via-WEB-INF-classes</id>
-	                        <phase>process-resources</phase>
-	                        <goals>
-	                            <goal>unpack</goal>
-	                        </goals>
-	                        <configuration>
-	                            <artifactItems>
-	                                <artifactItem>
-	                                    <groupId>gov.usgs.cida.gdp</groupId>
-	                                    <artifactId>gdp-52n-wps-patches</artifactId>
-	                                    <version>${gdp.version}</version>
-	                                    <type>jar</type>
-	                                </artifactItem>
-	                            </artifactItems>
-	                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
-	                        </configuration>
-	                    </execution>
-	                </executions>
-	            </plugin>   
-	<!--            <plugin>
-	                <groupId>org.apache.maven.plugins</groupId>
-	                <artifactId>maven-war-plugin</artifactId>
-	                <configuration>
-	                    <overlays>
-	
-	                    </overlay>
-	                </overlays>
-	                <failOnMissingWebXml>false</failOnMissingWebXml>
-	            </configuration>
-	        </plugin>-->
-	        </plugins>
-	    </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>patch-via-WEB-INF-classes</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>gov.usgs.cida.gdp</groupId>
+                                    <artifactId>gdp-52n-wps-patches</artifactId>
+                                    <version>${gdp.version}</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>   
+<!--            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <overlays>
+
+                    </overlay>
+                </overlays>
+                <failOnMissingWebXml>false</failOnMissingWebXml>
+            </configuration>
+        </plugin>-->
+        </plugins>
     </build>
 </project>
