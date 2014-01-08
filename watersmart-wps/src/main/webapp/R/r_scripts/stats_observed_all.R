@@ -75,11 +75,11 @@ for (i in 1:length(sites)) {
       ObsFlowStats[i, ] <- FlowStatsAll(obs_data, drain_area,stats=stats)
       cat(paste("Obs flow stats calculated for site", site, "\n", sep = " "))
     }
+    temp_STAT_time<-temp_STAT_time+proc.time()-temp_tic
     if (Magnifnum > 0) {
       magnifSevenObs[i, ] <- magnifSeven(obs_data)
       cat(paste("Obs mag7 stats calculated for site", site, "\n", sep = " "))
     }
-    temp_STAT_time<-temp_STAT_time+proc.time()-temp_tic
     comment <- ""
   } else {
     comment[i] <- "No observed data for this site"
