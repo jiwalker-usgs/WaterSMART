@@ -2,42 +2,34 @@
 # wps.in: sites, string, SOS Site Identifiers, A comma seperated list of the SOS site identifiers to be called;
 # wps.in: startdate, string, Start Date, The start date for analysis;
 # wps.in: enddate, string, End Date, The end date for analysis;
-# wps.in: stats, string, Statistic Groups, A list of statistic groups chosen from GOF GOFMonth magnifSeven magStat flowStat durStat timStat rateStat otherStat;
+# wps.in: stats, string, Statistic Groups, A list of statistic groups chosen from magnifSeven magStat flowStat durStat timStat rateStat otherStat;
 # wps.in: sos, string, SOS URL, The URL for the CWE CSV SOS;
 # wps.in: observedProperty, string, ObservedProperty, The observed property identifier for daily streamflow from the SOS;
 library(NWCCompare)
 # Inputs: uncomment for non Rserve execuation.
 # Note that this: http://cida-wiwsc-wsqa.er.usgs.gov:8081/thredds/sos/watersmart/HUC12_data/HUC12_Q.nc?request=GetObservation&service=SOS&version=1.0.0&observedProperty=MEAN_streamflow&offering=030601010101&eventTime=2008-10-01T00:00:00Z/2010-09-30T00:00:00Z should work, but doesn't actually filter time.
-sos<-"http://cida-wiwsc-wsqa.er.usgs.gov:8081/thredds/sos/watersmart/HUC12_data/HUC12_Q.nc"
-observedProperty="MEAN_streamflow"
+# sos<-"http://cida-wiwsc-wsqa.er.usgs.gov:8081/thredds/sos/watersmart/HUC12_data/HUC12_Q.nc"
+# observedProperty="MEAN_streamflow"
 #startdate <- "2008-10-01"
 #enddate <- "2010-09-29"
-stats<-"GOF,GOFMonth,magnifSeven,magStat,flowStat,durStat,timStat,rateStat,otherStat"
-stats_looper<-read.csv(header=F,colClasses=c("character"),text=stats)
-temp_timers<-array(dim=c(9,3))
-for (stat_check in 1:length(stats_looper))
-{
+#stats<-"magnifSeven,magStat,flowStat,durStat,timStat,rateStat,otherStat"
+#sites<-"031401020800"
 
-stats<-stats_looper[stat_check]
-sites<-"031401020800"
-
-temp_TOTAL_time<-0
-temp_total_tic<-proc.time()
 sites<-read.csv(header=F,colClasses=c("character"),text=sites)
 sos<-paste(sos,'?request=GetObservation&service=SOS&version=1.0.0&observedProperty=',observedProperty,'&offering=000000000000',sep="")
 
 # Hardcode urls and parameters.
 drainage_url<-'http://cida-eros-wsprod.er.usgs.gov:8081/nwc/geoserver/NHDPlusHUCs/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=NHDPlusHUCs:huc12_SE_Basins_v2&outputFormat=csv&filter=%3Cogc:Filter%20xmlns:ogc=%22http://www.opengis.net/ogc%22%3E%20%3Cogc:PropertyIsEqualTo%3E%20%3Cogc:PropertyName%3ENHDPlusHUCs:HUC12%3C/ogc:PropertyName%3E%3Cogc:Literal%3E000000000000%3C/ogc:Literal%3E%3C/ogc:PropertyIsEqualTo%3E%20%3C/ogc:Filter%3E&propertyName=NHDPlusHUCs:mi2'
 
-Flownum <- (length(grep("magStat", stats)) * 94) + (length(grep("flowStat", stats)) * 13) + (length(grep("durStat", stats)) * 41) + (length(grep("timStat", stats)) * 
-                                                                                                                                       6) + (length(grep("rateStat", stats)) * 9) + (length(grep("otherStat", stats)) * 12)
+Flownum <- (length(grep("magStat", stats)) * 94) + (length(grep("flowStat", stats)) * 13) + (length(grep("durStat", stats)) * 41) + (length(grep("timStat", stats)) * 6) + (length(grep("rateStat", stats)) * 9) + (length(grep("otherStat", stats)) * 12)
 Magnifnum <- (length(grep("magnifSeven", stats)) * 7)
 comment <- vector(length = length(sites))
 ObsFlowStats <- matrix(nrow = length(sites), ncol = Flownum)
 magnifSevenObs <- matrix(nrow = nrow(ObsFlowStats), ncol = Magnifnum)
-#MonAnnGoF <- matrix(nrow=nrow(ObsFlowStats),ncol=84)
+
 yv <- vector(length = length(sites))
 ymaxv <- vector(length = length(sites))
+
 namesMagnif <- c("lam1Obs", "tau2Obs", "tau3Obs", "tau4Obs", "ar1Obs", "amplitudeObs", "phaseObs")
 namesMagStat <- c("ma1_mean_disc", "ma2_median_disc", "ma3_mean_annual_var", "ma4", "ma5_skew", "ma6", "ma7", "ma8", "ma9", "ma10", "ma11", "ma12_jan_mean", 
                   "ma13_feb_mean", "ma14_mar_mean", "ma15_apr_mean", "ma16_may_mean", "ma17_june_mean", "ma18_july_mean", "ma19_aug_mean", "ma20_sep_mean", "ma21_oct_mean", 
@@ -57,31 +49,23 @@ namesOtherStat <- c("med_flowObs", "cv_flowObs", "cv_dailyObs", "l7Q10Obs", "l7Q
                     "flow_90Obs", "flow_15Obs")
 
 namesFull <- c("site_no", "min_date", "max_date")
-temp_DL_time<-0
-temp_STAT_time<-0
 for (i in 1:length(sites)) {
   site = sites[i]
-  temp_tic<-proc.time()
   url2<-gsub('000000000000',site,sos)
   x_obs <- SWE_CSV_IHA(url2)
-  temp_DL_time<-temp_DL_time+proc.time()-temp_tic
   if (nrow(x_obs) > 2) {
-    temp_tic<-proc.time()
     obs_data <- get_obsdata(x_obs)
     drain_url <- gsub('000000000000',site,drainage_url)
     drain_area <- as.numeric(read.delim(drain_url, header=TRUE, sep=",", colClasses=c("character"))$mi2) # Note that this is in square miles as required by underlying package.
     yv[i] <- as.character(min(obs_data$date))
     ymaxv[i] <- as.character(max(obs_data$date))
     obs_data <- obs_data[, c("wy_val", "date", "discharge", "month_val", "year_val", "day_val", "jul_val")]
-    temp_DL_time<-temp_DL_time+proc.time()-temp_tic
-    temp_tic<-proc.time()
     if (Flownum > 0) {
       ObsFlowStats[i, ] <- FlowStatsAll(obs_data, drain_area,stats=stats)
     }
     if (Magnifnum > 0) {
       magnifSevenObs[i, ] <- magnifSeven(obs_data)
     }
-    temp_STAT_time<-temp_STAT_time+proc.time()-temp_tic
     comment <- ""
   } else {
     comment[i] <- "No observed data for this site"
@@ -122,12 +106,5 @@ if (i == length(sites)) {
   output = "output.zip"
   message <- "One or more web service calls resulted in failure. Please try again."
   write.table(message, file = "output.txt", col.names = FALSE, row.names = FALSE, quote = FALSE)
-}
-temp_TOTAL_time<-temp_total_tic-proc.time()
-temp_DL_time
-temp_STAT_time
-temp_timers[stat_check,1]<-stats[[1]]
-temp_timers[stat_check,2]<-temp_DL_time[3][[1]]
-temp_timers[stat_check,3]<-temp_STAT_time[3][[1]]
 }
 # wps.out: output, text, Output File, A text file containing the table of statistics as well as monthly stats and graphs for each site;
