@@ -5,14 +5,6 @@
     <filter>
         <filter-name>CORS</filter-name>
         <filter-class>com.thetransactioncompany.cors.CORSFilter</filter-class>
-        <init-param>
-            <param-name>cors.allowOrigin</param-name>
-            <param-value>*</param-value>
-        </init-param>
-        <init-param>
-            <param-name>cors.supportedHeaders</param-name>
-            <param-value>Origin, X-Requested-With, Content-Type</param-value>
-        </init-param>
     </filter>
     <filter-mapping>
         <filter-name>CORS</filter-name>
