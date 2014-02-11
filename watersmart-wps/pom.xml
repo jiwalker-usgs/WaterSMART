@@ -4,7 +4,7 @@
     <parent>
         <groupId>gov.usgs.cida.watersmart</groupId>
         <artifactId>watersmart</artifactId>
-        <version>014-SNAPSHOT</version>
+        <version>015-SNAPSHOT</version>
     </parent>
     <groupId>gov.usgs.cida.watersmart</groupId>
     <artifactId>watersmart-wps</artifactId>
@@ -17,6 +17,11 @@
     </properties>
     
     <dependencies>
+        <dependency>
+            <groupId>com.thetransactioncompany</groupId>
+            <artifactId>cors-filter</artifactId>
+            <version>1.8</version>
+        </dependency>
         <dependency>
             <groupId>gov.usgs.cida.gdp</groupId>
             <artifactId>gdp-52n-wps-patches</artifactId>
