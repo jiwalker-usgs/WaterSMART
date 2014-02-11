@@ -26,8 +26,6 @@ library(NWCCompare)
 # wfsAreaPropertyname='NHDPlusHUCs:mi2'
 ##End Inputs##
 
-##Code##
-
 sites<-read.csv(header=F,colClasses=c("character"),text=sites)
 statsout <- calculateStatsGroupsSWE(stats, sites, sos, observedProperty, wfsUrl, wfsTypename, wfsFilterProperty,wfsAreaPropertyname)
 output = "output.txt"
