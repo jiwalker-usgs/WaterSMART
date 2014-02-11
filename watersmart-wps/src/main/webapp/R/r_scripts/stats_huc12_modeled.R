@@ -27,7 +27,7 @@ library(NWCCompare)
 ##End Inputs##
 
 sites<-read.csv(header=F,colClasses=c("character"),text=sites)
-statsout <- calculateStatsGroupsSWE(stats, sites, sos, observedProperty, wfsUrl, wfsTypename, wfsFilterProperty,wfsAreaPropertyname)
+statsout <- calculateStatsGroupsSWE(stats, sites, sos, startdate, enddate, observedProperty, wfsUrl, wfsTypename, wfsFilterProperty,wfsAreaPropertyname)
 output = "output.txt"
 write.table(statsout, file = output, col.names = TRUE, row.names = FALSE, quote = FALSE, sep = "\t")
 

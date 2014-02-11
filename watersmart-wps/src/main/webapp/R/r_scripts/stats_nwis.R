@@ -14,7 +14,7 @@ library(NWCCompare)
 ## end inputs ##
 
 sites<-read.csv(header=F,colClasses=c("character"),text=sites)
-statsout <- calculateStatsGroupsNWIS(stats, sites)
+statsout <- calculateStatsGroupsNWIS(stats, sites, startdate, enddate)
 output = "output.txt"
 write.table(statsout, file = output, col.names = TRUE, row.names = FALSE, quote = FALSE, sep = "\t")
 
