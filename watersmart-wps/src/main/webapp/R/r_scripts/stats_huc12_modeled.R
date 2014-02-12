@@ -17,7 +17,7 @@ library(NWCCompare)
 # sites<-"031401020800,031401020800"
 # startdate <- "2008-10-01"
 # enddate <- "2010-09-29"
-# stats<-"magnifSeven,magStat,flowStat,durStat,timStat,rateStat,otherStat"
+# stats<-"rateStat,otherStat" #magnifSeven,magStat,flowStat,durStat,timStat,
 # sos<-"http://cida-wiwsc-wsqa.er.usgs.gov:8081/thredds/sos/watersmart/HUC12_data/HUC12_Q.nc"
 # observedProperty="MEAN_streamflow"
 # wfsUrl<-'http://cida.usgs.gov/nwc/geoserver/NHDPlusHUCs/ows'
@@ -25,9 +25,9 @@ library(NWCCompare)
 # wfsFilterProperty='NHDPlusHUCs:HUC12'
 # wfsAreaPropertyname='NHDPlusHUCs:mi2'
 ##End Inputs##
-
 sites<-read.csv(header=F,colClasses=c("character"),text=sites)
-statsout <- calculateStatsGroupsSWE(stats, sites, sos, startdate, enddate, observedProperty, wfsUrl, wfsTypename, wfsFilterProperty,wfsAreaPropertyname)
+urls<-paste(sos,'?request=GetObservation&service=SOS&version=1.0.0&observedProperty=',observedProperty,'&offering=',sites,sep="")
+statsout <- calculateStatsGroups(stats, sites, startdate, enddate, SWE_CSV_IHA, urls, getWFSFieldAsNumeric, drain_args=list(wfs_url=wfsUrl, wfsTypename=wfsTypename, wfsProperty=wfsFilterProperty, wfsPropertyname=wfsAreaPropertyname), drain_site_param='wfsLiteral')
 output = "output.txt"
 write.table(statsout, file = output, col.names = TRUE, row.names = FALSE, quote = FALSE, sep = "\t")
 

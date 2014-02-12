@@ -10,11 +10,18 @@ library(NWCCompare)
 # sites <- '02177000,02178400'
 # startdate <- "2008-10-01"
 # enddate <- "2013-09-29"
-# stats<-"magnifSeven,magStat,flowStat,durStat,timStat,rateStat,otherStat"
+# stats<-"rateStat,otherStat" #magnifSeven,magStat,flowStat,durStat,timStat,
 ## end inputs ##
 
+nwisDvUrl <- "http://waterservices.usgs.gov/nwis/dv/?format=waterml,1.1&sites="
+offering <- "00003"
+property <- "00060"
+drainage_url <- "http://waterservices.usgs.gov/nwis/site/?siteOutput=Expanded&site="
+
 sites<-read.csv(header=F,colClasses=c("character"),text=sites)
-statsout <- calculateStatsGroupsNWIS(stats, sites, startdate, enddate)
+x_urls<-paste(nwisDvUrl, sites, "&startDT=", startdate, "&endDT=", enddate, "&statCd=", offering, "&parameterCd=", property, sep = "")
+d_urls<-paste(drainage_url, sites, sep = "")
+statsout <- calculateStatsGroups(stats, sites, startdate, enddate, getXMLWML1.1Data, x_urls, getDrainageArea, d_urls)
 output = "output.txt"
 write.table(statsout, file = output, col.names = TRUE, row.names = FALSE, quote = FALSE, sep = "\t")
 
