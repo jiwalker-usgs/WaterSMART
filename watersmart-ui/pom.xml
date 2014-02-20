@@ -9,7 +9,7 @@
     <parent>
         <groupId>gov.usgs.cida.watersmart</groupId>
         <artifactId>watersmart</artifactId>
-        <version>015-SNAPSHOT</version>
+        <version>015</version>
     </parent>
     <dependencies>
         <dependency>
