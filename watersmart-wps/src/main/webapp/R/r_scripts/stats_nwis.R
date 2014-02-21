@@ -7,10 +7,10 @@
 library(NWCCompare)
 
 ## Inputs: uncomment for non Rserve execuation. ##
-sites <- '02177000,02178400'
-startdate <- "2008-10-01"
-enddate <- "2013-09-29"
-stats<-"rateStat,otherStat" #magnifSeven,magStat,flowStat,durStat,timStat,
+# sites <- '02177000,02178400'
+# startdate <- "2008-10-01"
+# enddate <- "2013-09-29"
+# stats<-"rateStat,otherStat" #magnifSeven,magStat,flowStat,durStat,timStat,
 ## end inputs ##
 
 nwisDvUrl <- "http://waterservices.usgs.gov/nwis/dv/?format=waterml,1.1&sites="
