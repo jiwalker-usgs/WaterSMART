@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>gov.usgs.cida.watersmart</groupId>
     <artifactId>watersmart</artifactId>
-    <version>013-SNAPSHOT</version>
+    <version>016-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WaterSMART Parent Project</name>
   
@@ -66,8 +66,12 @@
 	
     <repositories>
         <repository>
-            <id>cida-releases</id>
+            <id>cida-public-releases</id>
             <url>http://internal.cida.usgs.gov/maven/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>cida-releases</id>
+            <url>http://internal.cida.usgs.gov/maven/content/repositories/cida-releases/</url>
         </repository>
         <repository>
             <id>cida-snapshots</id>
@@ -202,7 +206,7 @@
             <dependency>
                 <groupId>gov.usgs.cida.ncsos</groupId>
                 <artifactId>ncsosx-thredds</artifactId>
-                <version>1</version>
+                <version>2.1</version>
                 <type>war</type>
             </dependency>
             <dependency>

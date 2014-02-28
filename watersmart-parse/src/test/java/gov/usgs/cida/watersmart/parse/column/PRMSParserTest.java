@@ -1,21 +1,25 @@
 
 package gov.usgs.cida.watersmart.parse.column;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import gov.usgs.cida.watersmart.common.ModelType;
 import gov.usgs.cida.watersmart.common.RunMetadata;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ReturnInfo;
+
 import java.io.File;
 import java.io.IOException;
+
 import javax.xml.stream.XMLStreamException;
+
 import org.apache.commons.io.FileUtils;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import ucar.nc2.NetcdfFile;
+import ucar.nc2.Variable;
 
 /**
  *
@@ -52,7 +56,33 @@ public class PRMSParserTest {
         File ncFile = new File(new File(outputDir), info.filename);
         
         assertEquals(info.filename, "PRMS.nc");
-        assertEquals(FileUtils.sizeOf(ncFile), 25035L);
+
+        NetcdfFile dataFile = null;
+		try {
+			dataFile = NetcdfFile.open(ncFile.getPath(), null);
+		
+			/**
+			 * observation=108
+			 */	
+			Variable record = dataFile.findVariable("record");
+			int[] shape = record.getShape();
+			
+			if(shape.length > 0) {
+				int shapeValue = shape[0];
+				assertEquals(shapeValue, 108);
+			}			
+		} catch (java.io.IOException e) {
+			e.printStackTrace();
+			fail();
+		} finally {
+			if (dataFile != null) {
+				try {
+					dataFile.close();
+				} catch (IOException ioe) {
+					ioe.printStackTrace();
+				}
+			}
+		}
         FileUtils.deleteQuietly(ncFile);
     }
 

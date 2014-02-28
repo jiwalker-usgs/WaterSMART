@@ -5,14 +5,20 @@ import gov.usgs.cida.watersmart.common.ModelType;
 import gov.usgs.cida.watersmart.common.RunMetadata;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip;
 import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ReturnInfo;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+
 import javax.xml.stream.XMLStreamException;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import ucar.nc2.NetcdfFile;
+import ucar.nc2.Variable;
 import static org.junit.Assert.*;
 
 /**
@@ -50,7 +56,33 @@ public class AFINCHParserTest {
         File ncFile = new File(new File(outputDir), info.filename);
         
         assertEquals(info.filename, "AFINCH.nc");
-        assertEquals(FileUtils.sizeOf(ncFile),327233L);
+        
+        NetcdfFile dataFile = null;
+		try {
+			dataFile = NetcdfFile.open(ncFile.getPath(), null);
+
+			/**
+			 * observation=6169
+			 */	
+			Variable record = dataFile.findVariable("record");
+			int[] shape = record.getShape();
+			
+			if(shape.length > 0) {
+				int shapeValue = shape[0];
+				assertEquals(shapeValue, 6169);
+			}
+		} catch (java.io.IOException e) {
+			e.printStackTrace();
+			fail();
+		} finally {
+			if (dataFile != null) {
+				try {
+					dataFile.close();
+				} catch (IOException ioe) {
+					ioe.printStackTrace();
+				}
+			}
+		}
         FileUtils.deleteQuietly(ncFile);
     }
 
