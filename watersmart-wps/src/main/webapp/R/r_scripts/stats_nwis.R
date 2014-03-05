@@ -2,7 +2,7 @@
 # wps.in: sites, string, NWIS Sites, A comma seperated list of NWIS site ids;
 # wps.in: startdate, string, Start Date, The start date for analysis;
 # wps.in: enddate, string, End Date, The end date for analysis;
-# wps.in: stats, string, Statistic Groups, A list of statistic groups chosen from magnifSeven magStat flowStat durStat timStat rateStat otherStat;
+# wps.in: stats, string, Statistic Groups, A list of statistic groups chosen from magnifSeven magStat flowStat durStat timStat rateStat;
 
 library(NWCCompare)
 
