@@ -10,6 +10,7 @@
 # wps.in: wfsFilterProperty, string, wfsFilterProperty, The WFS property to be filtered by site to find drainage area for the given site;
 # wps.in: wfsAreaPropertyname, string, wfsAreaPropertyname, The WFS property to be queried for the given site to find drainage area;
 
+library(EflowStats)
 library(NWCCompare)
 
 ##Inputs: uncomment for non Rserve execuation.##
@@ -17,13 +18,13 @@ library(NWCCompare)
 # sites<-"031401020800,031401020800"
 # startdate <- "2008-10-01"
 # enddate <- "2010-09-29"
-# stats<-"rateStat,otherStat" #magnifSeven,magStat,flowStat,durStat,timStat,
+#stats<-"rateStat,magnifSeven,magStat,flowStat,durStat,timStat"
 # sos<-"http://cida-wiwsc-wsqa.er.usgs.gov:8081/thredds/sos/watersmart/HUC12_data/HUC12_Q.nc"
 # observedProperty="MEAN_streamflow"
 # wfsUrl<-'http://cida.usgs.gov/nwc/geoserver/NHDPlusHUCs/ows'
 # wfsTypename='NHDPlusHUCs:huc12_SE_Basins_v2'
 # wfsFilterProperty='NHDPlusHUCs:HUC12'
-# wfsAreaPropertyname='NHDPlusHUCs:mi2'
+#wfsAreaPropertyname='NHDPlusHUCs:mi2'
 ##End Inputs##
 sites<-read.csv(header=F,colClasses=c("character"),text=sites)
 urls<-paste(sos,'?request=GetObservation&service=SOS&version=1.0.0&observedProperty=',observedProperty,'&offering=',sites,sep="")

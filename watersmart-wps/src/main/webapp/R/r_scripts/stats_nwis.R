@@ -4,13 +4,14 @@
 # wps.in: enddate, string, End Date, The end date for analysis;
 # wps.in: stats, string, Statistic Groups, A list of statistic groups chosen from magnifSeven magStat flowStat durStat timStat rateStat;
 
+library(EflowStats)
 library(NWCCompare)
 
 ## Inputs: uncomment for non Rserve execuation. ##
 # sites <- '02177000,02178400'
 # startdate <- "2008-10-01"
 # enddate <- "2013-09-29"
-# stats<-"rateStat,otherStat" #magnifSeven,magStat,flowStat,durStat,timStat,
+#stats<-"rateStat,magnifSeven,magStat,flowStat,durStat,timStat"
 ## end inputs ##
 
 nwisDvUrl <- "http://waterservices.usgs.gov/nwis/dv/?format=waterml,1.1&sites="
