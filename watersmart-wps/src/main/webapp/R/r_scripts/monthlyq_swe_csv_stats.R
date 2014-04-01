@@ -1,14 +1,14 @@
 # wps.des: id=simple_monthly_stats, title = Simple Monthly Flow Statistics, abstract = Finds the mean and median annual and monthly statistics for a monthly flow record as well as the deciles;
 # wps.in: model_url, string, SOS Endpoint, A fully formed SOS GetObservations request that will return a SWE common CSV block holding date and flow;
 
-# model_url = 'ftp://ftpext.usgs.gov/pub/er/wi/middleton/dblodgett/example_monthly_swecsv.xml'
+ model_url = 'http://cida.usgs.gov/glri/afinch/thredds/out.nc?service=SOS&request=GetObservation&Version=1.0.0&offering=12006839&observedProperty=QAccCon'
 
-library(XML)
-library(zoo)
-library(chron)
-library(doBy)
-library(hydroGOF)
-library(HITHATStats)
+#library(XML)
+#library(zoo)
+#library(chron)
+#library(doBy)
+#library(hydroGOF)
+#library(EflowStats)
 deciles <- function(x) {
   isolateq <- x$discharge
   sortq <- sort(isolateq)
@@ -25,28 +25,7 @@ deciles <- function(x) {
   deciles[9,2] <- sortq[floor(findrank(length(sortq),0.1))]
   return(deciles)
 }
-SWE_CSV_IHA <- function(input) {
-  cat(paste("Retrieving data from: \n", input, "\n", 
-            sep = " "))
-  content<-paste(readLines(input,warn=FALSE))
-  if (length(sapply(content,nchar))>1) { 
-    flow <- read.delim(header = F, comment.char = "", 
-                       as.is = T, sep = ",", text = xpathApply(xmlParse(input), 
-                                                               "//swe:values", xmlValue)[[1]])
-    nms <- c("date", "discharge")
-    names(flow) <- nms
-    flow$date <- as.Date(strptime(flow$date, format = "%Y-%m-%dT%H:%M:%SZ"))
-    flow$discharge <- as.numeric(flow$discharge)
-    flow <- as.data.frame(flow)
-    attr(flow, "SRC") <- input
-    class(flow) <- c("flow", "data.frame")
-    cat("Finished!\n")
-    return(flow)
-  } else {
-    cat("No data available for site\n")
-    flow<-""
-    return(flow)}
-}
+
 x_obs=SWE_CSV_IHA(model_url)
 selqfile<-x_obs
 tempdatafr<-data.frame(selqfile)
@@ -81,6 +60,7 @@ colnames(medflowy)<-c("Year","medianq")
 colnames(meanmonthly)<-c("Month","meanq")
 colnames(medmonthly)<-c("Month","medianq")
 colnames(decile_list)<-c("decile","q")
+system('rm outfile.txt')
 output='outfile.txt'
 write('mean_annual_flow', output)
 write.table(meanflowy, output,sep=',', append=TRUE, row.names=FALSE)
