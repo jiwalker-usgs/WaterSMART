@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 public class PrepareRecord extends HttpServlet {
 
     static final org.slf4j.Logger log = LoggerFactory.getLogger(PrepareRecord.class);
+    private static final long serialVersionUID = -4342695761779251157L;
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -32,7 +33,7 @@ public class PrepareRecord extends HttpServlet {
         }
 
         Map<String, String> wpsOutputMap = Maps.newHashMap();
-        wpsOutputMap.put(WPSImpl.stats_compare, "");
+        wpsOutputMap.put(WPSImpl.stats_compare_groups, "");
 
         CSWTransactionHelper cswTransactionHelper = new CSWTransactionHelper(RunMetadata.getInstance(meta.toKeyValueMap()), null, wpsOutputMap);
         String addRecordResponse, responseText;
