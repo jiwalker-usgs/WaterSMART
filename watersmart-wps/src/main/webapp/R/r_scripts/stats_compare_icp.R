@@ -1,19 +1,11 @@
 # wps.des: id=nwc_stats_compare, title = Comparison of Daily Flow Statistics, abstract = Calculates a suite of daily flow statistics for Observd and Modeled data and compares the two;
-# wps.in: sites, string, NWIS Sites, A comma seperated list of NWIS site ids;
-# wps.in: startdate, string, Start Date, The start date for analysis;
-# wps.in: enddate, string, End Date, The end date for analysis;
-# wps.in: stats, string, Statistic Groups, A list of statistic groups chosen from magnifSeven magStat flowStat durStat timStat rateStat;
 # wps.in: model_url, string, SOS Endpoint, A fully formed SOS GetObservations request that will return a SWE common CSV block holding date and flow;
 
 library(EflowStats)
 library(NWCCompare)
 
 ## Inputs: uncomment for non Rserve execution. ##
-#sites <- '02177000,02178400'
-#startdate <- "2008-10-01"
-#enddate <- "2013-09-29"
-#stats<-"rateStat,magnifSeven,magStat,flowStat,durStat,timStat"
-#model_url="http://cida.usgs.gov/nwc/thredds/sos/watersmart/stats/stats-SE-DENSE2-2.03.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
+model_url="http://cida.usgs.gov/nwc/thredds/sos/watersmart/stats/stats-SE-DENSE2-2.03.nc?request=GetObservation&service=SOS&version=1.0.0&offering"
 ## end inputs ##
 
 nwisDvUrl <- "http://waterservices.usgs.gov/nwis/dv/?format=waterml,1.1&sites="

@@ -6,7 +6,6 @@
 
 library(EflowStats)
 library(NWCCompare)
-
 ## Inputs: uncomment for non Rserve execuation. ##
 # sites <- '02177000,02178400'
 # startdate <- "2008-10-01"
