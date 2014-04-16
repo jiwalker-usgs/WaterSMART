@@ -15,16 +15,16 @@ library(NWCCompare)
 
 ##Inputs: uncomment for non Rserve execuation.##
 # Note that this: http://cida-wiwsc-wsqa.er.usgs.gov:8081/thredds/sos/watersmart/HUC12_data/HUC12_Q.nc?request=GetObservation&service=SOS&version=1.0.0&observedProperty=MEAN_streamflow&offering=030601010101&eventTime=2008-10-01T00:00:00Z/2010-09-30T00:00:00Z should work, but doesn't actually filter time.
-# sites<-"031401020800,031401020800"
+# sites<-"031401020800"#,031401020800"
 # startdate <- "2008-10-01"
 # enddate <- "2010-09-29"
-#stats<-"rateStat,magnifSeven,magStat,flowStat,durStat,timStat"
-# sos<-"http://cida-wiwsc-wsqa.er.usgs.gov:8081/thredds/sos/watersmart/HUC12_data/HUC12_Q.nc"
+# stats<-"rateStat,magnifSeven,magStat,flowStat,durStat,timStat"
+# sos<-"http://cida-eros-wsqa.er.usgs.gov:8081/thredds/sos/watersmart/HUC12_data/HUC12_Q.nc"
 # observedProperty="MEAN_streamflow"
-# wfsUrl<-'http://cida.usgs.gov/nwc/geoserver/NHDPlusHUCs/ows'
-# wfsTypename='NHDPlusHUCs:huc12_SE_Basins_v2'
-# wfsFilterProperty='NHDPlusHUCs:HUC12'
-#wfsAreaPropertyname='NHDPlusHUCs:mi2'
+# wfsUrl<-'http://cida-eros-wsdev.er.usgs.gov:8081/geoserver/NWC/ows'
+# wfsTypename='NWC:huc12_SE_Basins_v2'
+# wfsFilterProperty='NWC:HUC12'
+# wfsAreaPropertyname='NWC:mi2'
 ##End Inputs##
 sites<-read.csv(header=F,colClasses=c("character"),text=sites)
 urls<-paste(sos,'?request=GetObservation&service=SOS&version=1.0.0&observedProperty=',observedProperty,'&offering=',sites,sep="")
