@@ -1,14 +1,15 @@
 # wps.des: id=simple_monthly_stats, title = Simple Monthly Flow Statistics, abstract = Finds the mean and median annual and monthly statistics for a monthly flow record as well as the deciles;
 # wps.in: model_url, string, SOS Endpoint, A fully formed SOS GetObservations request that will return a SWE common CSV block holding date and flow;
 
- model_url = 'http://cida.usgs.gov/glri/afinch/thredds/out.nc?service=SOS&request=GetObservation&Version=1.0.0&offering=12006839&observedProperty=QAccCon'
+#model_url = 'http://cida.usgs.gov/glri/afinch/thredds/out.nc?service=SOS&request=GetObservation&Version=1.0.0&offering=12006839&observedProperty=QAccCon'
 
-#library(XML)
-#library(zoo)
-#library(chron)
-#library(doBy)
-#library(hydroGOF)
-#library(EflowStats)
+library(XML)
+library(zoo)
+library(chron)
+library(doBy)
+library(hydroGOF)
+library(EflowStats)
+
 deciles <- function(x) {
   isolateq <- x$discharge
   sortq <- sort(isolateq)
