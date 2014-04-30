@@ -4,7 +4,7 @@
     <parent>
         <groupId>gov.usgs.cida.watersmart</groupId>
         <artifactId>watersmart</artifactId>
-        <version>017-SNAPSHOT</version>
+        <version>017</version>
     </parent>
     <groupId>gov.usgs.cida.watersmart</groupId>
     <artifactId>watersmart-geonetwork</artifactId>
