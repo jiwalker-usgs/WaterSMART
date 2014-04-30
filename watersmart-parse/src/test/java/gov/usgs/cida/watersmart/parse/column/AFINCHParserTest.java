@@ -8,7 +8,6 @@ import gov.usgs.cida.watersmart.parse.CreateDSGFromZip.ReturnInfo;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -50,7 +49,7 @@ public class AFINCHParserTest {
     public void testNetCDFFromAfinch() throws IOException, XMLStreamException {
         // TODO stand up dummy service that reads shapefiles
         RunMetadata runMeta = new RunMetadata(ModelType.AFINCH, "1", "test", "1", "1", "2012-07-10T00:00:00Z", 
-            "Special", "comments", "jiwalker@usgs.gov", "http://cida-wiwsc-wsdev.er.usgs.gov:8081/geoserver/NWC/ows", 
+            "Special", "comments", "jiwalker@usgs.gov", "http://cida-eros-wsdev.er.usgs.gov:8081/geoserver/NWC/ows", 
             "NWC:Dense1", "site_no");
         ReturnInfo info = CreateDSGFromZip.create(sampleFile, runMeta);
         File ncFile = new File(new File(outputDir), info.filename);
