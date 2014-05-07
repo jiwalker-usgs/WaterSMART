@@ -14,7 +14,7 @@ library(EflowStats)
 library(NWCCompare)
 
 ##Inputs: uncomment for non Rserve execuation.##
-# Note that this: http://cida-wiwsc-wsqa.er.usgs.gov:8081/thredds/sos/watersmart/HUC12_data/HUC12_Q.nc?request=GetObservation&service=SOS&version=1.0.0&observedProperty=MEAN_streamflow&offering=030601010101&eventTime=2008-10-01T00:00:00Z/2010-09-30T00:00:00Z should work, but doesn't actually filter time.
+# Note that this: http://cida-eros-wsqa.er.usgs.gov:8081/thredds/sos/watersmart/HUC12_data/HUC12_Q.nc?request=GetObservation&service=SOS&version=1.0.0&observedProperty=MEAN_streamflow&offering=030601010101&eventTime=2008-10-01T00:00:00Z/2010-09-30T00:00:00Z should work, but doesn't actually filter time.
 # sites<-"031401020800"#,031401020800"
 # startdate <- "2008-10-01"
 # enddate <- "2010-09-29"
@@ -27,7 +27,7 @@ library(NWCCompare)
 # wfsAreaPropertyname='NWC:mi2'
 ##End Inputs##
 sites<-read.csv(header=F,colClasses=c("character"),text=sites)
-urls<-paste(sos,'?request=GetObservation&service=SOS&version=1.0.0&observedProperty=',observedProperty,'&offering=',sites,sep="")
+urls<-paste(sos,'?request=GetObservation&service=SOS&version=1.0.0&observedProperty=',observedProperty,'&offering=',sites,'&eventTime=',startdate,'T00:00:00Z/',enddate,'T00:00:00Z',sep="")
 statsout <- calculateStatsGroups(stats, sites, startdate, enddate, SWE_CSV_IHA, urls, getWFSFieldAsNumeric, drain_args=list(wfs_url=wfsUrl, wfsTypename=wfsTypename, wfsProperty=wfsFilterProperty, wfsPropertyname=wfsAreaPropertyname), drain_site_param='wfsLiteral')
 output = "output.txt"
 write.table(statsout, file = output, col.names = TRUE, row.names = FALSE, quote = FALSE, sep = "\t")
