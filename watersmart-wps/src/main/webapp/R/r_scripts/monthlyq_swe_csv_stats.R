@@ -3,12 +3,8 @@
 
 # model_url = 'http://cida.usgs.gov/glri/afinch/thredds/out.nc?service=SOS&request=GetObservation&Version=1.0.0&offering=12006839&observedProperty=QAccCon'
 
-library(XML)
-library(zoo)
-library(chron)
-library(doBy)
-library(hydroGOF)
 library(EflowStats)
+library(NWCCompare)
 
 deciles <- function(x) {
   isolateq <- x$discharge
@@ -26,59 +22,29 @@ deciles <- function(x) {
   deciles[9,2] <- sortq[floor(findrank(length(sortq),0.1))]
   return(deciles)
 }
-SWE_CSV_IHA <- function(input) {
-  cat(paste("Retrieving data from: \n", input, "\n", 
-            sep = " "))
-  content<-paste(readLines(input,warn=FALSE))
-  if (length(sapply(content,nchar))>1) { 
-    flow <- read.delim(header = F, comment.char = "", 
-                       as.is = T, sep = ",", text = xpathApply(xmlParse(input), 
-                                                               "//swe:values", xmlValue)[[1]])
-    nms <- c("date", "discharge")
-    names(flow) <- nms
-    flow$date <- as.Date(strptime(flow$date, format = "%Y-%m-%dT%H:%M:%SZ"))
-    flow$discharge <- as.numeric(flow$discharge)
-    flow <- as.data.frame(flow)
-    attr(flow, "SRC") <- input
-    class(flow) <- c("flow", "data.frame")
-    cat("Finished!\n")
-    return(flow)
-  } else {
-    cat("No data available for site\n")
-    flow<-""
-    return(flow)}
-}
-x_obs=SWE_CSV_IHA(model_url)
-selqfile<-x_obs
-tempdatafr<-data.frame(selqfile)
-month_val<-rep(0,length(tempdatafr$date))
-year_val<-rep(0,length(tempdatafr$date))
-day_val<-rep(0,length(tempdatafr$date))
-jul_val<-rep(0,length(tempdatafr$date))
-wy_val<-rep(0,length(tempdatafr$date))
-ones_val<-rep(1,length(tempdatafr$date))
-qfiletempf<-data.frame(tempdatafr$date,tempdatafr$discharge,month_val,year_val,day_val,jul_val,wy_val)
-colnames(qfiletempf)<-c('date','discharge','month_val','year_val','day_val','jul_val','wy_val')
-qfiletempf$month_val<-substr(x_obs$date,6,7)
-qfiletempf$month_val<-as.numeric(qfiletempf$month_val)
-qfiletempf$year_val<-substr(x_obs$date,1,4)
-qfiletempf$month_val<-substr(x_obs$date,6,7)
-qfiletempf$month_val<-as.numeric(qfiletempf$month_val)
-qfiletempf$year_val<-substr(x_obs$date,1,4)
-qfiletempf$year_val<-as.numeric(qfiletempf$year_val)
-qfiletempf$day_val<-substr(x_obs$date,9,10)
-qfiletempf$day_val<-as.numeric(qfiletempf$day_val)
-qfiletempf$jul_val<-strptime(x_obs$date, "%Y-%m-%d")$yday+1
-qfiletempf$jul_val<-as.numeric(qfiletempf$jul_val)
-qfiletempf$wy_val<-ifelse(as.numeric(qfiletempf$month_val)>=10,as.character(as.numeric(qfiletempf$year_val)+ones_val),qfiletempf$year_val)
-obs_data<-qfiletempf
+
+x_obs <- SWE_CSV_IHA(model_url)
+x_obs$date <- as.Date(x_obs$date,format="%Y-%m-%d")
+x_obs$month_val <- substr(x_obs$date,6,7)
+x_obs$year_val <- substr(x_obs$date,1,4)
+x_obs$day_val <- substr(x_obs$date,9,10)
+x_obs$jul_val <- strptime(x_obs$date,"%Y-%m-%d")$yday+1
+x_obs$wy_val <- ifelse(as.numeric(x_obs$month_val)>=10,as.character(as.numeric(x_obs$year_val)+1),x_obs$year_val) 
+temp <- aggregate(discharge ~ wy_val,data=x_obs,length)
+temp <- temp[which(temp$discharge>=12),]
+obs_data<-x_obs[x_obs$wy_val %in% temp$wy_val,]
 meanflowy<-meanflowbyyear(obs_data)
 medflowy<-medflowbyyear(obs_data)
+colnames(medflowy) <- c("Year","medq")
 meanmonthly<-ma12.23(obs_data)
 medmonthly<-ma12.23(obs_data, pref='median')
 decile_list <- deciles(obs_data)
 colnames(meanflowy)<-c("Year","meanq")
 colnames(medflowy)<-c("Year","medianq")
+meanmonthly$Month <- seq(1:12)
+medmonthly$Month <- seq(1:12)
+meanmonthly <- meanmonthly[,c("Month","x")]
+medmonthly <- medmonthly[,c("Month","x")]
 colnames(meanmonthly)<-c("Month","meanq")
 colnames(medmonthly)<-c("Month","medianq")
 colnames(decile_list)<-c("decile","q")
