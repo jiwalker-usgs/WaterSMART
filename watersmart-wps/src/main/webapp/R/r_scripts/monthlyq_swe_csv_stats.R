@@ -33,7 +33,12 @@ x_obs$wy_val <- ifelse(as.numeric(x_obs$month_val)>=10,as.character(as.numeric(x
 temp <- aggregate(discharge ~ wy_val,data=x_obs,length)
 temp <- temp[which(temp$discharge>=12),]
 obs_data<-x_obs[x_obs$wy_val %in% temp$wy_val,]
-meanflowy<-meanflowbyyear(obs_data)
+
+#This is now calculating meanflowby calendar year:
+correctedData <- obs_data
+correctedData$wy_val <- correctedData$year_val
+meanflowy<-meanflowbyyear(correctedData)
+
 medflowy<-medflowbyyear(obs_data)
 colnames(medflowy) <- c("Year","medq")
 meanmonthly<-ma12.23(obs_data)
