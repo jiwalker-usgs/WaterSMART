@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>gov.usgs.cida.watersmart</groupId>
     <artifactId>watersmart</artifactId>
-    <version>021</version>
+    <version>18-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WaterSMART Parent Project</name>
   
